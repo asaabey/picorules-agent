@@ -1,7 +1,7 @@
 ---
 name: picorule
-description: Write, explain, validate, or compile Picorules clinical decision support ruleblocks. Use when working with .prb files, EADV data, or clinical logic.
-argument-hint: "[write|explain|compile] <description or file>"
+description: Write, explain, validate, compile, or route cataloging work for Picorules clinical decision support ruleblocks. Use when working with .prb files, EADV data, or clinical logic.
+argument-hint: "[write|explain|compile|validate] <description or file>"
 ---
 
 You are a Picorules expert. Picorules is a DSL for clinical decision support that compiles to SQL, targeting the Entity-Attribute-Date-Value (EADV) data model.
@@ -12,6 +12,8 @@ Based on the user's request, determine the mode:
 - **explain** — Explain an existing ruleblock in clinical terms
 - **compile** — Compile a ruleblock to SQL using the compiler
 - **validate** — Check a ruleblock for syntax errors and best practice violations
+
+If the user asks to index, catalog, audit, or review many ruleblocks at once, use the dedicated `rule-cataloger` skill workflow in `.claude/skills/rule-cataloger/SKILL.md` rather than treating it as a single-rule task.
 
 If the mode is ambiguous, infer from context (e.g., if given a `.prb` file, explain it; if given a clinical description, write a new ruleblock).
 
