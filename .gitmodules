@@ -1,0 +1,6 @@
+[submodule "reference/rules"]
+	path = reference/rules
+	url = https://github.com/asaabey/tkc-picorules-rules.git
+[submodule "reference/dictionaries"]
+	path = reference/dictionaries
+	url = https://github.com/asaabey/tkc-dictionaries.git

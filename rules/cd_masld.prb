@@ -1,0 +1,135 @@
+/* Algorithm to assess Metabolic Dysfunction-Associated Steatotic Liver Disease (MASLD) */
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "Algorithm to assess MASLD using Fatty Liver Index and cardiometabolic risk factors",
+        is_active:2
+    }
+);
+
+#doc(,{
+    txt: "Bind demographics for gender-specific thresholds"
+});
+
+gender => rout_dmg.gender.val.bind();
+
+female => rout_dmg.female.val.bind();
+
+#doc(,{
+    txt: "Bind BMI from obesity ruleblock"
+});
+
+bmi => rout_cd_obesity.bmi.val.bind();
+
+#doc(,{
+    txt: "Gather FLI components: triglycerides, GGT, waist circumference",
+    cite: "fli_bedogni_2006"
+});
+
+tg => eadv.lab_bld_cholesterol_tg._.lastdv();
+
+ggt => eadv.lab_bld_ggt._.lastdv();
+
+wc => eadv.obs_waist_circ._.lastdv();
+
+#doc(,{
+    txt: "Gather cardiometabolic risk factor components"
+});
+
+glu_fast => eadv.lab_bld_glucose_fasting._.lastdv();
+
+hdl => eadv.lab_bld_cholesterol_hdl._.lastdv();
+
+sbp => eadv.obs_bp_systolic.val.last();
+
+dbp => eadv.obs_bp_diastolic.val.last();
+
+#doc(,{
+    txt: "Bind diabetes and hypertension treatment status"
+});
+
+dm => rout_cd_dm_dx.dm.val.bind();
+
+htn => rout_cd_htn.htn.val.bind();
+
+dyslip => rout_cd_dyslip.cd_dyslip.val.bind();
+
+#doc(,{
+    txt: "Calculate Fatty Liver Index (Bedogni 2006). FLI = 100 * e^L / (1 + e^L) where L = 0.953*ln(TG) + 0.139*BMI + 0.718*ln(GGT) + 0.053*WC - 15.745. NOTE: TG in mg/dL, GGT in U/L, WC in cm",
+    cite: "fli_bedogni_2006,fli_asian_validation"
+});
+
+fli_data : { tg_val!? and ggt_val!? and wc_val!? and bmi!? => 1},{=>0};
+
+fli_l : { fli_data=1 => 0.953*ln(tg_val) + 0.139*bmi + 0.718*ln(ggt_val) + 0.053*wc_val - 15.745};
+
+fli : { fli_l!? => round(100 * exp(fli_l) / (1 + exp(fli_l)),1) };
+
+fli_steatosis : { fli >= 30 => 1},{=>0};
+
+#doc(,{
+    txt: "Evaluate cardiometabolic risk factors for MASLD classification (Asian criteria)",
+    cite: "masld_consensus_2023"
+});
+
+cmr_bmi : { bmi >= 23 => 1},{ wc_val > 90 and female=0 => 1},{ wc_val > 80 and female=1 => 1},{=>0};
+
+cmr_glu : { glu_fast_val >= 140 => 1},{ dm=1 => 1},{=>0};
+
+cmr_bp : { sbp >= 130 => 1},{ dbp >= 85 => 1},{ htn=1 => 1},{=>0};
+
+cmr_tg : { tg_val >= 150 => 1},{ dyslip=1 => 1},{=>0};
+
+cmr_hdl_low : { hdl_val <= 40 and female=0 => 1},{ hdl_val <= 50 and female=1 => 1},{ dyslip=1 => 1},{=>0};
+
+cmr_count : { . => coalesce(cmr_bmi,0) + coalesce(cmr_glu,0) + coalesce(cmr_bp,0) + coalesce(cmr_tg,0) + coalesce(cmr_hdl_low,0) };
+
+cmr_pos : { cmr_count >= 1 => 1},{=>0};
+
+#doc(,{
+    txt: "Classify steatotic liver disease subtypes",
+    cite: "masld_consensus_2023"
+});
+
+masld : { fli_steatosis=1 and cmr_pos=1 => 1},{=>0};
+
+[[rb_id]] : { . => masld };
+
+#define_attribute(
+    fli,
+    {
+        label: "Fatty Liver Index",
+        desc: "Continuous score 0-100, steatosis if >= 30",
+        is_reportable: 1,
+        type: 2
+    }
+);
+
+#define_attribute(
+    fli_steatosis,
+    {
+        label: "Hepatic steatosis by FLI >= 30",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    masld,
+    {
+        label: "MASLD: steatosis with cardiometabolic risk",
+        desc: "Metabolic Dysfunction-Associated Steatotic Liver Disease",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    cmr_count,
+    {
+        label: "Cardiometabolic risk factor count",
+        desc: "Number of MASLD cardiometabolic criteria met (0-5)",
+        is_reportable: 1,
+        type: 2
+    }
+);

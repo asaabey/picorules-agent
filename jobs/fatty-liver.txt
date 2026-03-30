@@ -1,0 +1,457 @@
+Skip to Main ContentSkip to Main Menu
+Kidney International Reports
+ISN
+Submit
+
+Log in
+Register
+
+Articles
+
+Publish
+
+Topics
+
+About
+
+Contact
+Search for...
+
+Advanced search
+Clinical ResearchVolume 11, Issue 5106414May 2026Open access
+Download Full Issue
+Association of Metabolic Dysfunction-Associated Steatotic Liver Disease and Kidney Failure in the CKD Population
+Jin Kyung Kwon1 ∙ Minsang Kim2 ∙ Jinsun Lee3 ∙ … ∙ Dong Ki Kim2,3 ∙ Kyungdo Han11 hkd917@naver.com ∙ Sehoon Park2 mailofsehoon@gmail.com … Show more
+Affiliations & Notes
+Article Info
+Download PDF
+Cite
+
+Share
+Set Alert
+Get Rights
+Reprints
+
+Download Full Issue
+Previous article
+Next article
+
+Show Outline
+Abstract
+Introduction
+Although fatty liver disease is a known risk factor for chronic kidney disease (CKD), its association with kidney failure remains unclear, especially after its redefinition as metabolic dysfunction-associated steatotic liver disease (MASLD). We aimed to quantify the association between MASLD and kidney failure in the CKD population by generating epidemiological data.
+Methods
+We used 187,881 individuals with CKD from medical screening data of the National Health Insurance Service (NHIS) database of Korea. The population was categorized with no steatotic liver disease, MASLD, MASLD with increased alcohol intake, and alcoholic liver disease or steatotic liver disease with other specific etiologies. The risk of kidney failure was analyzed using Cox proportional hazard models adjusting demographic and clinical variables.
+Results
+The study population had mean age of 63.3 years with 58% females. During the median of 9.28 (9.03–9.63) years of follow-up, 7497 (4%) events of kidney failure were identified. In the adjusted model, the “MASLD” group showed higher risk of kidney failure (hazard ratio [HR]: 1.146 [1.078– 1.219]) compared with “no steatotic liver disease.” However, “MASLD with increased alcohol intake” ([HR 0.981 [0.834–1.154]) or “alcoholic liver disease or steatotic liver disease with other specific etiologies” (HR 1.098, [0.991–1.216]) showed nonsignificant difference. The association between MASLD and kidney failure was particularly accentuated in females (HR 1.301 [(1.192–1.420]), old age, nonhypertension, nonalbuminuria, and nonsmoking subgroup.
+Conclusion
+In this large-scale observational study, MASLD was associated with kidney failure in individuals with CKD. Our findings highlight the importance of risk stratification in certain patients to prevent kidney failure.
+Graphical abstract
+Graphical abstract undfig1
+Keywords
+chronic kidney disease
+kidney failure
+metabolic dysfunction-associated steatotic liver disease
+nationwide cohort study
+The prognosis of CKD is associated with various factors, and those with high metabolic burden may progress to kidney failure.1,2As knowledge of various metabolic diseases continues to evolve, understanding the epidemiological relationship between the metabolic factors and CKD prognosis is crucial for optimizing patient care.
+Recently, there was an update in the concept of fatty liver disease, and in 2023 the definition of MASLD was introduced.3 MASLD is the prevalent chronic liver disease worldwide, affecting approximately 38% of adults around the world.4 MASLD provides a more precise and clinically relevant definition of fatty liver disease by focusing on metabolic dysfunction rather than alcohol exclusion, improving diagnostic clarity. Additionally, it allows for better differentiation of overlapping conditions, facilitating a more tailored risk assessment and management.
+Given the previously reported association between non-alcoholic fatty liver disease (NAFLD)/ metabolic dysfunction-associated fatty liver disease (MAFLD) and kidney dysfunction,5 it is reasonable to consider MASLD as a potential factor influencing CKD prognosis. However, direct evidence linking MASLD to kidney failure risk in CKD remains limited. Since MASLD was designed to facilitate early detection in healthcare screenings by removing the exclusion-based diagnosis of NAFLD, understanding its epidemiologic relationship with kidney failure could help improve risk stratification and early intervention, particularly in general health screening settings.
+In this study, we investigated the relationship between MASLD and the risk of adverse kidney outcomes, specifically kidney failure progression, in CKD populations using nationwide public health screening data. We hypothesized that CKD patients with MASLD have a higher risk of kidney failure compared with those without MASLD.
+Methods
+Ethical Approval
+This study was approved by the institutional review board of Seoul National University Hospital (no. E-2412-121-1599). The need to obtain informed consent was waived by the above organizations, as the study was observational and investigated anonymous public databases. This study was conducted in accordance with the ethical guidelines of the World Medical Association's Declaration of Helsinki.
+Data source –NHIS
+NHIS acts as the sole government-managed insurer, which covers almost the entire population (97%) in South Korea.6 NHIS public medical big data includes information such as death records, health screening records, and sociodemographic variables, such as income decile.7 We used health screening records to identify CKD population and MASLD group of the studied people and used International Classification of Diseases-10 diagnostic codes, other related claimed information to analyze the outcomes. NHIS provided general national health screening programs since 1995 to improve the health status of Koreans and has constructed databases of medical information, such as NHIS-Health Screening Cohort, National Health Information Database, and National Health Insurance Sharing Service to offer relevant and useful medical big data for health researchers.8
+Study Population
+We screened 4,910,068 individuals aged over 20 years who underwent the NHIS provided health screening program in 2012. From the above population and results of health screening, 187,881 individuals with estimated glomerular filtration rate (eGFR) < 60 ml/min per 1.73 m2 calculated using the Modification of Diet in Renal Disease equation were categorized as patients with CKD.9 Individuals who were diagnosed with liver malignancy or received liver transplantation were excluded. People who could not provide the needed medical information or additional medical data during the follow-up period were also excluded. Finally, 169,707 individuals were enrolled in our final analytic cohort (Figure 1).
+
+Figure viewer
+Figure 1 Flow chart of selecting study participants. CKD, chronic kidney disease; MASLD, metabolic dysfunction associated steatotic liver disease; eGFR, estimated glomerular filtration rate.
+Data Collection
+We included the following baseline characteristics for the cohort from the medical information obtained from the medical screening program of 2012: sex, age, height, weight, body mass index (BMI), waist circumference, systolic/diastolic blood pressure, fasting glucose, eGFR, albuminuria, serum total cholesterol, serum high density lipoprotein-cholesterol, serum low density lipoprotein-cholesterol, serum triglyceride, serum aspartate aminotransferase, serum alanine aminotransferase, and serum gamma glutamyl transpeptidase.
+Smoking history, alcohol intake history, and regular exercise history were obtained from a self-reported questionnaire administered with the medical screening program10 (Supplementary Figure S1). Smoking status was categorized as never smoked, ex-smoker, or current smoker. Based on the NHIS questionnaire, never smoked was defined as an individual who had smoked less than 100 cigarettes in their lifetime, ex-smoker was defined as someone who had smoked over 100 cigarettes in their lifetime but do not currently smoke, and current smoker was defined as an individual who had smoked over 100 cigarettes and currently smoking. For alcohol intake history, we assumed that 1 standard cup of alcohol drink contains 8 g of ethanol,11 and weekly consumption was counted by the questionnaire. Regular exercise was defined as moderate-intensity exercise (exercise that makes the individuals breathe a little harder) for more than 30 minutes for 5 days or more a week, or high-intensity exercise (exercise that makes the individuals breathe heavily) for more than 20 minutes for 3 days or more a week.
+Medical history, such as hypertension, type 2 diabetes mellitus, dyslipidemia, alcohol abuse, and specific etiology of steatotic liver disease were screened using laboratory definition or International Classification of Diseases-10 diagnostic code data. The Charlson Comorbidity Index score was used to represent the burden of underlying comorbidities in the individuals included in the cohort.12 The lowest quartile of the nation’s income was defined as the low-income group using the demographic claim data from the NHIS database.
+Definition of Exposure: Fatty Liver Index and Subtypes of Steatotic Liver Disease
+By using the available medical screening data from 2012 in the cohort, we subdivided the cohort into the following 4 steatotic liver disease exposure groups: no steatotic liver disease, MASLD group, MASLD with increased alcohol intake, and alcoholic liver disease or steatotic liver disease with other etiologies.
+Hepatic steatosis was defined using fatty liver index,13 which is widely accepted and validated by noninvasive test for diagnosing hepatic steatosis, and calculated as follows: (fatty liver index) / 100 = {eˆ(0.953 × log(Triglycerides) + 0.139 × body mass index + 0.718 × log(gamma-glutamyl transferase) + 0.053 × Waist Circumference − 15.745)} / {1 + eˆ(0.953 × log(Triglycerides) + 0.139 × body mass index + 0.718 × log(gamma-glutamyl transferase) + 0.053 × Waist Circumference - 15.745)}. The fatty liver index has demonstrated high diagnostic accuracy with an area under the curve 0.844, positive predictive values 83.2% and 84.8% and negative predictive values of 65.3% and 87.4% were found in Asian populations of males and females, respectively.14,15 Following the previous validation studies, we defined the presence of steatosis as fatty liver index ≥ 30.
+MASLD was diagnosed in individuals without specific steatotic liver disease etiologies who had fatty liver index ≥ 30, calculated using BMI, waist circumference, serum triglycerides, and serum gamma-glutamyl transferase, along with at least 1 cardiometabolic risk factor.16 Cardiometabolic risk factors included BMI ≥ 23 or waist circumference > 90 cm (men) / 80 cm (women), fasting glucose ≥ 140 mg/dl or treatment for type 2 diabetes mellitus, blood pressure ≥ 130/85 mm Hg or antihypertensive treatment, serum triglycerides ≥ 150 mg/dl or lipid-lowering treatment, and serum high density lipoprotein-cholesterol ≤ 40 mg/dl (men) / ≤ 50 mg/dl (women) or lipid-lowering treatment. MASLD was defined in individuals with an average daily alcohol intake < 30g (men) / < 20g (women) which was used in NAFLD/MAFLD.17-20
+MASLD with increased alcohol intake was defined as having fatty liver index ≥ 30 with at least 1 cardiometabolic risk factor and daily alcohol intake of 30 to 60g (men) / 20 to 50g (women), whereas alcoholic liver disease was diagnosed in those meeting the fatty liver index score and cardiometabolic risk factor criteria with alcohol intake ≥ 60g (men) / ≥ 50g (women).21 Steatotic liver disease with other etiologies included individuals with a specific liver disease diagnosis (International Classification of Diseases-10) who also met the fatty liver index score and cardiometabolic risk factor criteria. Remaining individuals were classified as having no steatotic liver disease.
+Study Outcome: Progression to Kidney Failure
+The primary outcome of our study was the identification of newly developed kidney failure during the follow-up period. In South Korea, there is a special insurance program for rare/incurable disease patients that covers a higher portion of medical expenses and the program covers patients with kidney failure undergoing dialysis or receiving kidney transplantation. We identified kidney failure events from the special insurance code designated for such condition. All participants were followed from the date of the baseline health screening visit at which the initial eGFR was measured until the occurrence of kidney failure, with follow-up ending at the date of death or on December 31, 2022, whichever came first.
+Statistical Analysis
+Continuous variables were presented as the mean ± standard deviation (SD), and categorical variables were presented as numbers (percentage). We used cause-specific Cox models to assess etiologic associations and Fine-Gray models to estimate cumulative incidence in the presence of competing risks. Cause-specific Cox proportional hazards models were used to estimate the HR and 95% confidence intervals (CIs) of the association between MASLD and kidney failure outcome. Comparisons were performed using the no steatotic liver disease group as the reference group. The proportional hazards assumption was verified using Schoenfeld residuals, and no significant departure from proportionality over time was detected. Competing risk analyses using the Fine-Gray subdistribution hazard model were performed, treating death before kidney failure as a competing event. We reported subdistribution HR with 95% CIs and presented cumulative incidence function curves to illustrate cumulative incidence under competing risks. In addition to the crude model, we identified potential confounding variables from the literature review and further analyzed the adjusted models.22 Sex, age, poor income status (lowest quartile of income), smoking, regular exercise, Charlson Comorbidity Index score, eGFR, positive albuminuria, BMI, serum total cholesterol, serum alanine aminotransferase, hypertension and type 2 diabetes mellitus were added in the adjusted model. Subgroup analysis was performed with following variables: sex, age ≥ 65 years old, presence of albuminuria, diabetes mellitus, and obesity (BMI ≥ 30 kg/m2). Statistical analyses were performed using SAS program (SAS institute, North Carolina, USA) and all P-values provided are 2-sided, with significance level set at 0.05.
+Results
+Baseline Characteristics
+MASLD group had relatively older age ranges and higher BMI than other groups, whereas alcohol drinking and smoking history were more prevalent in MASLD with increased alcohol intake group (Table 1). The alcoholic liver disease or steatotic liver disease with other etiologies group showed the highest percentage of hypertension (79.1%), type 2 diabetes mellitus (43.6%), dyslipidemia (51.9%), positive albuminuria (12.3%), and the proportion of people with a Charlson Comorbidity Index score of 2 or higher (78.0%) among all study groups. The MASLD with increased alcohol intake group showed the highest aspartate aminotransferase, serum alanine aminotransferase, and serum gamma-glutamyl transferase of 30.2, 26.9, 70.7, respectively. During the follow-up period (median 9.28 years, interquartile range 9.03––9.63 years), 7497 kidney failure events (4.42%) occurred.
+Characteristics	Total	SLD group
+No SLDmet	MASLD	MetALD	ALD/other SLDmet
+ 	169,707	93,348	65,833	3600	6926
+Sex
+Male	70823 (41.73)	28094 (30.1)	34955 (53.1)	3353 (93.14)	4421 (63.83)
+Female	98884 (58.27)	65254 (69.9)	30878 (46.9)	247 (6.86)	2505 (36.17)
+Age, yr	63.32 ± 12.58	63.03 ± 13.36	64.06 ± 11.51	57.69 ± 11.91	63.06 ± 10.95
+20–39	5598 (3.3)	3966 (4.25)	1348 (2.05)	149 (4.14)	135 (1.95)
+40–64	78117 (46.03)	42492 (45.52)	29762 (45.21)	2383 (66.19)	3480 (50.25)
+≥ 65	85992 (50.67)	46890 (50.23)	34723 (52.74)	1068 (29.67)	3311 (47.81)
+Income, Lowest quartile	37228 (21.94)	20847 (22.33)	14065 (21.36)	688 (19.11)	1628 (23.51)
+Smoking
+Never	120790 (71.18)	74020 (79.29)	42158 (64.04)	857 (23.81)	3755 (54.22)
+Former	27513 (16.21)	10914 (11.69)	13609 (20.67)	1234 (34.28)	1756 (25.35)
+Current	21404 (12.61)	8414 (9.01)	10066 (15.29)	1509 (41.92)	1415 (20.43)
+Drinking
+None	123654 (72.86)	73470 (78.71)	46166 (70.13)	0 (0)	4018 (58.01)
+Moderate	39497 (23.27)	18032 (19.32)	19667 (29.87)	0 (0)	1798 (25.96)
+Heavy	5377 (3.17)	1585 (1.7)	0 (0)	3600 (100)	192 (2.77)
+Alcoholic	1179 (0.69)	261 (0.28)	0 (0)	0 (0)	918 (13.25)
+Regular exercise	34492 (20.32)	19241 (20.61)	12997 (19.74)	867 (24.08)	1387 (20.03)
+Body mass index, kg/m2
+< 18.5	4147 (2.44)	4048 (4.34)	52 (0.08)	23 (0.64)	24 (0.35)
+18.5–23	51429 (30.3)	46120 (49.41)	4240 (6.44)	459 (12.75)	610 (8.81)
+23–25	43136 (25.42)	27406 (29.36)	13354 (20.28)	885 (24.58)	1491 (21.53)
+25–30	62270 (36.69)	15647 (16.76)	40693 (61.81)	1931 (53.64)	3999 (57.74)
+≥ 30	8725 (5.14)	127 (0.14)	7494 (11.38)	302 (8.39)	802 (11.58)
+Diabetes mellitus	45271 (26.68)	19032 (20.39)	22128 (33.61)	1087 (30.19)	3024 (43.66)
+Hypertension	105900 (62.4)	50090 (53.66)	47886 (72.74)	2442 (67.83)	5482 (79.15)
+Dyslipidemia	68284 (40.24)	31669 (33.93)	31631 (48.05)	1389 (38.58)	3595 (51.91)
+Charlson comorbidity index Score
+0	41291 (24.33)	25307 (27.11)	14351 (21.8)	1079 (29.97)	554 (8)
+1	35175 (20.73)	20107 (21.54)	13271 (20.16)	828 (23)	969 (13.99)
+≥ 2	93241 (54.94)	47934 (51.35)	38211 (58.04)	1693 (47.03)	5403 (78.01)
+Albuminuria, positive	14328 (8.44)	6497 (6.96)	6595 (10.02)	382 (10.61)	854 (12.33)
+Alcohol Abuse	3808 (2.24)	1497 (1.6)	0 (0)	255 (7.08)	2056 (29.69)
+MASLD specific etiology	9221 (5.43)	4799 (5.14)	0 (0)	0 (0)	4422 (63.85)
+Height, cm	159.34 ± 9.25	157.78 ± 8.7	160.77 ± 9.55	167.85 ± 6.99	162.38 ± 9.21
+Weight, kg	62.33 ± 11.18	56.6 ± 8.35	69.06 ± 10.06	73.15 ± 10.61	69.85 ± 10.51
+Body mass index, kg/m2	24.45 ± 3.26	22.68 ± 2.39	26.68 ± 2.8	25.9 ± 2.92	26.45 ± 3.01
+Waist Circumference, cm	82.94 ± 9.16	77.58 ± 6.96	89.49 ± 6.95	89.31 ± 7.25	89.71 ± 7.34
+Fasting glucose, mg/dl	105.97 ± 32.19	101.24 ± 27.42	111.26 ± 35.9	113.4 ± 35.69	115.5 ± 40.85
+Systolic blood pressure, mm Hg	127.31 ± 16.24	124.94 ± 16.27	130.24 ± 15.76	130.57 ± 15.66	129.67 ± 15.45
+Diastolic blood pressure, mm Hg	77.43 ± 10.36	75.98 ± 10.15	79.15 ± 10.3	80.82 ± 10.73	78.92 ± 10.31
+Total cholesterol, mg/dl	196.43 ± 41.13	193.04 ± 39.37	201.27 ± 42.8	200.54 ± 41.46	194.04 ± 43.07
+HDL-C, mg/dl	52.99 ± 17.98	56.05 ± 19.24	48.99 ± 15.42	52.84 ± 15.4	49.75 ± 16.17
+LDL-C, mg/dl	114.87 ± 37.64	115.35 ± 35.55	115.26 ± 39.59	107.29 ± 40.56	108.46 ± 43.14
+eGFR, mL/min per 1.73m2	52.36 ± 8.76	52.51 ± 8.77	52.19 ± 8.69	53.16 ± 8.73	51.62 ± 9.14
+aTriglyceride, mg/dl	126.06 (125.75–126.37)	98.42 (98.15–98.7)	170.42 (169.83–171.01)	186.27 (183.21–189.39)	164.56 (162.72–166.42)
+aAspartate Transaminase, IU/l	24.43 (24.39–24.47)	22.99 (22.94–23.03)	25.8 (25.72–25.87)	30.26 (29.8–30.72)	29.65 (29.3–30)
+aAlanine Transaminase, IU/l	20.08 (20.03–20.12)	17.09 (17.04–17.14)	24.09 (23.99–24.18)	26.99 (26.5–27.49)	26.66 (26.29–27.05)
+aGamma glutamyl transpeptidase, IU/l	25.97 (25.89–26.05)	19.13 (19.07–19.19)	35.56 (35.38–35.73)	70.75 (69.03–72.52)	48.09 (47.16–49.04)
+Kidney failure	7497 (4.42)	3384 (3.63)	3444 (5.23)	166 (4.61)	503 (7.26)
+Follow-up duration
+Mean ± SD	8.49 ± 2.22	8.52 ± 2.21	8.48 ± 2.2	8.64 ± 2	8.22 ± 2.48
+Median (Q1–Q3)	9.28 (9.03–9.63)	9.3 (9.03–9.63)	9.27 (9.02–9.63)	9.23 (9.04–9.58)	9.26 (8.75–9.62)
+Table 1
+Baseline characteristics of study cohort and SLD group
+ALD/other SLDmet, alcohol associated liver disease/metabolic cause associated steatotic liver disease with other combined etiologies group; eGFR, estimated glomerular filtration rate; HDL-C, high density lipoprotein-cholesterol; LDL-C, low density lipoprotein-cholesterol; MASLD, metabolic dysfunction associated steatotic liver disease; MetALD, MASLD with increased alcohol intake, SLD, steatotic liver disease; SLDmet, metabolic cause associated steatotic liver disease.
+Continuous variable: Mean ± standard deviation (SD), Categorical variable: numbers (percentage).
+a
+Geometric mean (95% CI).
+Open table in a new tab
+Association Between MASLD and Kidney Failure Outcomes
+The total steatotic liver disease group showed higher risk of kidney failure when compared with CKD patients without steatotic liver disease in the crude model (HR 1.495 [1.429, 1.565]) and in the adjusted model (adjusted HR 1.133 [1.067, 1.204]), respectively (Table 2). When specifically assessing the risk of kidney failure associated with specific liver disease category, the risk of kidney failure compared with CKD patients with no steatotic liver disease was significantly higher in MASLD (HR 1.45 [1.382, 1.52]), MASLD with increased alcohol intake (HR 1.254 [1.073, 1.465]), and alcoholic liver disease or steatotic liver disease with other etiologies group (HR 2.078[1.892, 2.282]), respectively before adjustment. In the adjusted model, the risk of kidney failure remained significantly higher in the MASLD group (adjusted HR 1.146 [1.078, 1.219]), whereas the significance disappeared in MASLD with increased alcohol intake (adjusted HR 0.981 [0.834, 1.154]) and alcoholic liver disease or steatotic liver disease with other etiologies group (adjusted HR 1.098 [(0.991, 1.216]). The cumulative incidence curve for kidney failure showed that the MASLD group had the highest cumulative incidence probability among the SLD groups (Figure 2).
+
+Figure viewer
+Figure 2 Adjusted Kaplan-Meier curve showing the cumulative incidence probability of kidney failure risk among the study groups. The above figure shows the Kaplan-Meier curve of fully adjusted model. Sex, age, poor income status (lowest quartile of income), smoking, regular exercise, Charlson comorbidity index score, estimated glomerular filtration rate, positive albuminuria, body mass index, total cholesterol, alanine transaminase, hypertension and type 2 diabetes mellitus were added in the adjusted model. The x-axis indicates the time from the follow-up initiation (years), and the y-axis indicates the cumulative incidence probability. MASLD, metabolic dysfunction associated steatotic liver disease; SLD, steatotic liver disease.
+SLD group	n	Kidney failure	Duration	IR, per 1000	Crude model	aAdjusted model
+No SLDmet	93348	3384	794936.34	4.26	1 (Ref.)	1 (Ref.)
+MASLD	65833	3444	558337.7	6.17	1.45 (1.382, 1.52)	1.146 (1.078, 1.219)
+MetALD	3600	166	31088.77	5.34	1.254 (1.073, 1.465)	0.981 (0.834, 1.154)
+ALD/other SLDmet	6926	503	56946.11	8.83	2.078 (1.892, 2.282)	1.098 (0.991, 1.216)
+P-value	 	 	 	 	< 0.001	< 0.001
+ 	n	Kidney failure	Duration	IR, per 1000	Crude model	aAdjusted model
+No SLDmet	93348	3384	794936.34	4.26	1 (Ref.)	1 (Ref.)
+SLDmet	76359	4113	646372.58	6.36	1.495 (1.429, 1.565)	1.133 (1.067, 1.204)
+P-value	 	 	 	 	< 0.001	< 0.001
+ 	n	Kidney failure	Duration	IR, per 1000	Crude model	aAdjusted model
+Non MASLD	103874	4053	882971.23	4.59	1 (Ref.)	1 (Ref.)
+MASLD	65833	3444	558337.7	6.17	1.344 (1.285, 1.407)	1.124 (1.064, 1.187)
+P-value	 	 	 	 	< 0.001	< 0.001
+Table 2
+Comparison of cause-specific proportional hazard model of SLD groups with crude/adjusted model
+ALD/other SLDmet, alcohol associated liver disease/metabolic cause associated steatotic liver disease with other combined etiologies group MASLD, metabolic dysfunction associated steatotic liver disease; MetALD, MASLD with increased alcohol intake; SLD, steatotic liver disease; SLDmet, metabolic cause associated steatotic liver disease.
+a
+Adjusted with Sex, Age, Income, Smoking, Regular exercise, Charlson comorbidity index score, Estimated glomerular filtration rate, Albuminuria, Body mass index, Total cholesterol, Alanine transaminase, Diabetes mellitus, Hypertension.
+Open table in a new tab
+When the risk of kidney failure was compared between MASLD and all other CKD patients, the risk of MASLD was still significantly higher in the CKD patients with MASLD (crude HR 1.344[1.285, 1.407], adjusted HR 1.124[1.064, 1.187)]).
+The competing risk analysis using Fine-Gray subdistribution hazard model showed consistency with the results of cause-specific Cox models. MASLD was significantly associated with a higher risk of kidney failure in the CKD patients (crude subdistribution HR 1.454[1.386, 1.524)], adjusted subdistribution HR 1.141[1.062, 1.226)]) (Supplementary Table S1, Supplementary Figure S2).
+Subgroup Analysis
+In the subgroup analysis, the risk of kidney failure associated with MASLD was significantly different by sex (interaction P-value < 0.001) (Figure 3). MASLD, including other liver disease groups, showed higher risk of kidney failure only in females (adjusted HR 1.301 [1.192, 1.420]), whereas the risk of kidney failure was not elevated in males with MASLD (adjusted HR 1.061 [0.988, 1.140]).
+
+Figure viewer
+Figure 3 Hazard ratios for kidney failure and their association according to subgroups among SLD groups. The above forest plots show the hazard ratios and association of subgroups (age, sex, hypertension, smoking, albuminuria) among each SLD groups. The x-axis indicates hazard ratio and each subgroup among SLD groups were listed. The adjusted model was adjusted for Sex, age, poor income status (lowest quartile of income), smoking, regular exercise, Charlson comorbidity index score, estimated glomerular filtration rate, positive albuminuria, body mass index, total cholesterol, alanine transaminase, hypertension and type 2 diabetes mellitus. ALD, alcoholic liver disease; MASLD, metabolic dysfunction associated steatotic liver disease; MetALD, MASLD with increased alcohol intake; SLDmet, metabolic-associated steatotic liver disease.
+However, the interaction of obesity, diabetes, or income on the association between kidney failure risk and fatty liver diseases was not significant (Supplementary Table S2). Regarding obesity subgroup analysis, the risk of kidney failure was significantly higher in the CKD patients with MASLD in both those with obesity (adjusted HR 1.234 [1.113, 1.369]) and without obesity (adjusted HR 1.126 [1.044, 1.215]) with interaction P-value 0.2. This was similar regarding the presence of diabetes, and MASLD was significantly associated with higher risk of kidney failure regardless of underlying diabetes (those without diabetes, adjusted HR 1.136 [1.046, 1.233] and those with diabetes, adjusted HR 1.155 [1.071, 1.245]). Underlying income status also did not show significant interaction (interaction P = 0.25) on the association between kidney failure and MASLD.
+Discussion
+Using the large-scale health screening data, we showed that steatotic liver disease, particularly with MASLD, was significantly associated with higher risk of kidney failure in the CKD population. The significant association was particularly accentuated with females, whereas the risk of kidney failure was similar in male CKD patients with and without MASLD. Our study suggests that when considering kidney prognosis, MASLD, designed to be introduced in health screening setting, may be considered as an associated risk factor for kidney failure in those with CKD.
+NAFLD or MAFLD was associated with higher incidence of CKD in several previous studies.23-26 As previous studies suggested that fatty liver disease influences kidney function by impairment of insulin resistance, systemic inflammation, oxidative stress, hypertension, and dyslipidemia,27 MASLD is also assumed to be associated with pathophysiological mechanisms stated above and is related with incidence of CKD.28 However, whereas a number of studies have analyzed the association between CKD and fatty liver disease, few have analyzed the fatty liver disease as a primary risk factor for kidney failure. A previous study analyzed NAFLD and kidney outcomes and checked the association with kidney failure, but the results were not significant.29 Subsequent studies have defined fatty liver disease as MAFLD rather than NAFLD to confirm kidney outcomes and suggested that fatty liver disease was significantly associated with kidney failure.30 Although it is assumed that MASLD would have similar health effects as MAFLD, additional epidemiologic data focusing on risk of kidney failure in the CKD patients would be helpful for clinicians considering the kidney impact of the updated nomenclature of fatty liver disease. Particularly, the definition of MASLD aimed to simplify the diagnosis for easy use in primary healthcare setting, such as in health exams. The large-scale data investigating the risk association between kidney failure and MASLD in CKD patients identified by routine health exams would be meaningful as substantial CKD and MASLD are diagnosed in such health screenings.
+By leveraging the unique nationwide health screening data of South Korea, our study provides valuable epidemiologic insights into the impact of MASLD on kidney outcomes. The findings could offer crucial guidance for clinicians managing CKD patients, particularly in primary healthcare settings where routine health examinations play a key role in early detection and disease prevention. Our study has several key strengths. First, it is based on a large nationwide cohort of 170,000 CKD patients followed for approximately 10 years, ensuring strong statistical power. Second, it is the first study to specifically examine the association between MASLD and kidney failure within a CKD population. Previous studies analyzed MAFLD and kidney failure in a general population rather than focusing on CKD patients, limiting their relevance to high-risk groups.30 In contrast, our study provides crucial evidence on MASLD as a risk factor for kidney failure specifically in CKD patients identified through general health screenings—individuals for whom accurate assessment of kidney failure risk and initiation for early intervention are important.
+Our study highlights a significant gender-specific impact of MASLD on the risk of progression to kidney failure in CKD patients. Notably, whereas MASLD is less prevalent among females, its presence correlates with a substantially heightened risk of kidney failure in this group compared with males. This disparity may be attributed to the influence of uncontrolled metabolic factors and additional risk elements in males, which may accelerate CKD progression,31 thereby diminishing the relative impact of MASLD on kidney failure risk. In contrast, females generally exhibit a slower progression of CKD,32 making MASLD a more pronounced and critical risk factor for kidney failure in this population. Given the limited direct treatment options for MASLD, early identification through general health screenings is crucial. When MASLD is detected in women, healthcare providers should prioritize the evaluation and management of associated risk factors to mitigate the elevated risk of kidney failure. Implementing targeted lifestyle interventions, such as dietary modifications and increasing physical activity, may be effective strategies in managing MASLD and its complication.33 This proactive approach is essential to improve kidney outcomes among female CKD patients with MASLD.
+In addition, among individuals with MASLD, the risk of progression to kidney failure appeared higher in those with old age, without hypertension, without albuminuria, or without a history of smoking. According to previous research aging is a well-known risk factor for kidney failure in the CKD patients because of increased nephron loss, glomerulosclerosis, tubulointerstitial fibrosis, and inflammaging, which may result in reduced kidney function reserve.34 Interestingly, the result of this study showed reversed pattern from conventional expectations such as hypertension, albuminuria, and smoking are risk factors for kidney failure. A possible explanation is that individuals with these recognized comorbidities or harmful health behaviors may be more likely to engage in regular medical surveillance and receive more intensive management, thereby attenuating the additional risk associated with MASLD. Further studies, including prospective studies, would be needed to verify the underlying associations.
+Our study has several limitations. First, MASLD was diagnosed using the fatty liver index, which, despite being a reasonable diagnostic tool, may have limited accuracy compared with imaging-based methods like liver ultrasound. Second, we did not assess the severity of steatotic liver disease, which could influence outcomes, as liver fibrosis progression has been linked to CKD risk.35,36 Third, because NHIS mainly used modification of diet in renal disease calculation in 2012, eGFR was estimated using the modification of diet in renal disease equation in the study. Fourth, because of data availability and accessibility, some medical data, such as medication information are lacking. Fifth, because our study is a retrospective cohort study, causal relationship cannot be inferred. Finally, since our cohort consists solely of Korean individuals, the generalizability of our findings to other ethnic populations may be limited.
+In conclusion, this study suggests MASLD as a significant risk factor for kidney failure in CKD patients. Our findings highlight the particular need for greater awareness and risk management in female CKD patients with MASLD, especially in health screening settings. Further research is needed to clarify the mechanisms linking MASLD to kidney outcomes and to develop optimized care protocols for at-risk patients.
+Disclosure
+All the authors declare no competing interests.
+Acknowledgments
+Kyungdo Han and Sehoon Park have equally contributed as co-corresponding authors.
+Funding
+The present study was supported by a National Research Foundation of Korea grant funded by the Korean government (MSIT, Ministry of Science and ICT) (Grant number: RS-2024-00345867). This research was supported by a grant of the Korea Health Technology R&D Project through the Korea Health Industry Development Institute (KHIDI), funded by the Ministry of Health & Welfare, Republic of Korea (grant number: RS-2025-25459535).
+Data Availability Statement
+The authors are restricted from sharing the data underlying this study because The Korean NHIS owns the data. The researchers who want to access the data may request NHIS (https://www.nhis.go.kr) for the use of database.
+Author Contributions
+JKK, EK, YK, KH, and SP designed the study conception. MWK, JL, JO, and SP collected the data. MK, JHK, SJ, SC, SL, HH, and KH performed data analysis. JKK, JMC, SGK, DKK, KH, and SP interpreted the results. JKK and SP drafted the initial version of the manuscript. JL, JO, MWK, MK, JHK, JMC, SGK, SJ, SC, SL, EK, YK, DKK, and KH critically revised the manuscript for important intellectual content. All authors reviewed and approved the final version of the manuscript.
+Supplementary Material (1)
+PDF (1.04 MB)
+Supplementary File (PDF)
+Table S1. Fine-Gray subdistribution hazard model for incident end stage kidney disease accounting for death as a competing risk†.Table S2. Subgroup analysis in SLD groups with crude/adjusted model. Figure S1. Crude cumulative incidence of kidney failure by steatotic liver disease group (death as a competing risk). Figure S2. English version questionnaire used in health screenings by the National Health Insurance Service of Korea. Reproduced from Jeong et al, published on behalf of the American Heart Association by Wiley, under the terms of the Creative Commons Attribution–NonCommercial 4.0 International License (CC BY-NC 4.0). STROBE checklist
+References
+1.
+Stevens, P.E. ∙ Ahmed, S.B. ∙ Carrero, J.J.
+KDIGO 2024 clinical practice guideline for the evaluation and management of chronic kidney disease
+Kidney Int. 2024; 105:S117-S314
+Google Scholar
+2.
+Qin, K. ∙ Qing, J. ∙ Wang, Q. ...
+Epidemiological shifts in chronic kidney disease: a 30-year global and regional assessment
+BMC Public Health. 2024; 24:3519
+Google Scholar
+3.
+Rinella, M.E. ∙ Lazarus, J.V. ∙ Ratziu, V. ...
+A multisociety Delphi consensus statement on new fatty liver disease nomenclature
+J Hepatol. 2023; 79:1542-1556
+Google Scholar
+4.
+Younossi, Z.M. ∙ Kalligeros, M. ∙ Henry, L.
+Epidemiology of metabolic dysfunction-associated steatotic liver disease
+Clin Mol Hepatol. 2024; 31(Suppl):S32-S50
+Google Scholar
+5.
+Sun, D.Q. ∙ Jin, Y. ∙ Wang, T.Y. ...
+MAFLD and risk of CKD
+Metab Clin Exp. 2021; 115, 154433
+Google Scholar
+6.
+Kyoung, D.S. ∙ Kim, H.S.
+Understanding and utilizing claim data from the Korean National Health Insurance Service (NHIS) and health insurance review & assessment (HIRA) database for research
+J Lipid Atheroscler. 2022; 11:103-110
+Google Scholar
+7.
+Seong, S.C. ∙ Kim, Y.Y. ∙ Khang, Y.H. ...
+Data resource profile: the national health information database of the national health insurance service in South Korea
+Int J Epidemiol. 2017; 46:799-800
+Google Scholar
+8.
+Seong, S.C. ∙ Kim, Y.Y. ∙ Park, S.K. ...
+Cohort profile: the National Health Insurance Service-National Health Screening Cohort (NHIS-HEALS) in Korea
+BMJ Open. 2017; 7, e016640
+Google Scholar
+9.
+Levey, A.S. ∙ Bosch, J.P. ∙ Lewis, J.B. ...
+A more accurate method to estimate glomerular filtration rate from serum creatinine: a new prediction equation
+Modification of Diet in Renal Disease Study Group. 1999; 130, 461470
+Google Scholar
+10.
+Jeong, H.G. ∙ Kim, D.Y. ∙ Kang, D.W. ...
+Physical activity frequency and the risk of stroke: a nationwide cohort study in Korea
+J Am Heart Assoc. 2017; 6, e005671
+Google Scholar
+11.
+Yoo, J.E. ∙ Shin, D.W. ∙ Han, K. ...
+Association of the frequency and quantity of alcohol consumption with gastrointestinal cancer
+JAMA Netw Open. 2021; 4, e2120382
+Google Scholar
+12.
+Sundararajan, V. ∙ Henderson, T. ∙ Perry, C. ...
+New ICD-10 version of the Charlson comorbidity index predicted in-hospital mortality
+J Clin Epidemiol. 2004; 57:1288-1294
+Google Scholar
+13.
+Bedogni, G. ∙ Bellentani, S. ∙ Miglioli, L. ...
+The fatty liver index: a simple and accurate predictor of hepatic steatosis in the general population
+BMC Gastroenterol. 2006; 6:33
+Google Scholar
+14.
+Takahashi, S. ∙ Tanaka, M. ∙ Higashiura, Y. ...
+Prediction and validation of nonalcoholic fatty liver disease by fatty liver index in a Japanese population
+Endocr J. 2021; 69:463-471
+Google Scholar
+15.
+Nomura, T. ∙ Ono, M. ∙ Kobayashi, K. ...
+Validation of fatty liver index as a predictor of hepatic steatosis in Asian populations: impact of alcohol consumption and sex
+Hepatol Res. 2023; 53:968-977
+Google Scholar
+16.
+Lassale, C. ∙ Tzoulaki, I. ∙ Moons, K.G.M. ...
+Separate and combined associations of obesity and metabolic health with coronary heart disease: a pan-European case-cohort analysis
+Eur Heart J. 2018; 39:397-406
+Google Scholar
+17.
+Di Angelantonio, E. ∙ Bhupathiraju, S.N. ∙ Wormser, D. ...
+Body-mass index and all-cause mortality: individual-participant-data meta-analysis of 239 prospective studies in four continents
+Lancet. 2016; 388:776-786
+Google Scholar
+18.
+Whelton, P.K. ∙ Carey, R.M. ∙ Aronow, W.S. ...
+2017 ACC/AHA/AAPA/ABC/ACPM/AGS/APhA/ASH/ASPC/NMA/PCNA guideline for the prevention, detection, evaluation, and management of high blood pressure in adults: a report of the American College of Cardiology/American Heart Association Task Force on Clinical Practice guidelines
+J Am Coll Cardiol. 2017; 71:e127-e248
+Google Scholar
+19.
+Matteoni, C.A. ∙ Younossi, Z.M. ∙ Gramlich, T. ...
+Nonalcoholic fatty liver disease: a spectrum of clinical and pathological severity
+Gastroenterology. 1999; 116:1413-1419
+Google Scholar
+20.
+Eslam, M. ∙ Newsome, P.N. ∙ Sarin, S.K. ...
+A new definition for metabolic dysfunction-associated fatty liver disease: an international expert consensus statement
+J Hepatol. 2020; 73:202-209
+Google Scholar
+21.
+Singal, A.K. ∙ Bataller, R. ∙ Ahn, J. ...
+ACG clinical guideline: alcoholic liver disease
+Am J Gastroenterol. 2018; 113:175-194
+Google Scholar
+22.
+Kim, K.S. ∙ Hong, S. ∙ Han, K. ...
+Association of non-alcoholic fatty liver disease with cardiovascular disease and all cause death in patients with type 2 diabetes mellitus: nationwide population based study
+BMJ. 2024; 384, e076388
+Google Scholar
+23.
+Jung, C.Y. ∙ Koh, H.B. ∙ Park, K.H. ...
+Metabolic dysfunction-associated fatty liver disease and risk of incident chronic kidney disease: a nationwide cohort study
+Diabetes Metab. 2022; 48, 101344
+Google Scholar
+24.
+Wang, T.Y. ∙ Wang, R.F. ∙ Bu, Z.Y. ...
+Association of metabolic dysfunction-associated fatty liver disease with kidney disease
+Nat Rev Nephrol. 2022; 18:259-268
+Google Scholar
+25.
+Heo, J.H. ∙ Lee, M.Y. ∙ Kim, S.H. ...
+Comparative associations of non-alcoholic fatty liver disease and metabolic dysfunction-associated steatotic liver disease with risk of incident chronic kidney disease: a cohort study
+Hepatobiliary Surg Nutr. 2024; 13:801-813
+Google Scholar
+26.
+Kwon, S.Y. ∙ Park, J. ∙ Park, S.H. ...
+MAFLD and NAFLD in the prediction of incident chronic kidney disease
+Sci Rep. 2023; 13:1796
+Google Scholar
+27.
+Targher, G. ∙ Chonchol, M.B. ∙ Byrne, C.D.
+CKD and nonalcoholic fatty liver disease
+Am J Kidney Dis. 2014; 64:638-652
+Google Scholar
+28.
+Sandireddy, R. ∙ Sakthivel, S. ∙ Gupta, P. ...
+Systemic impacts of metabolic dysfunction-associated steatotic liver disease (MASLD) and metabolic dysfunction-associated steatohepatitis (MASH) on heart, muscle, and kidney related diseases
+Front Cell Dev Biol. 2024; 12, 1433857
+Google Scholar
+29.
+Chinnadurai, R. ∙ Ritchie, J. ∙ Green, D. ...
+Non-alcoholic fatty liver disease and clinical outcomes in chronic kidney disease
+Nephrol Dial Transplant. 2019; 34:449-457
+Google Scholar
+30.
+Chen, S. ∙ Pang, J. ∙ Huang, R. ...
+Association of MAFLD with end-stage kidney disease: a prospective study of 337,783 UK Biobank participants
+Hepatol Int. 2023; 17:595-605
+Google Scholar
+31.
+Bash, L.D. ∙ Astor, B.C. ∙ Coresh, J.
+Risk of incident ESRD: a comprehensive look at cardiovascular risk factors and 17 years of follow-up in the atherosclerosis risk in communities (ARIC) study
+Am J Kidney Dis. 2009; 55:31-41
+Google Scholar
+32.
+Carrero, J.J. ∙ Hecking, M. ∙ Chesnaye, N.C. ...
+Sex and gender disparities in the epidemiology and outcomes of chronic kidney disease
+Nat Rev Nephrol. 2018; 14:151-164
+Google Scholar
+33.
+Tacke, F. ∙ Horn, P. ∙ Wai-Sun, W.V.
+EASL–EASD–EASO Clinical Practice Guidelines on the management of metabolic dysfunction-associated steatotic liver disease (MASLD)
+J Hepatol. 2024; 81:492-542
+Google Scholar
+34.
+Schmitt, R. ∙ Melk, A.
+Molecular mechanisms of renal aging
+Kidney Int. 2017; 92:569-579
+Google Scholar
+35.
+Gurun, M. ∙ Brennan, P. ∙ Handjiev, S. ...
+Increased risk of chronic kidney disease and mortality in a cohort of people diagnosed with metabolic dysfunction associated steatotic liver disease with hepatic fibrosis
+PLoS One. 2024; 19, e0299507
+Google Scholar
+36.
+Bilson, J. ∙ Hydes, T.J. ∙ McDonnell, D. ...
+Impact of metabolic syndrome traits on kidney disease risk in individuals with MASLD: a UK Biobank study
+Liver Int. 2024; 45, e16159
+Google Scholar
+Figures (3)
+Figure Viewer
+
+
+
+Article metrics
+Metric data currently unavailable
+Supplementary materials (1)
+PDF (1.04 MB)
+Supplementary File (PDF)
+Related articles (40)
+The Metabolic Dysfunction–Associated Steatotic Liver Disease–CKD Axis: Intersecting Pathways and Opportunities for Early Intervention
+Sriperumbuduri et al.
+Kidney International ReportsDecember 30, 2025
+Metabolic Dysfunction-Associated Steatotic Liver Disease and Kidney Transplant Outcomes
+Yoon et al.
+Kidney International ReportsMarch 11, 2026
+Metabolic Acidosis is Associated With Acute Kidney Injury in Patients With CKD
+Zhu et al.
+Kidney International ReportsJuly 15, 2022
+Show more
+Advertisement
+
+Home
+Access for Developing Countries
+Articles & Issues
+Articles in Press
+Current Issue
+Archive
+Topics
+Commentaries and Editorials
+Mitochondrial Function in DKD
+Pediatric Acute Kidney Injury
+Pregnancy
+Review Articles
+Trial Design/Study Design
+Graphical Abstract Video Presentations
+For Authors
+About Open Access
+Author Information
+Permissions
+Researcher Academy
+Submit a Manuscript
+For Readers
+About the Journal
+About Open Access
+Abstracting & Indexing
+Contact Us
+Editorial Board
+New Content Alerts
+For Advertisers
+Advertising Information
+Permissions
+Reprints
+Companion Journals
+Kidney International
+Kidney International Supplements
+ISN
+Follow Us
+Twitter
+The content on this site is intended for healthcare professionals.
+
+
+All content on this site: Copyright © 2026 Elsevier Inc., its licensors, and contributors.
+All rights are reserved, including those for text and data mining, AI training, and similar technologies.
+For all open access content, the relevant licensing terms apply.
+
+Privacy Policy   Cookie settings   Terms and Conditions   Accessibility   Help & Contact
+
+RELX
+
+
+
