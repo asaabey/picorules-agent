@@ -1,0 +1,160 @@
+/*  Ruleblock to calculate the Kidney Failure Risk Equation (KFRE)
+
+    The KFRE is a validated 4-variable equation that estimates the 2-year
+    and 5-year probability of progression to kidney failure (dialysis or
+    transplant) in patients with CKD stages G3a, G3b, and G4.
+
+    Variables: age, sex, eGFR, uACR
+
+    Note: KFRE has not been validated in Indigenous populations.
+*/
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "Ruleblock to calculate the Kidney Failure Risk Equation (KFRE)",
+        is_active:2
+    }
+);
+
+#doc(,
+    {
+        section: "External bindings"
+    }
+);
+
+#doc(,
+    {
+        txt:"Bind CKD stage from upstream ruleblock to determine applicability"
+    }
+);
+
+ckd => rout_ckd.ckd.val.bind();
+
+#doc(,
+    {
+        section: "Demographics"
+    }
+);
+
+#doc(,
+    {
+        txt:"Bind date of birth and gender from demographics ruleblock"
+    }
+);
+
+dob => rout_dmg.dob.val.bind();
+
+male => rout_dmg.gender.val.bind();
+
+#doc(,
+    {
+        section: "Laboratory inputs"
+    }
+);
+
+#doc(,
+    {
+        txt:"Retrieve most recent eGFR and uACR within the past 12 months. Both date and value are needed - eGFR date is used to calculate age at time of measurement."
+    }
+);
+
+egfr => eadv.lab_bld_egfr_c._.lastdv().where(dt > sysdate-365);
+
+uacr => eadv.lab_ua_acr._.lastdv().where(dt > sysdate-365);
+
+#doc(,
+    {
+        section: "Applicability criteria"
+    }
+);
+
+#doc(,
+    {
+        txt:"The 4-variable KFRE is applicable for CKD stages G3a, G3b, and G4 (stage 3-4) when eGFR, uACR, and gender are all available. uACR must be >1 mg/mmol to avoid log(0) errors.",
+        cite:"kfre_ref1, kfre_ref2"
+    }
+);
+
+kfre4v_ap : { coalesce(egfr_val,0)>0 and coalesce(uacr_val,0)>1 and male!? and ckd>=3 and ckd<5 => 1},{=>0};
+
+#doc(,
+    {
+        section: "KFRE calculation"
+    }
+);
+
+#doc(,
+    {
+        txt:"Calculate age at time of eGFR measurement (not current age) to anchor risk prediction to the laboratory data point"
+    }
+);
+
+age : { . => round(((egfr_dt-dob)/365.25),0)};
+
+#doc(,
+    {
+        txt:"Apply the 4-variable KFRE equation (Tangri et al). Coefficients are centred on population means. The uACR is multiplied by 8.84 to convert from mg/mmol to mg/g as required by the original equation.",
+        cite:"kfre_ref1, kfre_ref2"
+    }
+);
+
+kfre4v_exp : { kfre4v_ap =1 => exp((-0.5567*(egfr_val/5-7.222))+(0.2467*(male - 0.5642))+(0.451*(ln(uacr_val * 8.84)-5.137))-(0.2201*(age/10-7.036)))},{=>0};
+
+#doc(,
+    {
+        txt:"Derive 2-year and 5-year risk of kidney failure using baseline survival estimates (0.9832 for 2yr, 0.9365 for 5yr)",
+        cite:"kfre_ref1"
+    }
+);
+
+kfre4v_2yr : { kfre4v_ap =1 => round(1-power(0.9832,kfre4v_exp) ,2)};
+
+kfre4v_5yr : { kfre4v_ap =1 => round(1-power(0.9365,kfre4v_exp) ,2)};
+
+[[rb_id]] : { . => kfre4v_ap};
+
+#doc(,
+    {
+        section: "Output attributes"
+    }
+);
+
+#define_attribute(
+    kfre4v_ap,
+    {
+        label:"KFRE: 4-variable equation applicable",
+        desc:"1 if KFRE can be calculated (CKD G3-G4 with available eGFR, uACR, gender), 0 otherwise",
+        is_reportable:1,
+        type:1001
+    }
+);
+
+#define_attribute(
+    kfre4v_2yr,
+    {
+        label:"KFRE: 2-year kidney failure risk",
+        desc:"Probability of kidney failure within 2 years (0-1)",
+        is_reportable:1,
+        type:1001
+    }
+);
+
+#define_attribute(
+    kfre4v_5yr,
+    {
+        label:"KFRE: 5-year kidney failure risk",
+        desc:"Probability of kidney failure within 5 years (0-1)",
+        is_reportable:1,
+        type:1001
+    }
+);
+
+#define_attribute(
+    [[rb_id]],
+    {
+        label:"KFRE: Calculable",
+        desc:"1 if KFRE was applicable and calculated, 0 otherwise",
+        is_reportable:1,
+        type:1001
+    }
+);

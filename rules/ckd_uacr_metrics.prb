@@ -1,0 +1,272 @@
+/* Ruleblock to calculate uACR metrics including KDIGO albuminuria staging,
+   persistence assessment, assumption violation checks, and trend analysis.
+
+   Downstream consumers: ckd (binds 9 variables), ckd_card (binds acr_l_val, acr_l_dt)
+*/
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "Ruleblock to calculate uACR metrics",
+        is_active:2
+    }
+);
+
+/* ================================================================
+   Section 1: Raw laboratory data
+   ================================================================ */
+
+#doc(, { section: "Laboratory data" });
+
+#doc(, {
+    txt: "Retrieve uACR values: most recent, historical maximum, and total count. Both date and value are retrieved for the last result to support age-of-result and persistence calculations."
+});
+
+acr_l => eadv.lab_ua_acr._.lastdv();
+
+acr_max_l => eadv.lab_ua_acr._.maxldv();
+
+acr_n => eadv.lab_ua_acr.dt.count();
+
+acr_3_n => eadv.lab_ua_acr.dt.count().where(val > 3);
+
+/* ================================================================
+   Section 2: Currency check
+   ================================================================ */
+
+#doc(, { section: "Result currency" });
+
+#doc(, {
+    txt: "Flag uACR results older than 2 years (730 days) as outdated. Outdated results reduce confidence in staging and should prompt re-testing.",
+    cite: "kdigo_2012, kdigo_2024"
+});
+
+acr_outdated : { sysdate - acr_l_dt > 730 => 1 }, { => 0 };
+
+/* ================================================================
+   Section 3: Trend analysis
+   ================================================================ */
+
+#doc(, { section: "Trend analysis" });
+
+#doc(, {
+    txt: "Calculate the ratio of the most recent uACR to the historical peak (last / max). A ratio < 1 indicates improvement from peak. The condition acr_l_dt > acr_max_l_dt ensures the peak is not the current value, and acr_max_l_val > 0 guards against division by zero."
+});
+
+acr_ratio_last_to_peak : { acr_l_dt > acr_max_l_dt and acr_max_l_val > 0 => round(acr_l_val / acr_max_l_val, 2) };
+
+#doc(, {
+    txt: "Proportion of all uACR results that were elevated (> 3 mg/mmol, i.e. above A1 threshold). A high ratio suggests chronic rather than transient albuminuria."
+});
+
+acr_elevated_proportion : { coalesce(acr_n, 0) > 0 => round(acr_3_n / acr_n, 2) };
+
+#doc(, {
+    txt: "Flag a > 25% decline from historical peak uACR, where peak was at least in the A2 range (>= 3). This may indicate treatment response or spontaneous remission."
+});
+
+acr_decline_flag : { acr_ratio_last_to_peak < 0.75 and acr_max_l_val >= 3 => 1 }, { => 0 };
+
+#doc(, {
+    txt: "Flag patients whose current uACR is normal (< 3) but who have multiple prior elevated results (> 3). This indicates previously persistent albuminuria that has since resolved — relevant for CKD diagnosis which is not rescinded on improvement.",
+    cite: "kdigo_2012"
+});
+
+acr_past_pers_flag : { acr_l_val < 3 and acr_elevated_proportion > 0 and acr_3_n > 1 => 1 }, { => 0 };
+
+#doc(, {
+    txt: "Flag patients whose current uACR is normal (< 3) but who had a single prior elevated result. Weaker evidence of prior albuminuria than acr_past_pers_flag — may represent a false positive."
+});
+
+acr_past_singular_flag : { acr_l_val < 3 and acr_elevated_proportion > 0 and acr_3_n = 1 => 1 }, { => 0 };
+
+/* ================================================================
+   Section 4: KDIGO persistence assessment
+   ================================================================ */
+
+#doc(, { section: "Persistence assessment" });
+
+#doc(, {
+    txt: "KDIGO defines CKD persistence as abnormality confirmed on at least 2 occasions separated by >= 90 days. Count elevated uACR results (>= 3 mg/mmol) that occurred more than 90 days before the most recent result. If any exist, and the current result is also elevated, persistence is established at the A2 threshold.",
+    cite: "kdigo_2012, kdigo_2024"
+});
+
+acr_90d_v3_n => eadv.lab_ua_acr.val.count().where(dt < acr_l_dt - 90 and val >= 3);
+
+#doc(, {
+    txt: "Count severely elevated uACR results (>= 30 mg/mmol, A3 threshold) more than 90 days before the most recent result. This enables persistence assessment at the A3 level independently."
+});
+
+acr_90d_v30_n => eadv.lab_ua_acr.val.count().where(dt < acr_l_dt - 90 and val >= 30);
+
+#doc(, {
+    txt: "Albuminuria persistence flag: 1 if current uACR >= 3 AND at least one prior elevated result >= 90 days ago. This satisfies KDIGO persistence criteria at the A2 level."
+});
+
+a_pers : { acr_l_val >= 3 and coalesce(acr_90d_v3_n, 0) > 0 => 1 }, { => 0 };
+
+#doc(, {
+    txt: "Severe albuminuria persistence flag: 1 if current uACR >= 30 AND at least one prior result >= 30 at least 90 days ago. Satisfies KDIGO persistence at the A3 level."
+});
+
+a_pers_a3 : { acr_l_val >= 30 and coalesce(acr_90d_v30_n, 0) > 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Section 5: Assumption violation check
+   ================================================================ */
+
+#doc(, { section: "Assumption violation" });
+
+#doc(, {
+    txt: "Check for urinary leucocytes within +/- 14 days of the last uACR. Leucocyturia suggests UTI which can cause false-positive albuminuria. A result of 0 (no leucocytes) means the ACR assumption is not violated. This is an exclusion check: 1 = no violation detected (ACR is trustworthy), 0 = possible contamination or no leucocyte data available.",
+    cite: "kdigo_2012"
+});
+
+u_leuc => eadv.[lab_ua_poc_leucocytes,lab_ua_leucocytes]._.lastdv().where(dt > acr_l_dt - 14 and dt < acr_l_dt + 14);
+
+a_asm_viol_ex : { u_leuc_val = 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Section 6: Resolved albuminuria criteria
+   ================================================================ */
+
+#doc(, { section: "Resolved albuminuria" });
+
+#doc(, {
+    txt: "Flag patients where albuminuria has resolved (current ACR < 3) but the assumption violation check is clear AND there is historical evidence of elevation. These patients may still meet CKD criteria based on prior albuminuria even though current results are normal. This supports the KDIGO principle that CKD diagnosis is not rescinded when albuminuria resolves.",
+    cite: "kdigo_2012"
+});
+
+acr_nom_crit : { a_asm_viol_ex = 1 and (acr_past_pers_flag = 1 or acr_past_singular_flag = 1) => 1 }, { => 0 };
+
+/* ================================================================
+   Section 7: KDIGO albuminuria staging
+   ================================================================ */
+
+#doc(, { section: "KDIGO albuminuria staging" });
+
+#doc(, {
+    txt: "Apply KDIGO 2012 albuminuria categories based on uACR (mg/mmol): A1 (normal, < 3), A2 (moderately increased, 3-29), A3 (severely increased, 30-299), A4 (nephrotic range, >= 300). Note: KDIGO 2012 defines three categories (A1-A3). A4 (>= 300) is a subdivision used locally to flag nephrotic-range proteinuria.",
+    cite: "kdigo_2012, kdigo_2024"
+});
+
+[[rb_id]] : { acr_l_val < 3 => 1 },
+    { acr_l_val >= 3 and acr_l_val < 30 => 2 },
+    { acr_l_val >= 30 and acr_l_val < 300 => 3 },
+    { acr_l_val >= 300 => 4 },
+    { => 0 };
+
+/* ================================================================
+   Section 8: Output attribute definitions
+   ================================================================ */
+
+#doc(, { section: "Output attributes" });
+
+#define_attribute(
+    acr_l_val,
+    {
+        label: "uACR: last value (mg/mmol)",
+        desc: "Most recent urine albumin-to-creatinine ratio",
+        is_reportable: 1,
+        type: 2
+    }
+);
+
+#define_attribute(
+    acr_l_dt,
+    {
+        label: "uACR: last result date",
+        desc: "Date of most recent uACR measurement",
+        is_reportable: 1,
+        type: 12
+    }
+);
+
+#define_attribute(
+    acr_outdated,
+    {
+        label: "uACR: result outdated (> 2 years)",
+        desc: "1 if most recent uACR is older than 730 days, 0 otherwise",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    a_pers,
+    {
+        label: "uACR: KDIGO persistence confirmed (A2+)",
+        desc: "1 if elevated uACR confirmed on 2+ occasions >= 90 days apart",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    a_pers_a3,
+    {
+        label: "uACR: KDIGO persistence confirmed (A3+)",
+        desc: "1 if severely elevated uACR confirmed on 2+ occasions >= 90 days apart",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    a_asm_viol_ex,
+    {
+        label: "uACR: assumption violation excluded",
+        desc: "1 if no urinary leucocytes detected near last ACR (no UTI contamination), 0 if possible contamination or no data",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    acr_decline_flag,
+    {
+        label: "uACR: decline from peak (> 25%)",
+        desc: "1 if current uACR is < 75% of historical peak and peak was >= 3",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    acr_past_pers_flag,
+    {
+        label: "uACR: resolved persistent albuminuria",
+        desc: "1 if current ACR normal but multiple prior elevated results exist",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    acr_past_singular_flag,
+    {
+        label: "uACR: resolved singular albuminuria",
+        desc: "1 if current ACR normal but a single prior elevated result exists",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    acr_nom_crit,
+    {
+        label: "uACR: resolved albuminuria with clear assumption check",
+        desc: "1 if albuminuria resolved, no UTI contamination, and prior history of elevation — supports CKD diagnosis retention",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    [[rb_id]],
+    {
+        label: "uACR: KDIGO albuminuria category (1-4)",
+        desc: "1=A1 (normal), 2=A2 (moderate), 3=A3 (severe), 4=A4 (nephrotic range), 0=no data",
+        is_reportable: 1,
+        type: 2
+    }
+);

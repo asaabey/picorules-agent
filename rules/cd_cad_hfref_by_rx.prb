@@ -1,0 +1,262 @@
+/* Ruleblock to infer probable HFrEF from medication signatures.
+
+   HFrEF has a distinctive pharmacotherapy profile defined by four GDMT
+   pillars: ARNI/ACEi/ARB, evidence-based beta-blockers, MRA, and SGLT2i.
+   Certain drugs (ARNI, ivabradine) are virtually pathognomonic for HFrEF.
+   This ruleblock scores medication combinations to identify probable and
+   possible HFrEF even when ICD coding is absent.
+*/
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "Ruleblock to infer probable HFrEF from medication signatures",
+        is_active:2
+    }
+);
+
+/* ================================================================
+   Section 1: External bindings
+   ================================================================ */
+
+#doc(, { section: "External bindings" });
+
+#doc(, {
+    txt: "Bind coded CHF diagnosis to identify patients with medication signal but no ICD code"
+});
+
+chf_coded => rout_cd_cardiac_chf.chf.val.bind();
+
+/* ================================================================
+   Section 2: Highly specific HFrEF medications
+   ================================================================ */
+
+#doc(, { section: "Highly specific HFrEF medications" });
+
+#doc(, {
+    txt: "ARNI (sacubitril/valsartan) — virtually pathognomonic for HFrEF. ATC C09DX04. Prescribed status indicated by val=1.",
+    cite: "hfref_aha_2022, hfref_esc_2021"
+});
+
+rx_arni => eadv.[rxnc_c09dx04].dt.min().where(val=1);
+
+#doc(, {
+    txt: "Ivabradine — indicated only for HFrEF with resting HR >= 70 despite maximally tolerated beta-blocker. ATC C01EB (other cardiac preparations, filtered to ivabradine by class specificity in this context).",
+    cite: "hfref_aha_2022"
+});
+
+rx_ivabradine => eadv.[rxnc_c01eb].dt.min().where(val=1);
+
+/* ================================================================
+   Section 3: GDMT Pillar 1 — RAAS inhibition (ACEi/ARB)
+   ================================================================ */
+
+#doc(, { section: "GDMT Pillar 1: RAAS inhibition" });
+
+#doc(, {
+    txt: "ACE inhibitors (ATC C09AA) and ARBs (ATC C09CA). These are first-line RAAS blockade when ARNI is not used. Non-specific: also prescribed for HTN, CKD, diabetic nephropathy."
+});
+
+rx_acei => eadv.[rxnc_c09aa].dt.min().where(val=1);
+
+rx_arb => eadv.[rxnc_c09ca].dt.min().where(val=1);
+
+rx_raas : { coalesce(rx_arni, rx_acei, rx_arb)!? => 1 }, { => 0 };
+
+/* ================================================================
+   Section 4: GDMT Pillar 2 — Evidence-based beta-blockers
+   ================================================================ */
+
+#doc(, { section: "GDMT Pillar 2: Evidence-based beta-blockers" });
+
+#doc(, {
+    txt: "Only three beta-blockers have mortality benefit in HFrEF: carvedilol, bisoprolol, and metoprolol succinate (extended-release). Atenolol and other BBs are NOT evidence-based for HFrEF. We use RxCUI for dose-level identification of these three specific agents, matching patterns from rx_cv_common.",
+    cite: "hfref_aha_2022, hfref_esc_2021"
+});
+
+rx_carvedilol => eadv.[rxn_cui_315577,rxn_cui_315575,rxn_cui_315576].dt.min();
+
+rx_bisoprolol => eadv.[rxn_cui_854915,rxn_cui_854904,rxn_cui_854900].dt.min();
+
+rx_metoprolol_xl => eadv.[rxn_cui_1370489,rxn_cui_1370474,rxn_cui_1370483,rxn_cui_1370500].dt.min();
+
+rx_eb_bb : { coalesce(rx_carvedilol, rx_bisoprolol, rx_metoprolol_xl)!? => 1 }, { => 0 };
+
+/* ================================================================
+   Section 5: GDMT Pillar 3 — Mineralocorticoid receptor antagonist
+   ================================================================ */
+
+#doc(, { section: "GDMT Pillar 3: MRA" });
+
+#doc(, {
+    txt: "Steroidal MRAs: spironolactone and eplerenone (ATC C03DA). RALES and EMPHASIS-HF trials demonstrated mortality benefit in HFrEF. Also used for resistant HTN and hyperaldosteronism.",
+    cite: "hfref_aha_2022"
+});
+
+rx_mra => eadv.[rxnc_c03da].dt.min().where(val=1);
+
+rx_mra_flag : { rx_mra!? => 1 }, { => 0 };
+
+/* ================================================================
+   Section 6: GDMT Pillar 4 — SGLT2 inhibitor
+   ================================================================ */
+
+#doc(, { section: "GDMT Pillar 4: SGLT2 inhibitor" });
+
+#doc(, {
+    txt: "SGLT2 inhibitors (ATC A10BK): dapagliflozin and empagliflozin. DAPA-HF and EMPEROR-Reduced trials demonstrated HFrEF benefit independent of diabetes. Also prescribed for T2DM and CKD.",
+    cite: "hfref_aha_2022, hfref_esc_2021"
+});
+
+rx_sglt2i => eadv.[rxnc_a10bk].dt.min().where(val=1);
+
+rx_sglt2i_flag : { rx_sglt2i!? => 1 }, { => 0 };
+
+/* ================================================================
+   Section 7: Adjunctive HFrEF medications
+   ================================================================ */
+
+#doc(, { section: "Adjunctive medications" });
+
+#doc(, {
+    txt: "Loop diuretics (ATC C03CA, primarily frusemide) — used for congestion management in HF. Non-specific: also used for CKD oedema, nephrotic syndrome, cirrhosis."
+});
+
+rx_loop => eadv.[rxnc_c03ca].dt.min().where(val=1);
+
+rx_loop_flag : { rx_loop!? => 1 }, { => 0 };
+
+#doc(, {
+    txt: "Digoxin (ATC C01AA) — used for rate control in AF and symptomatic benefit in HFrEF. Non-specific but contributes to the medication signature."
+});
+
+rx_digoxin => eadv.[rxnc_c01aa].dt.min().where(val=1);
+
+rx_digoxin_flag : { rx_digoxin!? => 1 }, { => 0 };
+
+#doc(, {
+    txt: "Hydralazine (ATC C02DB) and nitrate (ISDN/ISMN, ATC C01DA) combination — alternative vasodilator therapy in patients intolerant of RAAS blockade. The combination is specific for HFrEF (A-HeFT trial).",
+    cite: "hfref_aha_2022"
+});
+
+rx_hydralazine => eadv.[rxnc_c02db].dt.min().where(val=1);
+
+rx_nitrate => eadv.[rxnc_c01da].dt.min().where(val=1);
+
+rx_hyd_nitrate : { rx_hydralazine!? and rx_nitrate!? => 1 }, { => 0 };
+
+/* ================================================================
+   Section 8: Composite scoring
+   ================================================================ */
+
+#doc(, { section: "Composite medication signature score" });
+
+#doc(, {
+    txt: "Count the four GDMT pillars present: (1) RAAS inhibition (ARNI/ACEi/ARB), (2) evidence-based BB, (3) MRA, (4) SGLT2i. Range 0-4.",
+    cite: "hfref_aha_2022, hfref_esc_2021"
+});
+
+rx_hf_pillars : { . => rx_raas + rx_eb_bb + rx_mra_flag + rx_sglt2i_flag };
+
+#doc(, {
+    txt: "Weighted medication signature score. Highly specific drugs (ARNI=3, ivabradine=3, hydralazine+nitrate=2) carry more weight than non-specific GDMT components (=1 each). Maximum theoretical score = 12 (all drugs present). Score thresholds: >=5 probable, 3-4 possible, <3 unlikely."
+});
+
+rx_arni_score : { rx_arni!? => 3 }, { => 0 };
+
+rx_ivabradine_score : { rx_ivabradine!? => 3 }, { => 0 };
+
+rx_hyd_nitrate_score : { rx_hyd_nitrate = 1 => 2 }, { => 0 };
+
+rx_hf_score : { . => rx_arni_score + rx_ivabradine_score + rx_eb_bb + rx_mra_flag + rx_sglt2i_flag + rx_loop_flag + rx_digoxin_flag + rx_hyd_nitrate_score };
+
+/* ================================================================
+   Section 9: Classification
+   ================================================================ */
+
+#doc(, { section: "HFrEF classification" });
+
+#doc(, {
+    txt: "Probable HFrEF: score >= 5 implies ARNI or ivabradine is present (scoring 3) plus at least 2 other GDMT drugs, OR 4+ non-specific GDMT drugs with adjunctive therapy. This threshold has high specificity."
+});
+
+rx_hfref_probable : { rx_hf_score >= 5 => 1 }, { => 0 };
+
+#doc(, {
+    txt: "Possible HFrEF: score 3-4 implies either one highly specific drug alone, or 3+ non-specific GDMT drugs. Requires clinical correlation (echocardiography)."
+});
+
+rx_hfref_possible : { rx_hf_score >= 3 and rx_hf_score < 5 => 1 }, { => 0 };
+
+#doc(, {
+    txt: "Uncoded HFrEF: probable or possible HFrEF by medication signature but no CHF ICD/ICPC code on record. May represent a coding gap."
+});
+
+rx_hfref_uncoded : { (rx_hfref_probable = 1 or rx_hfref_possible = 1) and coalesce(chf_coded, 0) = 0 => 1 }, { => 0 };
+
+[[rb_id]] : { rx_hfref_probable = 1 or rx_hfref_possible = 1 => 1 }, { => 0 };
+
+/* ================================================================
+   Section 10: Output attribute definitions
+   ================================================================ */
+
+#doc(, { section: "Output attributes" });
+
+#define_attribute(
+    rx_hf_score,
+    {
+        label: "HFrEF: medication signature score",
+        desc: "Weighted composite score (0-12) based on HFrEF-associated medications. >=5 probable, 3-4 possible, <3 unlikely",
+        is_reportable: 1,
+        type: 2
+    }
+);
+
+#define_attribute(
+    rx_hf_pillars,
+    {
+        label: "HFrEF: GDMT pillars present (0-4)",
+        desc: "Count of four foundational GDMT pillars: RAAS, evidence-based BB, MRA, SGLT2i",
+        is_reportable: 1,
+        type: 2
+    }
+);
+
+#define_attribute(
+    rx_hfref_probable,
+    {
+        label: "HFrEF: probable by medication signature",
+        desc: "1 if medication score >= 5 (high specificity for HFrEF)",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    rx_hfref_possible,
+    {
+        label: "HFrEF: possible by medication signature",
+        desc: "1 if medication score 3-4 (moderate specificity, needs clinical correlation)",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    rx_hfref_uncoded,
+    {
+        label: "HFrEF: probable/possible but no CHF ICD code",
+        desc: "1 if medication signature suggests HFrEF but no CHF diagnosis coded — potential coding gap",
+        is_reportable: 1,
+        type: 1001
+    }
+);
+
+#define_attribute(
+    [[rb_id]],
+    {
+        label: "HFrEF: detected by medication signature",
+        desc: "1 if probable or possible HFrEF based on medication analysis",
+        is_reportable: 1,
+        type: 1001
+    }
+);
