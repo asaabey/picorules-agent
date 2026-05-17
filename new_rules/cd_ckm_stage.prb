@@ -1,0 +1,173 @@
+/* Ruleblock: Cardiovascular-Kidney-Metabolic (CKM) syndrome staging.
+
+   Per AHA 2023 presidential advisory (Ndumele et al., Circulation 2023)
+   and reviewed in Mavromatis & Grams, Nat Rev Nephrol 2026
+   (https://doi.org/10.1038/s41581-026-01078-w).
+
+   Stages:
+     0  : Ideal CKM health (no risk factors)
+     1  : Excess/dysfunctional adiposity (overweight/obesity) OR pre-diabetes,
+          AND no stage 2/3/4 pathology
+     2  : >=1 of HTN, T2D, hypertriglyceridaemia (>=1.5 mmol/L),
+          OR moderate-to-high-risk CKD per KDIGO. Stage 1 not required.
+     3  : Stage 1 or 2 AND any of: subclinical CVD, very-high-risk CKD,
+          or 10-yr CVD risk >=20%
+     4a : Stage 1 or 2 AND clinical CVD, no kidney failure
+     4b : Stage 1 or 2 AND clinical CVD AND kidney failure (RRT or G5)
+
+   Units: AU/SI throughout. AHA TG cutoff is 135 mg/dL (~1.5 mmol/L).
+   HbA1c-NGSP stored as percent x 10 in EADV (e.g. 65/10 = 6.5%).
+   Pre-diabetes HbA1c band: 5.7-6.4% (57/10 .. 64/10).
+   Pre-diabetes FPG band:   5.6-6.9 mmol/L.
+
+   TODO: subclinical CVD (CAC score, LV hypertrophy, NT-proBNP) not yet
+   modelled in EADV; stage-3 modifier currently uses very-high-risk CKD
+   OR 10-yr CVD risk >=20% only. Add subclin_cvd binding when those
+   attributes are available.
+
+   Status: is_active:0 - back-test against existing CKM-component
+   ruleblocks before activation.
+*/
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "CKM (Cardiovascular-Kidney-Metabolic) syndrome stage 0-4 per AHA 2023",
+        is_active:0
+    }
+);
+
+/* ================================================================
+   BINDINGS: adiposity
+   ================================================================ */
+
+bmi => rout_cd_obesity.bmi.val.bind();
+obesity => rout_cd_obesity.cd_obesity.val.bind();
+
+/* ================================================================
+   BINDINGS: glycaemia (T2D + pre-diabetes)
+   ================================================================ */
+
+dm => rout_cd_dm_dx.dm.val.bind();
+hba1c_val => rout_cd_dm_dx.gluc_hba1c_val.val.bind();
+
+predm_code_fd => eadv.[icd_r73_03%,icpc_a91011].dt.min();
+fpg_predm_n   => eadv.lab_bld_glucose_fasting.val.count(0).where(val>=56/10 and val<=69/10);
+
+/* ================================================================
+   BINDINGS: lipids (triglycerides, mmol/L)
+   ================================================================ */
+
+tg_val => rout_cd_dyslip.tg_val.val.bind();
+
+/* ================================================================
+   BINDINGS: blood pressure / hypertension
+   ================================================================ */
+
+htn => rout_cd_htn.cd_htn.val.bind();
+
+/* ================================================================
+   BINDINGS: kidney (CKD presence + KDIGO heat-map risk)
+   ================================================================ */
+
+ckd        => rout_ckd.ckd.val.bind();
+cga_g_val  => rout_ckd.cga_g_val.val.bind();
+cga_a_val  => rout_ckd.cga_a_val.val.bind();
+esrd_risk  => rout_ckd.esrd_risk.val.bind();
+rrt        => rout_rrt.rrt.val.bind();
+
+/* ================================================================
+   BINDINGS: cardiovascular disease + 10-yr risk
+   ================================================================ */
+
+cvd_prev   => rout_cvra.cvd_prev.val.bind();
+cvd_risk_p => rout_cvra_ensemble.auspredict_p.val.bind();
+
+/* ================================================================
+   COMPONENT FLAGS
+   ================================================================ */
+
+bmi_overweight : { bmi >= 25 => 1 }, { => 0 };
+bmi_obese      : { bmi >= 30 => 1 }, { => 0 };
+
+/* Pre-diabetes: any of HbA1c 5.7-6.4%, coded dx, or fasting glucose
+   in pre-diabetic range. */
+prediab : { hba1c_val >= 57/10 and hba1c_val <= 64/10 => 1 },
+          { predm_code_fd!? => 1 },
+          { fpg_predm_n > 0 => 1 },
+          { => 0 };
+
+/* AHA CKM hypertriglyceridaemia threshold: 135 mg/dL ~ 1.5 mmol/L. */
+htg_ckm : { tg_val >= 1.5 => 1 }, { => 0 };
+
+/* Moderate-to-high-risk CKD per KDIGO: rout_ckd.ckd already encodes
+   the heat-map criteria with persistence. */
+ckd_mod_high  : { ckd = 1 => 1 }, { => 0 };
+ckd_very_high : { esrd_risk = 4 => 1 }, { => 0 };
+
+/* auspredict_p is rounded_risk_percent (e.g. 5 = 5%), NOT a probability.
+   AHA stage-3 cutoff is 10-yr CVD risk >=20%. */
+cvd_high_risk : { cvd_risk_p >= 20 => 1 }, { => 0 };
+
+/* TODO: bind to subclinical-CVD attributes when modelled
+   (e.g. CAC>=100, LVH on echo, NT-proBNP elevation). Stubbed to 0
+   via a never-true guard so production accepts the rule. */
+subclin_cvd : { 1 = 2 => 1 }, { => 0 };
+
+kidney_failure : { rrt = 1 => 1 },
+                 { cga_g_val = 5 => 1 },
+                 { => 0 };
+
+/* ================================================================
+   STAGE-COMPONENT ROLL-UPS
+   ================================================================ */
+
+ckm_s1_component : { bmi_overweight = 1 or bmi_obese = 1 or obesity = 1 or prediab = 1 => 1 },
+                   { => 0 };
+
+ckm_s2_component : { htn = 1 or dm = 1 or htg_ckm = 1 or ckd_mod_high = 1 => 1 },
+                   { => 0 };
+
+ckm_s3_modifier  : { ckd_very_high = 1 or cvd_high_risk = 1 or subclin_cvd = 1 => 1 },
+                   { => 0 };
+
+/* ================================================================
+   STAGE CLASSIFICATION (mutually exclusive; highest stage wins)
+   ================================================================ */
+
+[[rb_id]] : { cvd_prev = 1 and kidney_failure = 1 => `4b` },
+            { cvd_prev = 1 => `4a` },
+            { (ckm_s1_component = 1 or ckm_s2_component = 1) and ckm_s3_modifier = 1 => `3` },
+            { ckm_s2_component = 1 => `2` },
+            { ckm_s1_component = 1 => `1` },
+            { => `0` };
+
+/* Numeric mirror for downstream rules / reporting (4a=4, 4b=5). */
+ckm_stage_val : { cvd_prev = 1 and kidney_failure = 1 => 5 },
+                { cvd_prev = 1 => 4 },
+                { (ckm_s1_component = 1 or ckm_s2_component = 1) and ckm_s3_modifier = 1 => 3 },
+                { ckm_s2_component = 1 => 2 },
+                { ckm_s1_component = 1 => 1 },
+                { => 0 };
+
+/* ================================================================
+   OUTPUT METADATA
+   ================================================================ */
+
+#define_attribute([[rb_id]],
+    {
+        label: "CKM syndrome stage",
+        desc: "Cardiovascular-Kidney-Metabolic syndrome stage per AHA 2023 (0,1,2,3,4a,4b)",
+        is_reportable: 1,
+        type: 1
+    }
+);
+
+#define_attribute(ckm_stage_val,
+    {
+        label: "CKM syndrome stage (numeric)",
+        desc: "Numeric encoding of CKM stage 0 to 5 where 4 maps to 4a and 5 maps to 4b",
+        is_reportable: 1,
+        type: 2
+    }
+);
+

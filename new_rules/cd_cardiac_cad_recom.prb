@@ -1,0 +1,165 @@
+/* Ruleblock: Ischaemic heart disease pharmacotherapy recommendations (ESC CCS 2024-aligned) */
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "IHD/CAD pharmacotherapy recommendations and care gaps",
+        is_active:2
+    }
+);
+
+/* ================================================================
+   BINDINGS: CAD phenotyping
+   ================================================================ */
+
+#doc(,{
+    txt:"CAD presence, prior AMI/CABG from cd_cardiac_cad",
+    cite:"esc_ccs_2024"
+});
+
+cad => rout_cd_cardiac_cad.cd_cardiac_cad.val.bind();
+ami => rout_cd_cardiac_cad.ami.val.bind();
+cabg_flag => rout_cd_cardiac_cad.cabg_flag.val.bind();
+
+/* ================================================================
+   BINDINGS: Current medications
+   ================================================================ */
+
+rx_acei => rout_cd_htn.htn_rxn_acei.val.bind();
+rx_arb => rout_cd_htn.htn_rxn_arb.val.bind();
+rx_bb => rout_cd_htn.htn_rxn_bb.val.bind();
+rx_statin => rout_cd_dyslip.rx_statin.val.bind();
+rx_ezet => rout_cd_dyslip.rx_ezet.val.bind();
+rx_ap_dt => rout_cd_cardiac_rx.rxn_ap.val.bind();
+rx_anticoag_dt => rout_cd_cardiac_rx.rxn_anticoag.val.bind();
+rx_sglt2 => rout_cd_dm_rx_rcm.sglt2_f.val.bind();
+rx_glp1 => rout_cd_dm_rx_rcm.glp1_f.val.bind();
+
+ldl_val => rout_cd_dyslip.ldl_val.val.bind();
+
+/* ================================================================
+   BINDINGS: Comorbidity + safety
+   ================================================================ */
+
+dm => rout_cd_dm_dx.cd_dm_dx.val.bind();
+ci_acei_arb => rout_ckd_recom.ci_block_acei_arb.val.bind();
+ci_sglt2i => rout_ckd_recom.ci_block_sglt2i.val.bind();
+
+/* ================================================================
+   STAGE 1: Eligibility and severity
+   ================================================================ */
+
+cad_present : { nvl(cad,0) = 1 => 1 }, { => 0 };
+post_mi : { nvl(ami,0) = 1 => 1 }, { => 0 };
+
+rx_raas : { greatest(nvl(rx_acei,0), nvl(rx_arb,0)) > 0 => 1 }, { => 0 };
+rx_ap : { rx_ap_dt !? => 1 }, { => 0 };
+rx_anticoag : { rx_anticoag_dt !? => 1 }, { => 0 };
+
+ldl_above_target : { ldl_val !? and ldl_val > 1.8 => 1 }, { => 0 };
+ldl_very_above_target : { ldl_val !? and ldl_val > 2.6 => 1 }, { => 0 };
+
+sev_cad_ldl : { nvl(ldl_val,0) > 2.6 => 1.2 }, { => 1.0 };
+
+/* ================================================================
+   STAGE 2: Per-drug recommendations
+   ================================================================ */
+
+#doc(,{
+    section:"Recommendations",
+    cite:"esc_ccs_2024"
+});
+
+/* ---- Antiplatelet (aspirin/clopidogrel) — Class I secondary prevention ---- */
+recom_cad_antiplatelet : { cad_present = 0 => 0 },
+                         { rx_anticoag = 1 => 4 },
+                         { rx_ap = 0 => 1 },
+                         { => 4 };
+
+/* ---- Statin — foundational ---- */
+recom_cad_statin : { cad_present = 0 => 0 },
+                   { nvl(rx_statin,0) = 0 => 1 },
+                   { ldl_above_target = 1 and nvl(rx_ezet,0) = 0 => 3 },
+                   { => 4 };
+
+/* ---- Ezetimibe — add-on when LDL > target on statin ---- */
+recom_cad_ezetimibe : { cad_present = 0 => 0 },
+                      { nvl(rx_statin,0) = 1 and ldl_above_target = 1 and nvl(rx_ezet,0) = 0 => 1 },
+                      { nvl(rx_ezet,0) = 1 => 4 },
+                      { => 0 };
+
+/* ---- PCSK9i — reserve for very-high-risk with LDL>2.6 on max statin+ezet ---- */
+recom_cad_pcsk9i : { cad_present = 0 => 0 },
+                   { nvl(rx_statin,0) = 1 and nvl(rx_ezet,0) = 1 and ldl_very_above_target = 1 => 2 },
+                   { => 0 };
+
+/* ---- ACEi/ARB — post-MI or with comorbid HTN/CKD/DM ---- */
+recom_cad_acei_arb : { cad_present = 0 => 0 },
+                     { nvl(ci_acei_arb,0) = 1 => 0 },
+                     { post_mi = 1 and rx_raas = 0 => 1 },
+                     { rx_raas = 1 => 4 },
+                     { => 2 };
+
+/* ---- Beta-blocker — post-MI, angina ---- */
+recom_cad_bb : { cad_present = 0 => 0 },
+               { post_mi = 1 and nvl(rx_bb,0) = 0 => 1 },
+               { nvl(rx_bb,0) = 1 => 4 },
+               { cad_present = 1 and nvl(rx_bb,0) = 0 => 2 },
+               { => 0 };
+
+/* ---- SGLT2i / GLP-1 — cardiometabolic pillar in DM+IHD ---- */
+recom_cad_sglt2i : { cad_present = 0 or nvl(dm,0) = 0 => 0 },
+                   { nvl(ci_sglt2i,0) = 1 => 0 },
+                   { nvl(rx_sglt2,0) = 0 => 1 },
+                   { => 4 };
+
+recom_cad_glp1 : { cad_present = 0 or nvl(dm,0) = 0 => 0 },
+                 { nvl(rx_glp1,0) = 0 => 1 },
+                 { => 4 };
+
+/* ================================================================
+   STAGE 3: Care gaps
+   ================================================================ */
+
+gap_cad_antiplatelet : { recom_cad_antiplatelet = 1 => 1 }, { => 0 };
+gap_cad_statin : { recom_cad_statin = 1 => 1 }, { => 0 };
+gap_cad_lipid_intensify : { recom_cad_ezetimibe = 1 => 1 }, { => 0 };
+gap_cad_bb_post_mi : { post_mi = 1 and nvl(rx_bb,0) = 0 => 1 }, { => 0 };
+gap_cad_abc : { cad_present = 1 and (rx_ap = 0 and rx_anticoag = 0) => 1 },
+              { cad_present = 1 and nvl(rx_statin,0) = 0 => 1 },
+              { cad_present = 1 and rx_raas = 0 and post_mi = 1 => 1 },
+              { => 0 };
+
+/* ================================================================
+   STAGE 4: Concordance
+   ================================================================ */
+
+n_recom_cad_ap : { recom_cad_antiplatelet > 0 => 1 }, { => 0 };
+n_recom_cad_statin : { recom_cad_statin > 0 => 1 }, { => 0 };
+n_recom_cad_raas : { recom_cad_acei_arb > 0 => 1 }, { => 0 };
+n_recom_cad_bb : { recom_cad_bb > 0 => 1 }, { => 0 };
+n_cad_applicable : { . => n_recom_cad_ap + n_recom_cad_statin + n_recom_cad_raas + n_recom_cad_bb };
+
+n_met_cad_ap : { recom_cad_antiplatelet = 4 => 1 }, { => 0 };
+n_met_cad_statin : { recom_cad_statin = 4 => 1 }, { => 0 };
+n_met_cad_raas : { recom_cad_acei_arb = 4 => 1 }, { => 0 };
+n_met_cad_bb : { recom_cad_bb = 4 => 1 }, { => 0 };
+n_met_cad : { . => n_met_cad_ap + n_met_cad_statin + n_met_cad_raas + n_met_cad_bb };
+
+concordance_cad_pct : { n_cad_applicable > 0 => round((n_met_cad / n_cad_applicable) * 100, 0) },
+                      { => 100 };
+
+/* ================================================================
+   Summary output
+   ================================================================ */
+
+[[rb_id]] : { greatest(recom_cad_antiplatelet, recom_cad_statin, recom_cad_ezetimibe, recom_cad_acei_arb, recom_cad_bb, gap_cad_abc) > 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Attribute definitions
+   ================================================================ */
+
+#define_attribute(post_mi, { label:"Post-MI (STEMI/NSTEMI history)", is_reportable:1, type:1001 });
+#define_attribute(gap_cad_abc, { label:"Care gap: IHD missing core A/B/C therapy (AP+statin+RAAS)", is_reportable:1, type:1001 });
+#define_attribute(gap_cad_bb_post_mi, { label:"Care gap: Post-MI without beta-blocker", is_reportable:1, type:1001 });
+#define_attribute(concordance_cad_pct, { label:"IHD guideline concordance (0-100%)", is_reportable:1, type:2 });
+#define_attribute([[rb_id]], { label:"IHD management recommendation active", is_reportable:1, type:1001 });

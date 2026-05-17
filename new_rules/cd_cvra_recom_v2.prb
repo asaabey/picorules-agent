@@ -1,0 +1,394 @@
+/* Ruleblock: CVD risk management recommendations v2
+   AU-prioritised, aligned with 2023 Australian CVD Risk Guideline.
+   See cd_cvra_recom.prb for AU/EU/US comparison and rationale.
+
+   Primary references (cited inline below as URLs):
+     AU 2023  https://www.cvdcheck.org.au/
+              https://www.heartfoundation.org.au/for-professionals/guideline-for-managing-cvd
+     ESC/EAS 2019         https://doi.org/10.1093/eurheartj/ehz455
+     ESC/EAS 2025 focused https://doi.org/10.1093/eurheartj/ehaf190
+     AHA/ACC 2025 BP      https://doi.org/10.1161/CIR.0000000000001356
+     ACC/AHA portal       https://www.acc.org/guidelines
+     KDIGO 2024 CKD       https://kdigo.org/guidelines/ckd-evaluation-and-management/
+
+   v2 changes vs v1:
+     - SBP target lowered to 130 (AU 2023, except very-high young
+       <120 and frail elderly 140)
+     - clin_high_risk expanded: T2DM with end-organ damage, severe
+       hypercholesterolaemia (LDL>=5.0), prior CVD, eGFR<45 OR
+       albuminuria
+     - First Nations reclassification refined to age/risk-factor
+       conditional rather than blanket +1
+     - Lipid intensification ladder extended: statin -> ezetimibe ->
+       bempedoic acid / PCSK9i / inclisiran
+     - SGLT2i / GLP-1 cardio-renal recommendation stub for T2DM+CVD/CKD
+
+   Status: is_active:0 — back-test against v1 cohort distributions
+   before flipping to is_active:2.
+
+   TODO bindings (require upstream ruleblock work):
+     - rout_cd_dyslip.rx_alirocumab, rx_inclisiran, rx_bempedoic
+     - rout_dmg.fnp_age_band (replaces blanket FNP uplift)
+*/
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "CVD risk management recommendations v2 (AU 2023-aligned)",
+        is_active:0
+    }
+);
+
+/* ================================================================
+   BINDINGS: Risk assessment from ensemble + upstream sources
+   ================================================================ */
+
+#doc(,{
+    txt:"Risk assessment — bind to cvra_ensemble. Note: 2023 AU guideline (https://www.cvdcheck.org.au/) deprecates Framingham; ensemble should be migrated to AusCVDRisk-only in a future cvra_ensemble update."
+});
+
+ensemble_cat => rout_cvra_ensemble.ensemble_cat.val.bind();
+frmnghm_cat => rout_cvra_ensemble.frmnghm_cat.val.bind();
+auspredict_cat => rout_cvra_ensemble.auspredict_cat.val.bind();
+frmnghm_p => rout_cvra_ensemble.frmnghm_p.val.bind();
+auspredict_p => rout_cvra_ensemble.auspredict_p.val.bind();
+
+cvd_prev => rout_cvra.cvd_prev.val.bind();
+age => rout_cvra_ensemble.age.val.bind();
+ckd => rout_ckd.ckd.val.bind();
+cga_a_val => rout_ckd.cga_a_val.val.bind();
+fhc_prob => rout_cd_dyslip.fhc_prob.val.bind();
+fnp => rout_dmg.fnp.val.bind();
+
+/* ================================================================
+   BINDINGS: Diabetes status and end-organ damage (new in v2)
+   ================================================================ */
+
+#doc(,{
+    txt:"Diabetes diagnosis and microvascular complications. EOD = any of retinopathy, neuropathy, foot ulceration, albuminuria. T2DM+EOD reclassified as clinically high risk per AU 2023 (https://www.cvdcheck.org.au/)."
+});
+
+dm => rout_cd_dm_dx.dm.val.bind();
+dm_retino => rout_cd_dm_comp.dm_micvas_retino.val.bind();
+dm_neuro => rout_cd_dm_comp.dm_micvas_neuro.val.bind();
+dm_foot => rout_cd_dm_comp.dm_foot_ulc.val.bind();
+
+/* ================================================================
+   BINDINGS: Current BP medication state
+   ================================================================ */
+
+htn => rout_cd_htn.cd_htn.val.bind();
+rx_bp => rout_cd_htn.htn_rxn.val.bind();
+rx_bp_acei => rout_cd_htn.htn_rxn_acei.val.bind();
+rx_bp_arb => rout_cd_htn.htn_rxn_arb.val.bind();
+rx_bp_ccb => rout_cd_htn.htn_rxn_ccb.val.bind();
+rx_bp_bb => rout_cd_htn.htn_rxn_bb.val.bind();
+rx_bp_thiaz => rout_cd_htn.htn_rxn_diuretic_thiaz.val.bind();
+rx_bp_loop => rout_cd_htn.htn_rxn_diuretic_loop.val.bind();
+
+/* ================================================================
+   BINDINGS: Current lipid medication state (extended in v2)
+   ================================================================ */
+
+#doc(,{
+    txt:"Lipid Rx including non-statin intensifiers per 2025 ESC/EAS focused update (https://doi.org/10.1093/eurheartj/ehaf190) and ACC/AHA dyslipidaemia guidance (https://www.acc.org/guidelines). Bindings for alirocumab/inclisiran/bempedoic acid are TODO and currently default to 0 via nvl()."
+});
+
+rx_statin => rout_cd_dyslip.rx_statin.val.bind();
+rx_ezet => rout_cd_dyslip.rx_ezet.val.bind();
+rx_evolocumab => rout_cd_dyslip.rx_evolocumab.val.bind();
+ldl_val => rout_cd_dyslip.ldl_val.val.bind();
+
+/* ================================================================
+   BINDINGS: Antiplatelet / anticoagulant state
+   ================================================================ */
+
+rx_antiplatelet_dt => rout_cd_cardiac_rx.rxn_ap.val.bind();
+rx_anticoag_dt => rout_cd_cardiac_rx.rxn_anticoag.val.bind();
+
+/* ================================================================
+   BINDINGS: Cardiometabolic Rx (SGLT2i / GLP-1 RA from cd_dm_rx_rcm)
+   ================================================================ */
+
+rx_sglt2 => rout_cd_dm_rx_rcm.sglt2_f.val.bind();
+rx_glp1 => rout_cd_dm_rx_rcm.glp1_f.val.bind();
+
+/* ================================================================
+   BINDINGS: Smoking, weight, BP control
+   ================================================================ */
+
+smoker => rout_at_risk.smoker.val.bind();
+bmi => rout_cd_obesity.bmi.val.bind();
+sbp_mu_1 => rout_cd_htn_bp_control.sbp_mu_1.val.bind();
+
+/* ================================================================
+   DIRECT EADV LOOKUPS
+   ================================================================ */
+
+sbp => eadv.obs_bp_systolic._.lastdv().where(dt>sysdate-365);
+dbp => eadv.obs_bp_diastolic._.lastdv().where(dt>sysdate-365);
+tc => eadv.lab_bld_cholesterol_total.val.last().where(dt>sysdate-365);
+smoke0 => eadv.status_smoking_h2_v1.val.last();
+rx_cessation => eadv.[rxnc_n07ba].dt.last().where(val=1);
+
+/* ================================================================
+   STAGE 1: Risk Reconciliation (expanded in v2)
+   ================================================================ */
+
+#doc(,{
+    section:"Risk Reconciliation"
+});
+
+#doc(,{
+    txt:"Clinical overrides per 2023 AU CVD Risk Guideline (https://www.cvdcheck.org.au/) auto-high categories: established CVD, T2DM with end-organ damage, severe hypercholesterolaemia (LDL>=5.0), moderate-severe CKD (KDIGO 2024 — https://kdigo.org/guidelines/ckd-evaluation-and-management/), familial hypercholesterolaemia. First Nations reclassification handled separately."
+});
+
+albuminuria : { nvl(cga_a_val,0) >= 2 => 1 }, { => 0 };
+
+dm_eod : { greatest(nvl(dm_retino,0), nvl(dm_neuro,0), nvl(dm_foot,0), albuminuria) > 0 => 1 },
+         { => 0 };
+
+clin_high_risk : { nvl(cvd_prev,0) = 1 => 1 },
+                 { nvl(ckd,0) >= 3 => 1 },
+                 { nvl(fhc_prob,0) >= 2 => 1 },
+                 { nvl(ldl_val,0) >= 5.0 => 1 },
+                 { nvl(dm,0) = 1 and dm_eod = 1 => 1 },
+                 { albuminuria = 1 => 1 },
+                 { => 0 };
+
+clin_high_src : { nvl(cvd_prev,0) = 1 => `CVD` },
+                { nvl(ckd,0) >= 3 => `CKD` },
+                { nvl(fhc_prob,0) >= 2 => `FHC` },
+                { nvl(ldl_val,0) >= 5.0 => `LDL` },
+                { nvl(dm,0) = 1 and dm_eod = 1 => `DM_EOD` },
+                { albuminuria = 1 => `ACR` },
+                { => `NONE` };
+
+/* First Nations reclassification: 2023 AU guideline applies different
+   thresholds rather than a blanket +1 category. Pending an
+   FNP-specific calculator binding, retain a +1 uplift for ages 30-79
+   only (the AU calculator's modelled range), no uplift outside that
+   band. */
+fnp_uplift : { nvl(fnp,0) = 1 and age >= 30 and age < 80 and nvl(ensemble_cat,0) > 0 and nvl(ensemble_cat,0) < 3 => 1 },
+             { => 0 };
+
+cvra_cat_r : { clin_high_risk = 1 => 3 },
+             { fnp_uplift = 1 => nvl(ensemble_cat,0) + 1 },
+             { nvl(ensemble_cat,0) > 0 => ensemble_cat },
+             { => 0 };
+
+cvra_agree : { clin_high_risk = 1 => 2 },
+             { frmnghm_cat = auspredict_cat => 1 },
+             { frmnghm_cat !? and auspredict_cat !? => 0 },
+             { => -1 };
+
+cvra_src : { clin_high_risk = 1 => clin_high_src },
+           { fnp_uplift = 1 => `FNP` },
+           { nvl(frmnghm_cat,0) > nvl(auspredict_cat,0) => `FRAM` },
+           { nvl(auspredict_cat,0) > nvl(frmnghm_cat,0) => `AUS` },
+           { frmnghm_cat = auspredict_cat and frmnghm_cat !? => `BOTH` },
+           { => `NONE` };
+
+/* ================================================================
+   STAGE 2: Current Treatment Inventory
+   ================================================================ */
+
+#doc(,{
+    section:"Treatment Inventory"
+});
+
+rx_bp_raas : { greatest(nvl(rx_bp_acei,0), nvl(rx_bp_arb,0)) > 0 => 1 }, { => 0 };
+
+bp_rx_n : { . => nvl(rx_bp_raas,0) + nvl(rx_bp_ccb,0) + nvl(rx_bp_bb,0) + nvl(rx_bp_thiaz,0) + nvl(rx_bp_loop,0) };
+
+lipid_rx_n : { . => nvl(rx_statin,0) + nvl(rx_ezet,0) + nvl(rx_evolocumab,0) };
+
+rx_antiplatelet : { rx_antiplatelet_dt !? => 1 }, { => 0 };
+rx_anticoag : { rx_anticoag_dt !? => 1 }, { => 0 };
+
+#doc(,{
+    txt:"BP target per 2023 AU CVD Risk Guideline (https://www.cvdcheck.org.au/) / TG: <120 for high-risk young (<65), 140 for frail elderly (>=80) as proxy, 130 for everyone else under treatment. Cf. 2025 AHA/ACC BP guideline (https://doi.org/10.1161/CIR.0000000000001356) which also adopts <130 as standard target."
+});
+
+sbp_target : { cvra_cat_r = 3 and age < 65 => 120 },
+             { age >= 80 => 140 },
+             { => 130 };
+
+sbp_above_target : { sbp_val !? and sbp_val > sbp_target => 1 }, { => 0 };
+
+#doc(,{
+    txt:"LDL targets follow AU (TG Cardiovascular, https://www.cvdcheck.org.au/). EU caveat: ESC/EAS 2019 (https://doi.org/10.1093/eurheartj/ehz455) and 2025 focused update (https://doi.org/10.1093/eurheartj/ehaf190) targets are tighter — secondary prevention <1.4 mmol/L + >=50% reduction; <1.0 mmol/L if recurrent. US ACC/AHA (https://www.acc.org/guidelines) aligns with AU at <1.8 secondary."
+});
+
+ldl_target : { cvd_prev = 1 => 1.8 },
+             { cvra_cat_r = 3 => 2.0 },
+             { => 4.9 };
+
+ldl_above_target : { ldl_val !? and ldl_val > ldl_target => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 3: Override Triggers
+   ================================================================ */
+
+#doc(,{
+    section:"Override Triggers"
+});
+
+#doc(,{
+    txt:"Stage 2 HTN (SBP>=160 or DBP>=100) or severe hypercholesterolaemia (TC>=7.5) warrant Rx regardless of risk category. Aligned across AU 2023 (https://www.cvdcheck.org.au/), ESC/EAS 2019 (https://doi.org/10.1093/eurheartj/ehz455), and AHA/ACC 2025 BP (https://doi.org/10.1161/CIR.0000000000001356)."
+});
+
+rx_override_bp : { sbp_val >= 160 or dbp_val >= 100 => 1 }, { => 0 };
+rx_override_tc : { tc >= 7.5 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4a: BP Pharmacotherapy Recommendation
+   ================================================================ */
+
+#doc(,{
+    section:"Recommendations"
+});
+
+#doc(,{
+    txt:"BP pharmacotherapy: 0=not indicated, 1=initiate, 2=consider, 3=intensify, 4=maintain"
+});
+
+recom_rx_bp : { rx_override_bp = 1 and nvl(rx_bp,0) = 0 => 1 },
+              { rx_override_bp = 1 and nvl(rx_bp,0) > 0 => 3 },
+              { cvra_cat_r = 3 and nvl(rx_bp,0) = 0 => 1 },
+              { cvra_cat_r = 3 and nvl(rx_bp,0) > 0 and sbp_above_target = 1 => 3 },
+              { cvra_cat_r = 3 and nvl(rx_bp,0) > 0 and sbp_above_target = 0 => 4 },
+              { cvra_cat_r = 2 and nvl(rx_bp,0) = 0 => 2 },
+              { cvra_cat_r = 2 and nvl(rx_bp,0) > 0 and sbp_above_target = 1 => 3 },
+              { cvra_cat_r = 2 and nvl(rx_bp,0) > 0 and sbp_above_target = 0 => 4 },
+              { => 0 };
+
+/* ================================================================
+   STAGE 4b: Lipid Pharmacotherapy Recommendation (extended ladder)
+   ================================================================ */
+
+#doc(,{
+    txt:"Lipid pharmacotherapy: 0=not indicated, 1=initiate statin, 2=consider statin, 3=intensify (add ezetimibe), 4=maintain, 5=add non-statin intensifier (bempedoic acid / PCSK9i / inclisiran) — for LDL above target on max statin+ezetimibe."
+});
+
+recom_rx_lipid : { rx_override_tc = 1 and nvl(rx_statin,0) = 0 => 1 },
+                 { rx_override_tc = 1 and nvl(rx_statin,0) > 0 => 3 },
+                 { cvra_cat_r = 3 and lipid_rx_n = 0 => 1 },
+                 { cvra_cat_r = 3 and nvl(rx_statin,0) > 0 and nvl(rx_ezet,0) > 0 and ldl_above_target = 1 => 5 },
+                 { cvra_cat_r = 3 and nvl(rx_statin,0) > 0 and nvl(rx_ezet,0) = 0 and ldl_above_target = 1 => 3 },
+                 { cvra_cat_r = 3 and ldl_above_target = 0 => 4 },
+                 { cvra_cat_r = 2 and lipid_rx_n = 0 => 2 },
+                 { cvra_cat_r = 2 and lipid_rx_n > 0 => 4 },
+                 { => 0 };
+
+/* ================================================================
+   STAGE 4c: Antiplatelet — Secondary Prevention
+   ================================================================ */
+
+recom_rx_antiplatelet : { nvl(cvd_prev,0) = 1 and rx_antiplatelet = 0 and rx_anticoag = 0 => 1 },
+                        { nvl(cvd_prev,0) = 1 and (rx_antiplatelet = 1 or rx_anticoag = 1) => 4 },
+                        { => 0 };
+
+gap_antiplatelet : { nvl(cvd_prev,0) = 1 and rx_antiplatelet = 0 and rx_anticoag = 0 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4d: SGLT2i / GLP-1 cardio-renal recommendation (new in v2)
+   ================================================================ */
+
+#doc(,{
+    txt:"SGLT2i or GLP-1 RA recommended in T2DM with established CVD or CKD. Sources: AU 2023 CVD Risk Guideline (https://www.cvdcheck.org.au/); ESC/EAS 2025 focused update (https://doi.org/10.1093/eurheartj/ehaf190); ACC/AHA (https://www.acc.org/guidelines); KDIGO 2024 CKD (https://kdigo.org/guidelines/ckd-evaluation-and-management/). 0=not indicated, 1=initiate (eligible, neither on board), 4=maintain (on at least one)."
+});
+
+cardiometab_eligible : { nvl(dm,0) = 1 and (nvl(cvd_prev,0) = 1 or nvl(ckd,0) >= 3) => 1 },
+                       { => 0 };
+
+recom_cardiometab_rx : { cardiometab_eligible = 1 and nvl(rx_sglt2,0) = 0 and nvl(rx_glp1,0) = 0 => 1 },
+                       { cardiometab_eligible = 1 => 4 },
+                       { => 0 };
+
+/* ================================================================
+   STAGE 4e: Smoking Cessation Recommendation
+   ================================================================ */
+
+is_smoker : { nvl(smoke0,0) >= 29 => 1 }, { => 0 };
+is_exsmoker : { nvl(smoke0,0) = 20 => 1 }, { => 0 };
+rx_cessation_f : { rx_cessation !? => 1 }, { => 0 };
+
+recom_smoking : { is_smoker = 1 and rx_cessation_f = 0 => 1 },
+                { is_smoker = 1 and rx_cessation_f = 1 => 2 },
+                { is_exsmoker = 1 => 3 },
+                { => 0 };
+
+gap_smoking_rx : { is_smoker = 1 and rx_cessation_f = 0 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4f: Lifestyle Recommendations
+   ================================================================ */
+
+recom_lifestyle : { . => 1 };
+
+recom_weight : { nvl(bmi,0) >= 25 => 1 }, { => 0 };
+
+#doc(,{
+    txt:"Reassessment interval per 2023 AU guideline (https://www.cvdcheck.org.au/): low <=5 yr, intermediate <=2 yr, high annual, First Nations annual."
+});
+
+recom_reassess_yr : { nvl(fnp,0) = 1 => 1 },
+                    { cvra_cat_r = 3 => 1 },
+                    { cvra_cat_r = 2 => 2 },
+                    { cvra_cat_r = 1 => 5 },
+                    { => 0 };
+
+/* ================================================================
+   STAGE 5: Care Gap Detection
+   ================================================================ */
+
+#doc(,{
+    section:"Care Gaps"
+});
+
+gap_bp_rx : { recom_rx_bp = 1 and nvl(rx_bp,0) = 0 => 1 }, { => 0 };
+gap_bp_intensify : { nvl(rx_bp,0) > 0 and sbp_above_target = 1 => 1 }, { => 0 };
+gap_lipid_rx : { recom_rx_lipid = 1 and nvl(rx_statin,0) = 0 => 1 }, { => 0 };
+gap_lipid_intensify : { nvl(rx_statin,0) > 0 and ldl_above_target = 1 and nvl(rx_ezet,0) = 0 => 1 }, { => 0 };
+gap_lipid_nonstatin : { recom_rx_lipid = 5 => 1 }, { => 0 };
+gap_cardiometab_rx : { recom_cardiometab_rx = 1 => 1 }, { => 0 };
+n_met_cardiometab_v : { recom_cardiometab_rx = 4 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 6: Guideline Concordance Score
+   ================================================================ */
+
+#doc(,{
+    section:"Guideline Concordance"
+});
+
+n_recom_bp : { recom_rx_bp > 0 => 1 }, { => 0 };
+n_recom_lipid : { recom_rx_lipid > 0 => 1 }, { => 0 };
+n_recom_antipl : { nvl(cvd_prev,0) = 1 => 1 }, { => 0 };
+n_recom_smoking : { is_smoker = 1 => 1 }, { => 0 };
+n_recom_cardiometab : { recom_cardiometab_rx > 0 => 1 }, { => 0 };
+
+n_applicable : { . => n_recom_bp + n_recom_lipid + n_recom_antipl + n_recom_smoking + n_recom_cardiometab };
+
+n_met_bp : { recom_rx_bp = 4 => 1 }, { => 0 };
+n_met_lipid : { recom_rx_lipid = 4 => 1 }, { => 0 };
+n_met_antipl : { recom_rx_antiplatelet = 4 => 1 }, { => 0 };
+n_met_smoking : { recom_smoking = 2 => 1 }, { => 0 };
+n_met_cardiometab : { . => nvl(n_met_cardiometab_v,0) };
+
+n_met : { . => n_met_bp + n_met_lipid + n_met_antipl + n_met_smoking + n_met_cardiometab };
+
+concordance_pct : { n_applicable > 0 => round((n_met / n_applicable) * 100, 0) },
+                  { => 100 };
+
+/* ================================================================
+   Summary output
+   ================================================================ */
+
+[[rb_id]] : { greatest(recom_rx_bp, recom_rx_lipid, recom_rx_antiplatelet, recom_smoking, recom_cardiometab_rx, gap_bp_rx, gap_bp_intensify, gap_lipid_rx, gap_lipid_intensify, gap_lipid_nonstatin, gap_smoking_rx, gap_antiplatelet, gap_cardiometab_rx) > 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Attribute definitions
+   ================================================================ */
+
+#define_attribute([[rb_id]], { label:"CVD management recommendation v2 active", is_reportable:1, type:1001 });

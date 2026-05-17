@@ -1,0 +1,144 @@
+/* Ruleblock: Hypertension pharmacotherapy recommendations (NHF AU + ESC 2024) */
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "HTN pharmacotherapy recommendations and care gaps",
+        is_active:2
+    }
+);
+
+/* ================================================================
+   BINDINGS: HTN phenotyping and current meds
+   ================================================================ */
+
+#doc(,{
+    txt:"HTN presence and drug class flags from cd_htn",
+    cite:"nhf_au_2016,esc_hypertension_2024"
+});
+
+htn => rout_cd_htn.cd_htn.val.bind();
+rx_acei => rout_cd_htn.htn_rxn_acei.val.bind();
+rx_arb => rout_cd_htn.htn_rxn_arb.val.bind();
+rx_ccb => rout_cd_htn.htn_rxn_ccb.val.bind();
+rx_bb => rout_cd_htn.htn_rxn_bb.val.bind();
+rx_thiaz => rout_cd_htn.htn_rxn_diuretic_thiaz.val.bind();
+rx_loop => rout_cd_htn.htn_rxn_diuretic_loop.val.bind();
+
+sbp_mu => rout_cd_htn_bp_control.sbp_mu_1.val.bind();
+
+/* ================================================================
+   BINDINGS: Comorbidity + safety + risk
+   ================================================================ */
+
+chf => rout_cd_cardiac_chf.chf.val.bind();
+cad => rout_cd_cardiac_cad.cd_cardiac_cad.val.bind();
+ckd => rout_ckd.ckd.val.bind();
+dm => rout_cd_dm_dx.cd_dm_dx.val.bind();
+cvra_cat => rout_cd_cvra_recom.cvra_cat_r.val.bind();
+ci_acei_arb => rout_ckd_recom.ci_block_acei_arb.val.bind();
+
+/* ================================================================
+   DIRECT EADV: BP and K for MRA eligibility
+   ================================================================ */
+
+sbp => eadv.obs_bp_systolic._.lastdv().where(dt>sysdate-365);
+dbp => eadv.obs_bp_diastolic._.lastdv().where(dt>sysdate-365);
+
+/* ================================================================
+   STAGE 1: Eligibility, targets, severity
+   ================================================================ */
+
+htn_present : { nvl(htn,0) = 1 => 1 }, { => 0 };
+rx_raas : { greatest(nvl(rx_acei,0), nvl(rx_arb,0)) > 0 => 1 }, { => 0 };
+
+rx_class_count : { . => nvl(rx_raas,0) + nvl(rx_ccb,0) + nvl(rx_thiaz,0) + nvl(rx_bb,0) + nvl(rx_loop,0) };
+
+sbp_target : { nvl(cvra_cat,0) >= 3 => 120 },
+             { nvl(ckd,0) >= 1 => 130 },
+             { nvl(dm,0) = 1 => 130 },
+             { => 140 };
+
+sbp_above_target : { sbp_val !? and sbp_val > sbp_target => 1 }, { => 0 };
+sbp_very_above : { sbp_val !? and sbp_val >= 160 => 1 },
+                 { dbp_val !? and dbp_val >= 100 => 1 },
+                 { => 0 };
+
+resistant_htn : { htn_present = 1 and rx_class_count >= 3 and sbp_above_target = 1 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 2: Per-drug recommendations
+   ================================================================ */
+
+#doc(,{
+    section:"Recommendations",
+    cite:"nhf_au_2016"
+});
+
+/* ---- ACEi/ARB — first-line (RAAS) ---- */
+recom_htn_acei_arb : { htn_present = 0 => 0 },
+                     { nvl(ci_acei_arb,0) = 1 => 0 },
+                     { rx_raas = 0 => 1 },
+                     { rx_raas = 1 and sbp_above_target = 1 => 3 },
+                     { => 4 };
+
+/* ---- CCB — first-line ---- */
+recom_htn_ccb : { htn_present = 0 => 0 },
+                { nvl(chf,0) = 1 => 0 },
+                { rx_raas = 1 and nvl(rx_ccb,0) = 0 and sbp_above_target = 1 => 1 },
+                { nvl(rx_ccb,0) = 1 => 4 },
+                { htn_present = 1 and rx_raas = 0 => 2 },
+                { => 0 };
+
+/* ---- Thiazide — first-line ---- */
+recom_htn_thiaz : { htn_present = 0 => 0 },
+                  { rx_raas = 1 and nvl(rx_ccb,0) = 1 and nvl(rx_thiaz,0) = 0 and sbp_above_target = 1 => 1 },
+                  { nvl(rx_thiaz,0) = 1 => 4 },
+                  { => 0 };
+
+/* ---- Beta-blocker — reserve for compelling indication (IHD/HF) ---- */
+recom_htn_bb : { htn_present = 0 => 0 },
+               { (nvl(cad,0) = 1 or nvl(chf,0) = 1) and nvl(rx_bb,0) = 0 => 1 },
+               { nvl(rx_bb,0) = 1 => 4 },
+               { => 0 };
+
+/* ---- MRA add-on for resistant HTN ---- */
+recom_htn_mra : { resistant_htn = 1 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 3: Care gaps
+   ================================================================ */
+
+gap_htn_untreated : { htn_present = 1 and rx_class_count = 0 => 1 }, { => 0 };
+gap_htn_uncontrolled : { htn_present = 1 and sbp_above_target = 1 and rx_class_count > 0 => 1 }, { => 0 };
+gap_htn_severe : { sbp_very_above = 1 => 1 }, { => 0 };
+gap_htn_raas_missing : { htn_present = 1 and rx_raas = 0 and nvl(ci_acei_arb,0) = 0 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4: Concordance
+   ================================================================ */
+
+n_recom_htn_raas : { recom_htn_acei_arb > 0 => 1 }, { => 0 };
+n_recom_htn_ccb : { recom_htn_ccb > 0 => 1 }, { => 0 };
+n_recom_htn_thiaz : { recom_htn_thiaz > 0 => 1 }, { => 0 };
+n_htn_applicable : { . => n_recom_htn_raas + n_recom_htn_ccb + n_recom_htn_thiaz };
+
+n_met_htn : { htn_present = 1 and sbp_above_target = 0 => n_htn_applicable }, { => 0 };
+
+concordance_htn_pct : { n_htn_applicable > 0 => round((n_met_htn / n_htn_applicable) * 100, 0) },
+                      { => 100 };
+
+/* ================================================================
+   Summary output
+   ================================================================ */
+
+[[rb_id]] : { greatest(recom_htn_acei_arb, recom_htn_ccb, recom_htn_thiaz, recom_htn_bb, recom_htn_mra, gap_htn_uncontrolled, gap_htn_severe) > 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Attribute definitions
+   ================================================================ */
+
+#define_attribute(sbp_above_target, { label:"SBP above risk-adjusted target", is_reportable:1, type:1001 });
+#define_attribute(resistant_htn, { label:"Resistant HTN (≥3 drug classes, SBP above target)", is_reportable:1, type:1001 });
+#define_attribute(gap_htn_uncontrolled, { label:"Care gap: HTN on Rx but SBP above target", is_reportable:1, type:1001 });
+#define_attribute(concordance_htn_pct, { label:"HTN guideline concordance (0-100%)", is_reportable:1, type:2 });
+#define_attribute([[rb_id]], { label:"HTN management recommendation active", is_reportable:1, type:1001 });

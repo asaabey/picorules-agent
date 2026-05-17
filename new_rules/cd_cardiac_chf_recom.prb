@@ -1,0 +1,204 @@
+/* Ruleblock: Heart failure pharmacotherapy recommendations (ESC HF 2023 focused update)
+   NOTE: LVEF not available in current EADV feed. HFrEF-specific drugs (ARNI/BB/MRA) default
+   to 'consider' (recom=2) unless HFrEF is inferred from DCM coding or existing ARNI therapy. */
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "Heart failure pharmacotherapy recommendations and care gaps",
+        is_active:2
+    }
+);
+
+/* ================================================================
+   BINDINGS: HF disease state
+   ================================================================ */
+
+#doc(,{
+    txt:"CHF presence and aetiology from cd_cardiac_chf",
+    cite:"esc_hf_2023_focused"
+});
+
+chf => rout_cd_cardiac_chf.chf.val.bind();
+dcm => rout_cd_cardiac_chf.dcm.val.bind();
+hocm => rout_cd_cardiac_chf.hocm.val.bind();
+rx_arni_flag => rout_cd_cardiac_chf.rx_arni.val.bind();
+
+/* ================================================================
+   BINDINGS: Current medications
+   ================================================================ */
+
+rx_acei => rout_cd_htn.htn_rxn_acei.val.bind();
+rx_arb => rout_cd_htn.htn_rxn_arb.val.bind();
+rx_bb => rout_cd_htn.htn_rxn_bb.val.bind();
+rx_loop_flag => rout_cd_htn.htn_rxn_diuretic_loop.val.bind();
+rx_sglt2 => rout_cd_dm_rx_rcm.sglt2_f.val.bind();
+rx_glp1 => rout_cd_dm_rx_rcm.glp1_f.val.bind();
+
+/* ================================================================
+   BINDINGS: Renal safety signals from ckd_recom
+   ================================================================ */
+
+#doc(,{
+    txt:"Consume contraindication signals from ckd_recom — avoid duplicating K/eGFR logic"
+});
+
+ci_acei_arb => rout_ckd_recom.ci_block_acei_arb.val.bind();
+ci_mra => rout_ckd_recom.ci_block_mra.val.bind();
+ci_sglt2i => rout_ckd_recom.ci_block_sglt2i.val.bind();
+
+/* ================================================================
+   DIRECT EADV: MRA (K-sparing diuretic), obesity, HR
+   ================================================================ */
+
+rx_mra_dt => eadv.[rxnc_c03d%].dt.last().where(val=1);
+rx_mra : { rx_mra_dt !? => 1 }, { => 0 };
+
+bmi => rout_cd_obesity.bmi.val.bind();
+hr_val => eadv.obs_heart_rate.val.last().where(dt>sysdate-365);
+
+/* ================================================================
+   STAGE 1: HF phenotype inference (LVEF proxy)
+   ================================================================ */
+
+#doc(,{
+    section:"HF phenotype",
+    txt:"Without LVEF, infer likely-HFrEF from DCM coding or existing ARNI therapy. Otherwise HF-unspecified."
+});
+
+chf_present : { nvl(chf,0) = 1 => 1 }, { => 0 };
+hfref_likely : { chf_present = 1 and (nvl(dcm,0) = 1 or nvl(rx_arni_flag,0) = 1) => 1 }, { => 0 };
+hfref_unknown_ef : { chf_present = 1 and hfref_likely = 0 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 2: Severity modifier (placeholder — LVEF unavailable)
+   ================================================================ */
+
+#doc(,{
+    txt:"Severity modifier stub. Returns 1.0 until LVEF or NT-proBNP ingested into EADV."
+});
+
+sev_chf : { . => 1.0 };
+
+/* ================================================================
+   STAGE 3: Eligibility flags
+   ================================================================ */
+
+rx_raas : { greatest(nvl(rx_acei,0), nvl(rx_arb,0), nvl(rx_arni_flag,0)) > 0 => 1 }, { => 0 };
+obesity_hfpef_candidate : { chf_present = 1 and hfref_likely = 0 and nvl(bmi,0) >= 30 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4: Per-drug recommendations
+   0=none, 1=initiate, 2=consider (phenotype uncertain), 3=intensify, 4=maintain
+   ================================================================ */
+
+#doc(,{
+    section:"Recommendations",
+    cite:"esc_hf_2023_focused"
+});
+
+/* ---- SGLT2i: Class I across EF spectrum ---- */
+recom_chf_sglt2i : { chf_present = 0 => 0 },
+                   { nvl(ci_sglt2i,0) = 1 => 0 },
+                   { nvl(rx_sglt2,0) = 0 => 1 },
+                   { => 4 };
+
+/* ---- ACEi/ARB foundational pillar ---- */
+recom_chf_acei_arb : { chf_present = 0 => 0 },
+                     { nvl(ci_acei_arb,0) = 1 => 0 },
+                     { rx_raas = 0 and hfref_likely = 1 => 1 },
+                     { rx_raas = 0 and hfref_unknown_ef = 1 => 2 },
+                     { rx_raas = 1 => 4 },
+                     { => 0 };
+
+/* ---- ARNI: Class I HFrEF (preferred over ACEi/ARB if tolerated) ---- */
+recom_chf_arni : { chf_present = 0 => 0 },
+                 { nvl(ci_acei_arb,0) = 1 => 0 },
+                 { hfref_likely = 1 and nvl(rx_arni_flag,0) = 0 => 1 },
+                 { nvl(rx_arni_flag,0) = 1 => 4 },
+                 { hfref_unknown_ef = 1 and nvl(rx_arni_flag,0) = 0 => 2 },
+                 { => 0 };
+
+/* ---- Beta-blocker: Class I HFrEF ---- */
+recom_chf_bb : { chf_present = 0 => 0 },
+               { nvl(hr_val,999) < 50 => 0 },
+               { hfref_likely = 1 and nvl(rx_bb,0) = 0 => 1 },
+               { hfref_unknown_ef = 1 and nvl(rx_bb,0) = 0 => 2 },
+               { nvl(rx_bb,0) = 1 => 4 },
+               { => 0 };
+
+/* ---- MRA (steroidal): Class I HFrEF; HFpEF signal per FINEARTS ---- */
+recom_chf_mra : { chf_present = 0 => 0 },
+                { nvl(ci_mra,0) = 1 => 0 },
+                { hfref_likely = 1 and rx_mra = 0 => 1 },
+                { hfref_unknown_ef = 1 and rx_mra = 0 => 2 },
+                { rx_mra = 1 => 4 },
+                { => 0 };
+
+/* ---- Loop diuretic (symptomatic, not mortality) ---- */
+recom_chf_loop : { chf_present = 0 => 0 },
+                 { nvl(rx_loop_flag,0) = 1 => 4 },
+                 { => 2 };
+
+/* ---- GLP-1 RA: STEP-HFpEF in obese, EF-preserved ---- */
+recom_chf_glp1 : { obesity_hfpef_candidate = 1 and nvl(rx_glp1,0) = 0 => 2 },
+                 { chf_present = 1 and nvl(rx_glp1,0) = 1 => 4 },
+                 { => 0 };
+
+/* ================================================================
+   STAGE 5: Care gaps
+   ================================================================ */
+
+#doc(,{
+    section:"Care Gaps"
+});
+
+gap_chf_sglt2i : { recom_chf_sglt2i = 1 => 1 }, { => 0 };
+gap_chf_acei_arb : { recom_chf_acei_arb = 1 => 1 }, { => 0 };
+gap_chf_arni : { recom_chf_arni = 1 => 1 }, { => 0 };
+gap_chf_bb : { recom_chf_bb = 1 => 1 }, { => 0 };
+gap_chf_mra : { recom_chf_mra = 1 => 1 }, { => 0 };
+gap_chf_quad : { hfref_likely = 1 and rx_raas = 1 and nvl(rx_bb,0) = 1 and rx_mra = 1 and nvl(rx_sglt2,0) = 1 => 0 },
+               { hfref_likely = 1 => 1 },
+               { => 0 };
+gap_chf_lvef_missing : { chf_present = 1 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 6: Concordance
+   ================================================================ */
+
+#doc(,{
+    section:"Guideline Concordance"
+});
+
+n_recom_chf_sglt2i : { recom_chf_sglt2i > 0 => 1 }, { => 0 };
+n_recom_chf_raas : { recom_chf_acei_arb > 0 or recom_chf_arni > 0 => 1 }, { => 0 };
+n_recom_chf_bb : { recom_chf_bb > 0 => 1 }, { => 0 };
+n_recom_chf_mra : { recom_chf_mra > 0 => 1 }, { => 0 };
+
+n_chf_applicable : { . => n_recom_chf_sglt2i + n_recom_chf_raas + n_recom_chf_bb + n_recom_chf_mra };
+
+n_met_chf_sglt2i : { recom_chf_sglt2i = 4 => 1 }, { => 0 };
+n_met_chf_raas : { recom_chf_acei_arb = 4 or recom_chf_arni = 4 => 1 }, { => 0 };
+n_met_chf_bb : { recom_chf_bb = 4 => 1 }, { => 0 };
+n_met_chf_mra : { recom_chf_mra = 4 => 1 }, { => 0 };
+
+n_met_chf : { . => n_met_chf_sglt2i + n_met_chf_raas + n_met_chf_bb + n_met_chf_mra };
+
+concordance_chf_pct : { n_chf_applicable > 0 => round((n_met_chf / n_chf_applicable) * 100, 0) },
+                      { => 100 };
+
+/* ================================================================
+   Summary output
+   ================================================================ */
+
+[[rb_id]] : { greatest(recom_chf_sglt2i, recom_chf_acei_arb, recom_chf_arni, recom_chf_bb, recom_chf_mra, recom_chf_loop, recom_chf_glp1, gap_chf_quad) > 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Attribute definitions
+   ================================================================ */
+
+#define_attribute(hfref_likely, { label:"HFrEF likely (DCM coded or on ARNI)", is_reportable:1, type:1001 });
+#define_attribute(gap_chf_quad, { label:"Care gap: HFrEF without quadruple therapy complete", is_reportable:1, type:1001 });
+#define_attribute(gap_chf_lvef_missing, { label:"Data gap: HF present but LVEF missing", is_reportable:1, type:1001 });
+#define_attribute(concordance_chf_pct, { label:"HF guideline concordance (0-100%)", is_reportable:1, type:2 });
+#define_attribute([[rb_id]], { label:"HF management recommendation active", is_reportable:1, type:1001 });

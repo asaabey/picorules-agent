@@ -1,0 +1,254 @@
+/* Ruleblock: Multi-morbidity recommendation orchestrator
+   Binds per-disease recommendation outputs, computes weighted drug utility across
+   indications, and emits ranked regimen + multi-domain care gaps.
+   Weights inlined from reference/data/drug_indication_matrix.csv. */
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "Multi-morbidity drug recommendation orchestrator with weighted utility",
+        is_active:2
+    }
+);
+
+/* ================================================================
+   BINDINGS: Per-disease recom states (0=none, 1=initiate, 2=consider, 3=intensify, 4=maintain)
+   ================================================================ */
+
+#doc(,{
+    section:"Per-disease bindings"
+});
+
+/* CKD */
+r_ckd_acei_arb => rout_ckd_recom.recom_ckd_acei_arb.val.bind();
+r_ckd_sglt2i => rout_ckd_recom.recom_ckd_sglt2i.val.bind();
+r_ckd_finer => rout_ckd_recom.recom_ckd_finerenone.val.bind();
+r_ckd_glp1 => rout_ckd_recom.recom_ckd_glp1.val.bind();
+r_ckd_statin => rout_ckd_recom.recom_ckd_statin.val.bind();
+sev_ckd => rout_ckd_recom.sev_ckd_acr.val.bind();
+
+/* CHF */
+r_chf_sglt2i => rout_cd_cardiac_chf_recom.recom_chf_sglt2i.val.bind();
+r_chf_acei_arb => rout_cd_cardiac_chf_recom.recom_chf_acei_arb.val.bind();
+r_chf_arni => rout_cd_cardiac_chf_recom.recom_chf_arni.val.bind();
+r_chf_bb => rout_cd_cardiac_chf_recom.recom_chf_bb.val.bind();
+r_chf_mra => rout_cd_cardiac_chf_recom.recom_chf_mra.val.bind();
+r_chf_glp1 => rout_cd_cardiac_chf_recom.recom_chf_glp1.val.bind();
+sev_chf => rout_cd_cardiac_chf_recom.sev_chf.val.bind();
+
+/* DM */
+r_dm_metformin => rout_cd_dm_recom.recom_dm_metformin.val.bind();
+r_dm_sglt2i => rout_cd_dm_recom.recom_dm_sglt2i.val.bind();
+r_dm_glp1 => rout_cd_dm_recom.recom_dm_glp1.val.bind();
+r_dm_statin => rout_cd_dm_recom.recom_dm_statin.val.bind();
+sev_dm => rout_cd_dm_recom.sev_dm_hba1c.val.bind();
+
+/* CAD */
+r_cad_ap => rout_cd_cardiac_cad_recom.recom_cad_antiplatelet.val.bind();
+r_cad_statin => rout_cd_cardiac_cad_recom.recom_cad_statin.val.bind();
+r_cad_ezet => rout_cd_cardiac_cad_recom.recom_cad_ezetimibe.val.bind();
+r_cad_acei_arb => rout_cd_cardiac_cad_recom.recom_cad_acei_arb.val.bind();
+r_cad_bb => rout_cd_cardiac_cad_recom.recom_cad_bb.val.bind();
+r_cad_sglt2i => rout_cd_cardiac_cad_recom.recom_cad_sglt2i.val.bind();
+r_cad_glp1 => rout_cd_cardiac_cad_recom.recom_cad_glp1.val.bind();
+sev_cad => rout_cd_cardiac_cad_recom.sev_cad_ldl.val.bind();
+
+/* HTN */
+r_htn_acei_arb => rout_cd_htn_recom.recom_htn_acei_arb.val.bind();
+r_htn_ccb => rout_cd_htn_recom.recom_htn_ccb.val.bind();
+r_htn_thiaz => rout_cd_htn_recom.recom_htn_thiaz.val.bind();
+r_htn_bb => rout_cd_htn_recom.recom_htn_bb.val.bind();
+r_htn_mra => rout_cd_htn_recom.recom_htn_mra.val.bind();
+
+/* Concordance components for roll-up */
+conc_ckd => rout_ckd_recom.concordance_ckd_pct.val.bind();
+conc_chf => rout_cd_cardiac_chf_recom.concordance_chf_pct.val.bind();
+conc_dm => rout_cd_dm_recom.concordance_dm_pct.val.bind();
+conc_cad => rout_cd_cardiac_cad_recom.concordance_cad_pct.val.bind();
+conc_htn => rout_cd_htn_recom.concordance_htn_pct.val.bind();
+
+/* Disease-presence flags — gate applicability on real diagnosis,
+   not on null-ness of concordance (upstream rules emit 100 vacuously
+   when disease is absent; see fix plan A follow-up) */
+has_ckd => rout_ckd.ckd.val.bind();
+has_chf => rout_cd_cardiac_chf.chf.val.bind();
+has_dm  => rout_cd_dm_dx.cd_dm_dx.val.bind();
+has_cad => rout_cd_cardiac_cad.cd_cardiac_cad.val.bind();
+has_htn => rout_cd_htn.cd_htn.val.bind();
+
+/* ================================================================
+   STAGE 1: Recommendation-state factors (rsf)
+   1=initiate → 10, 3=intensify → 7, 2=consider → 5, 4=maintain → 3, 0 → 0
+   ================================================================ */
+
+#doc(,{
+    section:"State factors",
+    txt:"Map recom 0-4 state to utility contribution strength"
+});
+
+/* Macro-style: inline per cell */
+rsf_ckd_acei_arb : { nvl(r_ckd_acei_arb,0) = 1 => 10 }, { r_ckd_acei_arb = 3 => 7 }, { r_ckd_acei_arb = 2 => 5 }, { r_ckd_acei_arb = 4 => 3 }, { => 0 };
+rsf_ckd_sglt2i : { nvl(r_ckd_sglt2i,0) = 1 => 10 }, { r_ckd_sglt2i = 3 => 7 }, { r_ckd_sglt2i = 2 => 5 }, { r_ckd_sglt2i = 4 => 3 }, { => 0 };
+rsf_ckd_finer : { nvl(r_ckd_finer,0) = 1 => 10 }, { r_ckd_finer = 3 => 7 }, { r_ckd_finer = 2 => 5 }, { r_ckd_finer = 4 => 3 }, { => 0 };
+rsf_ckd_glp1 : { nvl(r_ckd_glp1,0) = 1 => 10 }, { r_ckd_glp1 = 3 => 7 }, { r_ckd_glp1 = 2 => 5 }, { r_ckd_glp1 = 4 => 3 }, { => 0 };
+rsf_ckd_statin : { nvl(r_ckd_statin,0) = 1 => 10 }, { r_ckd_statin = 3 => 7 }, { r_ckd_statin = 2 => 5 }, { r_ckd_statin = 4 => 3 }, { => 0 };
+
+rsf_chf_sglt2i : { nvl(r_chf_sglt2i,0) = 1 => 10 }, { r_chf_sglt2i = 3 => 7 }, { r_chf_sglt2i = 2 => 5 }, { r_chf_sglt2i = 4 => 3 }, { => 0 };
+rsf_chf_acei_arb : { nvl(r_chf_acei_arb,0) = 1 => 10 }, { r_chf_acei_arb = 3 => 7 }, { r_chf_acei_arb = 2 => 5 }, { r_chf_acei_arb = 4 => 3 }, { => 0 };
+rsf_chf_arni : { nvl(r_chf_arni,0) = 1 => 10 }, { r_chf_arni = 3 => 7 }, { r_chf_arni = 2 => 5 }, { r_chf_arni = 4 => 3 }, { => 0 };
+rsf_chf_bb : { nvl(r_chf_bb,0) = 1 => 10 }, { r_chf_bb = 3 => 7 }, { r_chf_bb = 2 => 5 }, { r_chf_bb = 4 => 3 }, { => 0 };
+rsf_chf_mra : { nvl(r_chf_mra,0) = 1 => 10 }, { r_chf_mra = 3 => 7 }, { r_chf_mra = 2 => 5 }, { r_chf_mra = 4 => 3 }, { => 0 };
+rsf_chf_glp1 : { nvl(r_chf_glp1,0) = 1 => 10 }, { r_chf_glp1 = 3 => 7 }, { r_chf_glp1 = 2 => 5 }, { r_chf_glp1 = 4 => 3 }, { => 0 };
+
+rsf_dm_metformin : { nvl(r_dm_metformin,0) = 1 => 10 }, { r_dm_metformin = 3 => 7 }, { r_dm_metformin = 2 => 5 }, { r_dm_metformin = 4 => 3 }, { => 0 };
+rsf_dm_sglt2i : { nvl(r_dm_sglt2i,0) = 1 => 10 }, { r_dm_sglt2i = 3 => 7 }, { r_dm_sglt2i = 2 => 5 }, { r_dm_sglt2i = 4 => 3 }, { => 0 };
+rsf_dm_glp1 : { nvl(r_dm_glp1,0) = 1 => 10 }, { r_dm_glp1 = 3 => 7 }, { r_dm_glp1 = 2 => 5 }, { r_dm_glp1 = 4 => 3 }, { => 0 };
+rsf_dm_statin : { nvl(r_dm_statin,0) = 1 => 10 }, { r_dm_statin = 3 => 7 }, { r_dm_statin = 2 => 5 }, { r_dm_statin = 4 => 3 }, { => 0 };
+
+rsf_cad_ap : { nvl(r_cad_ap,0) = 1 => 10 }, { r_cad_ap = 3 => 7 }, { r_cad_ap = 2 => 5 }, { r_cad_ap = 4 => 3 }, { => 0 };
+rsf_cad_statin : { nvl(r_cad_statin,0) = 1 => 10 }, { r_cad_statin = 3 => 7 }, { r_cad_statin = 2 => 5 }, { r_cad_statin = 4 => 3 }, { => 0 };
+rsf_cad_ezet : { nvl(r_cad_ezet,0) = 1 => 10 }, { r_cad_ezet = 3 => 7 }, { r_cad_ezet = 2 => 5 }, { r_cad_ezet = 4 => 3 }, { => 0 };
+rsf_cad_acei_arb : { nvl(r_cad_acei_arb,0) = 1 => 10 }, { r_cad_acei_arb = 3 => 7 }, { r_cad_acei_arb = 2 => 5 }, { r_cad_acei_arb = 4 => 3 }, { => 0 };
+rsf_cad_bb : { nvl(r_cad_bb,0) = 1 => 10 }, { r_cad_bb = 3 => 7 }, { r_cad_bb = 2 => 5 }, { r_cad_bb = 4 => 3 }, { => 0 };
+rsf_cad_sglt2i : { nvl(r_cad_sglt2i,0) = 1 => 10 }, { r_cad_sglt2i = 3 => 7 }, { r_cad_sglt2i = 2 => 5 }, { r_cad_sglt2i = 4 => 3 }, { => 0 };
+rsf_cad_glp1 : { nvl(r_cad_glp1,0) = 1 => 10 }, { r_cad_glp1 = 3 => 7 }, { r_cad_glp1 = 2 => 5 }, { r_cad_glp1 = 4 => 3 }, { => 0 };
+
+rsf_htn_acei_arb : { nvl(r_htn_acei_arb,0) = 1 => 10 }, { r_htn_acei_arb = 3 => 7 }, { r_htn_acei_arb = 2 => 5 }, { r_htn_acei_arb = 4 => 3 }, { => 0 };
+rsf_htn_ccb : { nvl(r_htn_ccb,0) = 1 => 10 }, { r_htn_ccb = 3 => 7 }, { r_htn_ccb = 2 => 5 }, { r_htn_ccb = 4 => 3 }, { => 0 };
+rsf_htn_thiaz : { nvl(r_htn_thiaz,0) = 1 => 10 }, { r_htn_thiaz = 3 => 7 }, { r_htn_thiaz = 2 => 5 }, { r_htn_thiaz = 4 => 3 }, { => 0 };
+rsf_htn_bb : { nvl(r_htn_bb,0) = 1 => 10 }, { r_htn_bb = 3 => 7 }, { r_htn_bb = 2 => 5 }, { r_htn_bb = 4 => 3 }, { => 0 };
+rsf_htn_mra : { nvl(r_htn_mra,0) = 1 => 10 }, { r_htn_mra = 3 => 7 }, { r_htn_mra = 2 => 5 }, { r_htn_mra = 4 => 3 }, { => 0 };
+
+/* ================================================================
+   STAGE 2: Drug utility (Σ cell_weight × severity × rsf)
+   Weights sourced from reference/data/drug_indication_matrix.csv
+   ================================================================ */
+
+#doc(,{
+    section:"Drug utility",
+    cite:"multimorbid_recom_plan_2026"
+});
+
+u_sglt2i : { . => 1.0 * nvl(sev_ckd,1.0) * rsf_ckd_sglt2i
+                + 1.0 * nvl(sev_chf,1.0) * rsf_chf_sglt2i
+                + 0.30 * nvl(sev_dm,1.0) * rsf_dm_sglt2i
+                + 0.42 * rsf_cad_sglt2i };
+
+u_glp1 : { . => 0.70 * nvl(sev_ckd,1.0) * rsf_ckd_glp1
+              + 0.30 * rsf_chf_glp1
+              + 0.30 * nvl(sev_dm,1.0) * rsf_dm_glp1
+              + 1.00 * rsf_cad_glp1 };
+
+u_acei_arb : { . => 1.00 * nvl(sev_ckd,1.0) * rsf_ckd_acei_arb
+                  + 1.00 * rsf_chf_acei_arb
+                  + 1.00 * rsf_cad_acei_arb
+                  + 1.00 * rsf_htn_acei_arb };
+
+u_arni : { . => 1.00 * rsf_chf_arni };
+
+u_mra : { . => 1.00 * rsf_chf_mra
+             + 0.30 * rsf_htn_mra };
+
+u_finer : { . => 1.00 * nvl(sev_ckd,1.0) * rsf_ckd_finer };
+
+u_bb : { . => 1.00 * rsf_cad_bb
+            + 1.00 * rsf_chf_bb
+            + 0.30 * rsf_htn_bb };
+
+u_ccb : { . => 1.00 * rsf_htn_ccb };
+
+u_thiaz : { . => 1.00 * rsf_htn_thiaz };
+
+u_statin : { . => 0.50 * rsf_ckd_statin
+                + 0.30 * rsf_dm_statin
+                + 1.00 * nvl(sev_cad,1.0) * rsf_cad_statin };
+
+u_ezet : { . => 0.70 * nvl(sev_cad,1.0) * rsf_cad_ezet };
+
+u_metformin : { . => 0.30 * rsf_dm_metformin };
+
+u_ap : { . => 1.00 * rsf_cad_ap };
+
+/* ================================================================
+   STAGE 3: Indication counts and top-leverage flags
+   ================================================================ */
+
+ind_sglt2i_n : { . => least(nvl(r_ckd_sglt2i,0),1) + least(nvl(r_chf_sglt2i,0),1) + least(nvl(r_dm_sglt2i,0),1) + least(nvl(r_cad_sglt2i,0),1) };
+ind_glp1_n : { . => least(nvl(r_ckd_glp1,0),1) + least(nvl(r_chf_glp1,0),1) + least(nvl(r_dm_glp1,0),1) + least(nvl(r_cad_glp1,0),1) };
+ind_acei_arb_n : { . => least(nvl(r_ckd_acei_arb,0),1) + least(nvl(r_chf_acei_arb,0),1) + least(nvl(r_cad_acei_arb,0),1) + least(nvl(r_htn_acei_arb,0),1) };
+
+multimorb_sglt2i : { ind_sglt2i_n >= 2 => 1 }, { => 0 };
+multimorb_glp1 : { ind_glp1_n >= 2 => 1 }, { => 0 };
+multimorb_acei_arb : { ind_acei_arb_n >= 2 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4: Ranked drug — identify highest-utility
+   Emit label of top-1 drug for reporting
+   ================================================================ */
+
+u_max_1 : { . => greatest(u_sglt2i, u_glp1, u_acei_arb, u_arni, u_mra, u_finer, u_bb, u_ccb, u_thiaz, u_statin, u_ezet, u_metformin, u_ap) };
+
+top_drug : { u_max_1 = u_sglt2i and u_max_1 > 0 => `SGLT2i` },
+           { u_max_1 = u_acei_arb and u_max_1 > 0 => `ACEi/ARB` },
+           { u_max_1 = u_glp1 and u_max_1 > 0 => `GLP-1 RA` },
+           { u_max_1 = u_statin and u_max_1 > 0 => `Statin` },
+           { u_max_1 = u_bb and u_max_1 > 0 => `Beta-blocker` },
+           { u_max_1 = u_mra and u_max_1 > 0 => `MRA` },
+           { u_max_1 = u_arni and u_max_1 > 0 => `ARNI` },
+           { u_max_1 = u_finer and u_max_1 > 0 => `Finerenone` },
+           { u_max_1 = u_ap and u_max_1 > 0 => `Antiplatelet` },
+           { u_max_1 = u_ccb and u_max_1 > 0 => `CCB` },
+           { u_max_1 = u_thiaz and u_max_1 > 0 => `Thiazide` },
+           { u_max_1 = u_ezet and u_max_1 > 0 => `Ezetimibe` },
+           { u_max_1 = u_metformin and u_max_1 > 0 => `Metformin` },
+           { => `None` };
+
+/* ================================================================
+   STAGE 5: Multi-domain gap roll-up
+   ================================================================ */
+
+gap_multimorb_priority_n : { . => nvl(multimorb_sglt2i,0) + nvl(multimorb_glp1,0) + nvl(multimorb_acei_arb,0) };
+
+/* ================================================================
+   STAGE 6: Overall concordance (mean of applicable disease-level scores)
+   ================================================================ */
+
+appl_ckd : { has_ckd = 1 => 1 }, { => 0 };
+appl_chf : { has_chf = 1 => 1 }, { => 0 };
+appl_dm  : { has_dm  = 1 => 1 }, { => 0 };
+appl_cad : { has_cad = 1 => 1 }, { => 0 };
+appl_htn : { has_htn = 1 => 1 }, { => 0 };
+
+n_dx_applicable : { . => appl_ckd + appl_chf + appl_dm + appl_cad + appl_htn };
+
+conc_sum : { . => appl_ckd * nvl(conc_ckd,0) + appl_chf * nvl(conc_chf,0) + appl_dm * nvl(conc_dm,0) + appl_cad * nvl(conc_cad,0) + appl_htn * nvl(conc_htn,0) };
+
+concordance_pct_overall : { n_dx_applicable > 0 => round(conc_sum / n_dx_applicable, 0) },
+                          { => 100 };
+
+/* ================================================================
+   Summary output
+   ================================================================ */
+
+[[rb_id]] : { u_max_1 > 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Attribute definitions (reporting surface only)
+   ================================================================ */
+
+#define_attribute(top_drug, { label:"Highest-utility drug across all morbidities", is_reportable:1, type:1 });
+#define_attribute(ind_sglt2i_n, { label:"SGLT2i indications count (domains where indicated)", is_reportable:1, type:2 });
+#define_attribute(ind_glp1_n, { label:"GLP-1 RA indications count (domains where indicated)", is_reportable:1, type:2 });
+#define_attribute(ind_acei_arb_n, { label:"ACEi/ARB indications count (domains where indicated)", is_reportable:1, type:2 });
+#define_attribute(gap_multimorb_priority_n, { label:"Count of multi-indication drug gaps (≥2 domains)", is_reportable:1, type:2 });
+#define_attribute(concordance_pct_overall, { label:"Overall guideline concordance across all domains (0-100%)", is_reportable:1, type:2 });
+#define_attribute(conc_ckd, { label:"CKD guideline concordance (0-100%)", is_reportable:1, type:2 });
+#define_attribute(conc_chf, { label:"CHF guideline concordance (0-100%)", is_reportable:1, type:2 });
+#define_attribute(conc_dm,  { label:"DM guideline concordance (0-100%)",  is_reportable:1, type:2 });
+#define_attribute(conc_cad, { label:"CAD guideline concordance (0-100%)", is_reportable:1, type:2 });
+#define_attribute(conc_htn, { label:"HTN guideline concordance (0-100%)", is_reportable:1, type:2 });
+#define_attribute(has_ckd, { label:"CKD present", is_reportable:1 });
+#define_attribute(has_chf, { label:"CHF present", is_reportable:1 });
+#define_attribute(has_dm,  { label:"DM present",  is_reportable:1 });
+#define_attribute(has_cad, { label:"CAD present", is_reportable:1 });
+#define_attribute(has_htn, { label:"HTN present", is_reportable:1 });
+#define_attribute([[rb_id]], { label:"Multi-morbidity recommendation active", is_reportable:1, type:1001 });

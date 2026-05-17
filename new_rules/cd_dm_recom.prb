@@ -1,0 +1,157 @@
+/* Ruleblock: Type 2 Diabetes pharmacotherapy recommendations (ADA/EASD 2026-aligned) */
+
+#define_ruleblock([[rb_id]],
+    {
+              description: "DM2 pharmacotherapy recommendations and care gaps",
+                      is_active:2
+    }
+);
+
+/* ================================================================
+   BINDINGS: Disease, metrics, meds
+      ================================================================ */
+
+      #doc(,{
+             txt:"DM presence, glycaemic control, current DM meds",
+                 cite:"ada_soc_2026"
+      });
+
+      dm => rout_cd_dm_dx.cd_dm_dx.val.bind();
+      rx_metformin => rout_cd_dm_rx_rcm.bg_f.val.bind();
+      rx_su => rout_cd_dm_rx_rcm.su_f.val.bind();
+      rx_sglt2 => rout_cd_dm_rx_rcm.sglt2_f.val.bind();
+      rx_glp1 => rout_cd_dm_rx_rcm.glp1_f.val.bind();
+      rx_insulin_long => rout_cd_dm_rx_rcm.ins_long_f.val.bind();
+
+      rx_statin => rout_cd_dyslip.rx_statin.val.bind();
+
+      /* ================================================================
+         BINDINGS: Comorbid drivers for first-line choice
+            ================================================================ */
+
+            #doc(,{
+                   txt:"ASCVD/HF/CKD presence drives GLP-1/SGLT2i preference over other agents"
+            });
+
+            cvd_prev => rout_cvra.cvd_prev.val.bind();
+            chf_present => rout_cd_cardiac_chf.chf.val.bind();
+            ckd_present => rout_ckd.ckd.val.bind();
+            cvra_cat => rout_cd_cvra_recom.cvra_cat_r.val.bind();
+
+            /* ================================================================
+               BINDINGS: Safety signals from ckd_recom
+                  ================================================================ */
+
+                  ci_metformin => rout_ckd_recom.ci_block_metformin.val.bind();
+                  ci_sglt2i => rout_ckd_recom.ci_block_sglt2i.val.bind();
+
+                  /* ================================================================
+                     DIRECT EADV: HbA1c
+                        ================================================================ */
+
+                        hba1c_val => eadv.lab_bld_hba1c.val.last().where(dt>sysdate-365);
+
+                        /* ================================================================
+                           STAGE 1: Eligibility and severity
+                              ================================================================ */
+
+                              dm_present : { nvl(dm,0) = 1 => 1 }, { => 0 };
+                              high_cv_risk : { nvl(cvd_prev,0) = 1 => 1 },
+                                             { nvl(chf_present,0) = 1 => 1 },
+                                                            { nvl(ckd_present,0) >= 1 => 1 },
+                                                                           { nvl(cvra_cat,0) >= 3 => 1 },
+                                                                                          { => 0 };
+
+                                                                                          hba1c_above_target : { hba1c_val !? and hba1c_val > 53 => 1 }, { => 0 };
+
+                                                                                          sev_dm_hba1c : { nvl(hba1c_val,0) > 75 => 1.2 }, { => 1.0 };
+
+                                                                                          /* ================================================================
+                                                                                             STAGE 2: Per-drug recommendations
+                                                                                                ================================================================ */
+
+                                                                                                #doc(,{
+                                                                                                       section:"Recommendations",
+                                                                                                           cite:"ada_soc_2026"
+                                                                                                });
+
+                                                                                                /* ---- Metformin: first-line unless contraindicated ---- */
+                                                                                                recom_dm_metformin : { dm_present = 0 => 0 },
+                                                                                                                     { nvl(ci_metformin,0) = 1 => 0 },
+                                                                                                                                          { nvl(rx_metformin,0) = 0 => 1 },
+                                                                                                                                                               { => 4 };
+
+                                                                                                                                                               /* ---- SGLT2i: first-line when ASCVD/HF/CKD present regardless of HbA1c ---- */
+                                                                                                                                                               recom_dm_sglt2i : { dm_present = 0 => 0 },
+                                                                                                                                                                                 { nvl(ci_sglt2i,0) = 1 => 0 },
+                                                                                                                                                                                                   { high_cv_risk = 1 and nvl(rx_sglt2,0) = 0 => 1 },
+                                                                                                                                                                                                                     { hba1c_above_target = 1 and nvl(rx_sglt2,0) = 0 => 2 },
+                                                                                                                                                                                                                                       { nvl(rx_sglt2,0) = 1 => 4 },
+                                                                                                                                                                                                                                                         { => 0 };
+
+                                                                                                                                                                                                                                                         /* ---- GLP-1 RA: first-line when ASCVD present; weight/obesity benefit ---- */
+                                                                                                                                                                                                                                                         recom_dm_glp1 : { dm_present = 0 => 0 },
+                                                                                                                                                                                                                                                                         { high_cv_risk = 1 and nvl(rx_glp1,0) = 0 => 1 },
+                                                                                                                                                                                                                                                                                         { hba1c_above_target = 1 and nvl(rx_glp1,0) = 0 => 2 },
+                                                                                                                                                                                                                                                                                                         { nvl(rx_glp1,0) = 1 => 4 },
+                                                                                                                                                                                                                                                                                                                         { => 0 };
+
+                                                                                                                                                                                                                                                                                                                         /* ---- Statin: primary prevention in DM when risk-qualified ---- */
+                                                                                                                                                                                                                                                                                                                         recom_dm_statin : { dm_present = 0 => 0 },
+                                                                                                                                                                                                                                                                                                                                           { nvl(rx_statin,0) = 0 and nvl(cvra_cat,0) >= 2 => 1 },
+                                                                                                                                                                                                                                                                                                                                                             { nvl(rx_statin,0) = 1 => 4 },
+                                                                                                                                                                                                                                                                                                                                                                               { => 0 };
+
+                                                                                                                                                                                                                                                                                                                                                                               /* ---- SU: de-prioritise; flag if sole second-line ---- */
+                                                                                                                                                                                                                                                                                                                                                                               recom_dm_su_deprescribe : { nvl(rx_su,0) = 1 and high_cv_risk = 1 and nvl(rx_sglt2,0) = 0 and nvl(rx_glp1,0) = 0 => 1 },
+                                                                                                                                                                                                                                                                                                                                                                                                         { => 0 };
+
+                                                                                                                                                                                                                                                                                                                                                                                                         /* ================================================================
+                                                                                                                                                                                                                                                                                                                                                                                                            STAGE 3: Care gaps
+                                                                                                                                                                                                                                                                                                                                                                                                               ================================================================ */
+
+                                                                                                                                                                                                                                                                                                                                                                                                               gap_dm_metformin : { recom_dm_metformin = 1 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                               gap_dm_sglt2i : { recom_dm_sglt2i = 1 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                               gap_dm_glp1 : { recom_dm_glp1 = 1 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                               gap_dm_cardioprotective : { dm_present = 1 and high_cv_risk = 1 and nvl(rx_sglt2,0) = 0 and nvl(rx_glp1,0) = 0 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                               gap_dm_hba1c_monitor : { dm_present = 1 and hba1c_val ? => 1 }, { => 0 };
+
+                                                                                                                                                                                                                                                                                                                                                                                                               /* ================================================================
+                                                                                                                                                                                                                                                                                                                                                                                                                  STAGE 4: Concordance
+                                                                                                                                                                                                                                                                                                                                                                                                                     ================================================================ */
+
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_recom_dm_metformin : { recom_dm_metformin > 0 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_recom_dm_sglt2i : { recom_dm_sglt2i > 0 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_recom_dm_glp1 : { recom_dm_glp1 > 0 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_recom_dm_statin : { recom_dm_statin > 0 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_dm_applicable : { . => n_recom_dm_metformin + n_recom_dm_sglt2i + n_recom_dm_glp1 + n_recom_dm_statin };
+
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_met_dm_metformin : { recom_dm_metformin = 4 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_met_dm_sglt2i : { recom_dm_sglt2i = 4 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_met_dm_glp1 : { recom_dm_glp1 = 4 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_met_dm_statin : { recom_dm_statin = 4 => 1 }, { => 0 };
+                                                                                                                                                                                                                                                                                                                                                                                                                     n_met_dm : { . => n_met_dm_metformin + n_met_dm_sglt2i + n_met_dm_glp1 + n_met_dm_statin };
+
+                                                                                                                                                                                                                                                                                                                                                                                                                     concordance_dm_pct : { n_dm_applicable > 0 => round((n_met_dm / n_dm_applicable) * 100, 0) },
+                                                                                                                                                                                                                                                                                                                                                                                                                                          { => 100 };
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                          /* ================================================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                             Summary output
+                                                                                                                                                                                                                                                                                                                                                                                                                                                ================================================================ */
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                [[rb_id]] : { greatest(recom_dm_metformin, recom_dm_sglt2i, recom_dm_glp1, recom_dm_statin, gap_dm_cardioprotective) > 0 => 1 }, { => 0 };
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                /* ================================================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                   Attribute definitions (reporting surface only)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      ================================================================ */
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      #define_attribute(high_cv_risk, { label:"DM with ASCVD/HF/CKD/high CVD risk — cardioprotective indication", is_reportable:1, type:1001 });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      #define_attribute(gap_dm_cardioprotective, { label:"Care gap: High-CV-risk DM without SGLT2i or GLP-1 RA", is_reportable:1, type:1001 });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      #define_attribute(gap_dm_hba1c_monitor, { label:"Care gap: DM without recent HbA1c", is_reportable:1, type:1001 });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      #define_attribute(concordance_dm_pct, { label:"DM guideline concordance (0-100%)", is_reportable:1, type:2 });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      #define_attribute([[rb_id]], { label:"DM management recommendation active", is_reportable:1, type:1001 });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+                                                                                                })
+            })
+      })
+    })

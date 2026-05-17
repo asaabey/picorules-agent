@@ -1,0 +1,236 @@
+/* Ruleblock: CKD pharmacotherapy recommendations (KDIGO 2024-aligned) */
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "CKD pharmacotherapy recommendations and care gaps (KDIGO 2024)",
+        is_active:2
+    }
+);
+
+/* ================================================================
+   BINDINGS: CKD disease state and metrics
+   ================================================================ */
+
+#doc(,{
+    txt:"CKD stage, eGFR, UACR from upstream ckd ruleblock",
+    cite:"kdigo_2024"
+});
+
+ckd => rout_ckd.ckd.val.bind();
+ckd_stage_3a => rout_ckd.ckd_stage_3a.val.bind();
+ckd_stage_3b => rout_ckd.ckd_stage_3b.val.bind();
+ckd_stage_4 => rout_ckd.ckd_stage_4.val.bind();
+ckd_stage_5 => rout_ckd.ckd_stage_5.val.bind();
+egfr_val => rout_ckd.egfr_l_val.val.bind();
+acr_val => rout_ckd.acr_l_val.val.bind();
+
+/* ================================================================
+   BINDINGS: Current medication state (from upstream disease blocks)
+   ================================================================ */
+
+#doc(,{
+    txt:"Current RAAS, statin, DM agents from upstream ruleblocks"
+});
+
+rx_acei => rout_cd_htn.htn_rxn_acei.val.bind();
+rx_arb => rout_cd_htn.htn_rxn_arb.val.bind();
+rx_statin => rout_cd_dyslip.rx_statin.val.bind();
+rx_ezet => rout_cd_dyslip.rx_ezet.val.bind();
+rx_sglt2 => rout_cd_dm_rx_rcm.sglt2_f.val.bind();
+rx_glp1 => rout_cd_dm_rx_rcm.glp1_f.val.bind();
+
+/* ================================================================
+   BINDINGS: DM status (for finerenone/GLP-1 gating)
+   ================================================================ */
+
+dm => rout_cd_dm_dx.dm_fd.val.bind();
+
+/* ================================================================
+   DIRECT EADV: Potassium, finerenone, LDL
+   ================================================================ */
+
+#doc(,{
+    txt:"Potassium for MRA/RAAS safety gating; finerenone separate from steroidal MRA"
+});
+
+k_val => eadv.lab_bld_potassium.val.last().where(dt>sysdate-365);
+rx_finerenone_dt => eadv.[rxnc_c03da05].dt.last().where(val=1);
+rx_finerenone : { rx_finerenone_dt !? => 1 }, { => 0 };
+ldl_val => rout_cd_dyslip.ldl_val.val.bind();
+
+/* ================================================================
+   STAGE 1: Disease severity and eligibility flags
+   ================================================================ */
+
+#doc(,{
+    section:"Severity and Eligibility"
+});
+
+ckd_present : { nvl(ckd,0) >= 1 => 1 }, { => 0 };
+
+proteinuric : { nvl(acr_val,0) >= 3 => 1 }, { => 0 };
+proteinuric_high : { nvl(acr_val,0) >= 30 => 1 }, { => 0 };
+
+dm_present : { dm !? => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 2: Contraindication signals (exported for orchestrator)
+   ================================================================ */
+
+#doc(,{
+    section:"Contraindication Signals",
+    txt:"Hard blocks on drug initiation based on eGFR, K+ thresholds"
+});
+
+ci_block_acei_arb : { nvl(k_val,0) > 5.5 => 1 }, { => 0 };
+ci_block_mra : { nvl(egfr_val,999) < 30 => 1 },
+               { nvl(k_val,0) > 5.0 => 1 },
+               { => 0 };
+ci_block_finerenone : { nvl(egfr_val,999) < 25 => 1 },
+                      { nvl(k_val,0) > 5.0 => 1 },
+                      { => 0 };
+ci_block_sglt2i : { nvl(egfr_val,999) < 20 => 1 }, { => 0 };
+ci_block_metformin : { nvl(egfr_val,999) < 30 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 3: Severity modifier for utility weighting (per §4b)
+   ================================================================ */
+
+#doc(,{
+    txt:"Severity modifiers for CKD-indicated drugs, consumed by orchestrator utility calc"
+});
+
+sev_ckd_acr : { nvl(acr_val,0) > 300 => 1.3 },
+              { nvl(acr_val,0) > 30 => 1.0 },
+              { => 0.7 };
+
+/* ================================================================
+   STAGE 4: Per-drug recommendations
+   0=none, 1=initiate, 2=consider, 3=intensify, 4=maintain
+   ================================================================ */
+
+#doc(,{
+    section:"Recommendations",
+    cite:"kdigo_2024"
+});
+
+/* ---- ACEi / ARB ---- */
+rx_acei_arb : { greatest(nvl(rx_acei,0), nvl(rx_arb,0)) > 0 => 1 }, { => 0 };
+
+recom_ckd_acei_arb : { ckd_present = 0 => 0 },
+                     { ci_block_acei_arb = 1 => 0 },
+                     { proteinuric = 1 and rx_acei_arb = 0 => 1 },
+                     { proteinuric = 1 and rx_acei_arb = 1 => 4 },
+                     { ckd_present = 1 and rx_acei_arb = 0 => 2 },
+                     { ckd_present = 1 and rx_acei_arb = 1 => 4 },
+                     { => 0 };
+
+/* ---- SGLT2i ---- */
+recom_ckd_sglt2i : { ckd_present = 0 => 0 },
+                   { ci_block_sglt2i = 1 => 0 },
+                   { proteinuric = 1 and nvl(rx_sglt2,0) = 0 => 1 },
+                   { proteinuric = 1 and nvl(rx_sglt2,0) = 1 => 4 },
+                   { ckd_present = 1 and dm_present = 1 and nvl(rx_sglt2,0) = 0 => 2 },
+                   { nvl(rx_sglt2,0) = 1 => 4 },
+                   { => 0 };
+
+/* ---- Finerenone (T2D + CKD with albuminuria) ---- */
+recom_ckd_finerenone : { ckd_present = 0 or dm_present = 0 => 0 },
+                       { ci_block_finerenone = 1 => 0 },
+                       { proteinuric_high = 1 and rx_finerenone = 0 => 1 },
+                       { proteinuric = 1 and rx_finerenone = 0 => 2 },
+                       { rx_finerenone = 1 => 4 },
+                       { => 0 };
+
+/* ---- GLP-1 RA (T2D + CKD, kidney-protective per FLOW) ---- */
+recom_ckd_glp1 : { ckd_present = 0 or dm_present = 0 => 0 },
+                 { proteinuric = 1 and nvl(rx_glp1,0) = 0 => 2 },
+                 { nvl(rx_glp1,0) = 1 => 4 },
+                 { => 0 };
+
+/* ---- Statin (ASCVD reduction in CKD non-dialysis) ---- */
+ldl_above_target : { ldl_val !? and ldl_val > 1.8 => 1 }, { => 0 };
+
+recom_ckd_statin : { ckd_present = 0 => 0 },
+                   { nvl(rx_statin,0) = 0 => 1 },
+                   { nvl(rx_statin,0) = 1 and ldl_above_target = 1 and nvl(rx_ezet,0) = 0 => 3 },
+                   { nvl(rx_statin,0) = 1 => 4 },
+                   { => 0 };
+
+/* ================================================================
+   STAGE 5: Care gaps
+   ================================================================ */
+
+#doc(,{
+    section:"Care Gaps"
+});
+
+gap_ckd_acei_arb : { recom_ckd_acei_arb = 1 => 1 }, { => 0 };
+gap_ckd_sglt2i : { recom_ckd_sglt2i = 1 => 1 }, { => 0 };
+gap_ckd_finerenone : { recom_ckd_finerenone = 1 => 1 }, { => 0 };
+gap_ckd_statin : { recom_ckd_statin = 1 => 1 }, { => 0 };
+gap_ckd_uacr_monitor : { ckd_present = 1 and acr_val ? => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 6: Concordance
+   ================================================================ */
+
+#doc(,{
+    section:"Guideline Concordance"
+});
+
+n_recom_ckd_acei_arb : { recom_ckd_acei_arb > 0 => 1 }, { => 0 };
+n_recom_ckd_sglt2i : { recom_ckd_sglt2i > 0 => 1 }, { => 0 };
+n_recom_ckd_finerenone : { recom_ckd_finerenone > 0 => 1 }, { => 0 };
+n_recom_ckd_statin : { recom_ckd_statin > 0 => 1 }, { => 0 };
+
+n_ckd_applicable : { . => n_recom_ckd_acei_arb + n_recom_ckd_sglt2i + n_recom_ckd_finerenone + n_recom_ckd_statin };
+
+n_met_ckd_acei_arb : { recom_ckd_acei_arb = 4 => 1 }, { => 0 };
+n_met_ckd_sglt2i : { recom_ckd_sglt2i = 4 => 1 }, { => 0 };
+n_met_ckd_finerenone : { recom_ckd_finerenone = 4 => 1 }, { => 0 };
+n_met_ckd_statin : { recom_ckd_statin = 4 => 1 }, { => 0 };
+
+n_met_ckd : { . => n_met_ckd_acei_arb + n_met_ckd_sglt2i + n_met_ckd_finerenone + n_met_ckd_statin };
+
+concordance_ckd_pct : { n_ckd_applicable > 0 => round((n_met_ckd / n_ckd_applicable) * 100, 0) },
+                      { => 100 };
+
+/* ================================================================
+   Summary output
+   ================================================================ */
+
+[[rb_id]] : { greatest(recom_ckd_acei_arb, recom_ckd_sglt2i, recom_ckd_finerenone, recom_ckd_glp1, recom_ckd_statin, gap_ckd_acei_arb, gap_ckd_sglt2i, gap_ckd_finerenone, gap_ckd_statin) > 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Attribute definitions
+   ================================================================ */
+
+#define_attribute(proteinuric, { label:"Proteinuric CKD (ACR>=3 mg/mmol)", is_reportable:1, type:1001 });
+#define_attribute(proteinuric_high, { label:"High-proteinuria CKD (ACR>=30 mg/mmol)", is_reportable:1 });
+#define_attribute(gap_ckd_sglt2i, { label:"Care gap: Proteinuric CKD without SGLT2i", is_reportable:1, type:1001 });
+#define_attribute(gap_ckd_acei_arb, { label:"Care gap: Proteinuric CKD without ACEi/ARB", is_reportable:1 });
+#define_attribute(gap_ckd_finerenone, { label:"Care gap: T2D+CKD albuminuric without finerenone", is_reportable:1 });
+#define_attribute(gap_ckd_statin, { label:"Care gap: CKD without statin", is_reportable:1 });
+#define_attribute(gap_ckd_uacr_monitor, { label:"Care gap: CKD without recent UACR", is_reportable:1, type:1001 });
+#define_attribute(concordance_ckd_pct, { label:"CKD guideline concordance (0-100%)", is_reportable:1, type:2 });
+#define_attribute(ckd_present, { label:"CKD present", is_reportable:1 });
+#define_attribute(ckd_stage_3a, { label:"CKD stage G3a", is_reportable:1 });
+#define_attribute(ckd_stage_3b, { label:"CKD stage G3b", is_reportable:1 });
+#define_attribute(ckd_stage_4,  { label:"CKD stage G4",  is_reportable:1 });
+#define_attribute(ckd_stage_5,  { label:"CKD stage G5",  is_reportable:1 });
+#define_attribute(egfr_val, { label:"Latest eGFR (ml/min/1.73m²)", is_reportable:1 });
+#define_attribute(acr_val,  { label:"Latest UACR (mg/mmol)",  is_reportable:1 });
+#define_attribute(k_val,    { label:"Latest serum potassium (mmol/L)", is_reportable:1 });
+#define_attribute(ldl_val,  { label:"Latest LDL-C (mmol/L)",  is_reportable:1 });
+#define_attribute(recom_ckd_acei_arb,   { label:"CKD ACEi/ARB recommendation state (0-4)",   is_reportable:1 });
+#define_attribute(recom_ckd_sglt2i,     { label:"CKD SGLT2i recommendation state (0-4)",     is_reportable:1 });
+#define_attribute(recom_ckd_finerenone, { label:"CKD finerenone recommendation state (0-4)", is_reportable:1 });
+#define_attribute(recom_ckd_glp1,       { label:"CKD GLP-1 RA recommendation state (0-4)",   is_reportable:1 });
+#define_attribute(recom_ckd_statin,     { label:"CKD statin recommendation state (0-4)",     is_reportable:1 });
+#define_attribute(ci_block_acei_arb,   { label:"Contraindication: ACEi/ARB (K>5.5)",       is_reportable:1 });
+#define_attribute(ci_block_mra,        { label:"Contraindication: MRA (eGFR<30 or K>5.0)", is_reportable:1 });
+#define_attribute(ci_block_finerenone, { label:"Contraindication: finerenone (eGFR<25 or K>5.0)", is_reportable:1 });
+#define_attribute(ci_block_sglt2i,     { label:"Contraindication: SGLT2i (eGFR<20)",       is_reportable:1 });
+#define_attribute(ci_block_metformin,  { label:"Contraindication: metformin (eGFR<30)",    is_reportable:1 });
+#define_attribute([[rb_id]], { label:"CKD management recommendation active", is_reportable:1, type:1001 });

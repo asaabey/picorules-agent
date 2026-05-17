@@ -1,0 +1,423 @@
+/* Ruleblock: CVD risk management recommendations and guideline concordance */
+
+/* ================================================================
+   GUIDELINE ALIGNMENT (AU primary; EU/US for cross-reference)
+   ================================================================
+   This ruleblock prioritises the 2023 Australian CVD Risk Guideline
+   (Nelson et al., MJA 2024) and Therapeutic Guidelines (Cardiovascular,
+   AU). EU (2019/2025 ESC/EAS) and US (2025 AHA/ACC HTN; 2026 ACC/AHA
+   dyslipidemia) shown for reference; notable disagreements flagged
+   inline.
+
+   Cross-jurisdiction comparison
+   -----------------------------
+   Where the three guideline sets AGREE:
+     - Framingham/PCE retired; use jurisdiction-specific calculators
+       (AusCVDRisk / SCORE2 / PREVENT).
+     - Risk-based pharmacotherapy, with clinical overrides for prior
+       CVD, severe hypercholesterolaemia, CKD, T2DM with end-organ damage.
+     - BP target <130/80 for most treated adults (frailty/age caveats).
+     - Stage 2 HTN (>=140/90) -> start meds regardless of risk.
+     - No aspirin for primary prevention.
+     - Statin first; ezetimibe as second step.
+     - Universal smoking cessation; BMI>=25 triggers weight management.
+     - Lp(a) once-in-lifetime measurement.
+
+   Where they DIFFER (this ruleblock follows the AU column):
+   +-------------------------+-----------------+--------------------+--------------------+
+   | Area                    | AU 2023         | ESC/EAS 2019/2025  | AHA/ACC 2025-26    |
+   +-------------------------+-----------------+--------------------+--------------------+
+   | Risk calculator         | AusCVDRisk 5-yr | SCORE2/SCORE2-OP   | PREVENT 10-yr      |
+   | High-risk cutoff        | >=10% / 5 yr    | >=7.5% / 10 yr     | >=7.5% / 10 yr     |
+   | LDL secondary prev.     | <=1.8 mmol/L    | <1.4 + >=50% red.; | <1.8 mmol/L        |
+   |                         |                 | <1.0 if recurrent  |                    |
+   | LDL high primary        | <=2.0 mmol/L    | <1.8 mmol/L        | <1.8 mmol/L        |
+   | CAC scoring             | optional        | IIa selected       | central            |
+   | Diabetes handling       | T2DM+EOD = high | T2DM>=10y = high   | risk-enhancer      |
+   | Ethnicity reclass       | First Nations + | n/a                | race-free PREVENT  |
+   |                         | albuminuria/SES |                    |                    |
+   | SGLT2i/GLP-1 cardio-ren | recommended     | recommended        | recommended        |
+   +-------------------------+-----------------+--------------------+--------------------+
+
+   CAVEAT: EU targets are tighter than AU for LDL. Patients meeting AU
+   targets may still be above ESC/EAS targets for secondary prevention
+   (1.4 mmol/L + >=50% reduction) and recurrent events (<1.0 mmol/L).
+   See ldl_target conditional below.
+   ================================================================ */
+
+#define_ruleblock([[rb_id]],
+    {
+        description: "CVD risk management recommendations and guideline concordance (AU-prioritised)",
+        is_active:2
+    }
+);
+
+/* ================================================================
+   BINDINGS: Risk assessment from ensemble + upstream sources
+   ================================================================ */
+
+#doc(,{
+    txt:"Risk assessment — bind to cvra_ensemble (Framingham + AusCVDRisk highest-of-two) and clinical overrides",
+    cite:"cvra_hlc_2019,cvra_circ_2018"
+});
+
+ensemble_cat => rout_cvra_ensemble.ensemble_cat.val.bind();
+frmnghm_cat => rout_cvra_ensemble.frmnghm_cat.val.bind();
+auspredict_cat => rout_cvra_ensemble.auspredict_cat.val.bind();
+frmnghm_p => rout_cvra_ensemble.frmnghm_p.val.bind();
+auspredict_p => rout_cvra_ensemble.auspredict_p.val.bind();
+
+cvd_prev => rout_cvra.cvd_prev.val.bind();
+age => rout_cvra_ensemble.age.val.bind();
+ckd => rout_ckd.ckd.val.bind();
+fhc_prob => rout_cd_dyslip.fhc_prob.val.bind();
+fnp => rout_dmg.fnp.val.bind();
+
+/* ================================================================
+   BINDINGS: Current BP medication state
+   ================================================================ */
+
+#doc(,{
+    txt:"Current BP medication from cd_htn — individual drug class flags"
+});
+
+htn => rout_cd_htn.cd_htn.val.bind();
+rx_bp => rout_cd_htn.htn_rxn.val.bind();
+rx_bp_acei => rout_cd_htn.htn_rxn_acei.val.bind();
+rx_bp_arb => rout_cd_htn.htn_rxn_arb.val.bind();
+rx_bp_ccb => rout_cd_htn.htn_rxn_ccb.val.bind();
+rx_bp_bb => rout_cd_htn.htn_rxn_bb.val.bind();
+rx_bp_thiaz => rout_cd_htn.htn_rxn_diuretic_thiaz.val.bind();
+rx_bp_loop => rout_cd_htn.htn_rxn_diuretic_loop.val.bind();
+
+/* ================================================================
+   BINDINGS: Current lipid medication state
+   ================================================================ */
+
+#doc(,{
+    txt:"Current lipid medication from cd_dyslip"
+});
+
+rx_statin => rout_cd_dyslip.rx_statin.val.bind();
+rx_ezet => rout_cd_dyslip.rx_ezet.val.bind();
+rx_evolocumab => rout_cd_dyslip.rx_evolocumab.val.bind();
+ldl_val => rout_cd_dyslip.ldl_val.val.bind();
+
+/* ================================================================
+   BINDINGS: Antiplatelet / anticoagulant state
+   ================================================================ */
+
+#doc(,{
+    txt:"Antithrombotic medication from cd_cardiac_rx"
+});
+
+rx_antiplatelet_dt => rout_cd_cardiac_rx.rxn_ap.val.bind();
+rx_anticoag_dt => rout_cd_cardiac_rx.rxn_anticoag.val.bind();
+
+/* ================================================================
+   BINDINGS: Smoking, weight, BP control
+   ================================================================ */
+
+#doc(,{
+    txt:"Smoking status, BMI, and BP control metrics"
+});
+
+smoker => rout_at_risk.smoker.val.bind();
+bmi => rout_cd_obesity.bmi.val.bind();
+sbp_mu_1 => rout_cd_htn_bp_control.sbp_mu_1.val.bind();
+
+/* ================================================================
+   DIRECT EADV LOOKUPS
+   ================================================================ */
+
+#doc(,{
+    txt:"Direct EADV lookups for BP, cholesterol, smoking status, and cessation Rx"
+});
+
+sbp => eadv.obs_bp_systolic._.lastdv().where(dt>sysdate-365);
+dbp => eadv.obs_bp_diastolic._.lastdv().where(dt>sysdate-365);
+tc => eadv.lab_bld_cholesterol_total.val.last().where(dt>sysdate-365);
+smoke0 => eadv.status_smoking_h2_v1.val.last();
+rx_cessation => eadv.[rxnc_n07ba].dt.last().where(val=1);
+
+/* ================================================================
+   STAGE 1: Risk Reconciliation
+   ================================================================ */
+
+#doc(,{
+    section:"Risk Reconciliation"
+});
+
+#doc(,{
+    txt:"Layer clinical overrides (CKD/FHC) on top of ensemble_cat from cvra_ensemble. First Nations reclassification upward.",
+    cite:"cvra_nsf_2019"
+});
+
+clin_high_risk : { nvl(ckd,0) >= 3 => 1 },
+                 { nvl(fhc_prob,0) >= 2 => 1 },
+                 { => 0 };
+
+cvra_cat_r : { clin_high_risk = 1 => 3 },
+             { fnp = 1 and nvl(ensemble_cat,0) > 0 and nvl(ensemble_cat,0) < 3 => nvl(ensemble_cat,0) + 1 },
+             { nvl(ensemble_cat,0) > 0 => ensemble_cat },
+             { => 0 };
+
+cvra_agree : { clin_high_risk = 1 => 2 },
+             { frmnghm_cat = auspredict_cat => 1 },
+             { frmnghm_cat !? and auspredict_cat !? => 0 },
+             { => -1 };
+
+cvra_src : { clin_high_risk = 1 and nvl(ckd,0) >= 3 => `CKD` },
+           { clin_high_risk = 1 and nvl(fhc_prob,0) >= 2 => `FHC` },
+           { fnp = 1 and nvl(ensemble_cat,0) > 0 and nvl(ensemble_cat,0) < 3 => `FNP` },
+           { nvl(frmnghm_cat,0) > nvl(auspredict_cat,0) => `FRAM` },
+           { nvl(auspredict_cat,0) > nvl(frmnghm_cat,0) => `AUS` },
+           { frmnghm_cat = auspredict_cat and frmnghm_cat !? => `BOTH` },
+           { => `NONE` };
+
+/* ================================================================
+   STAGE 2: Current Treatment Inventory
+   ================================================================ */
+
+#doc(,{
+    section:"Treatment Inventory"
+});
+
+#doc(,{
+    txt:"Count distinct BP drug classes and lipid drug classes currently prescribed"
+});
+
+rx_bp_raas : { greatest(nvl(rx_bp_acei,0), nvl(rx_bp_arb,0)) > 0 => 1 }, { => 0 };
+
+bp_rx_n : { . => nvl(rx_bp_raas,0) + nvl(rx_bp_ccb,0) + nvl(rx_bp_bb,0) + nvl(rx_bp_thiaz,0) + nvl(rx_bp_loop,0) };
+
+lipid_rx_n : { . => nvl(rx_statin,0) + nvl(rx_ezet,0) + nvl(rx_evolocumab,0) };
+
+rx_antiplatelet : { rx_antiplatelet_dt !? => 1 }, { => 0 };
+rx_anticoag : { rx_anticoag_dt !? => 1 }, { => 0 };
+
+#doc(,{
+    txt:"BP and LDL targets based on risk category and CVD history. LDL targets follow AU (TG Cardiovascular / 2023 Australian CVD Risk Guideline). EU (ESC/EAS 2019/2025) targets are tighter: secondary prevention <1.4 mmol/L + >=50% reduction; <1.0 mmol/L if recurrent events. US (2026 ACC/AHA dyslipidemia) aligns with AU at 1.8 for secondary prevention.",
+    cite:"cvra_nsf_2019"
+});
+
+sbp_target : { cvra_cat_r = 3 and age < 65 => 120 },
+             { => 140 };
+
+sbp_above_target : { sbp_val !? and sbp_val > sbp_target => 1 }, { => 0 };
+
+/* AU-prioritised LDL targets. EU caveat: ESC/EAS 2019/2025 recommends
+   <1.4 mmol/L + >=50% reduction for secondary prevention, and <1.0
+   mmol/L for recurrent events (class IIb). Consider tightening to EU
+   thresholds for patients with recurrent ASCVD. */
+ldl_target : { cvd_prev = 1 => 1.8 },
+             { cvra_cat_r = 3 => 2.0 },
+             { => 4.9 };
+
+ldl_above_target : { ldl_val !? and ldl_val > ldl_target => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 3: Override Triggers
+   ================================================================ */
+
+#doc(,{
+    section:"Override Triggers"
+});
+
+#doc(,{
+    txt:"Very high BP (SBP>=160 or DBP>=100) or TC>=7.5 warrant Rx regardless of risk category",
+    cite:"cvra_nsf_2019"
+});
+
+rx_override_bp : { sbp_val >= 160 or dbp_val >= 100 => 1 }, { => 0 };
+rx_override_tc : { tc >= 7.5 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4a: BP Pharmacotherapy Recommendation
+   ================================================================ */
+
+#doc(,{
+    section:"Recommendations"
+});
+
+#doc(,{
+    txt:"BP pharmacotherapy: 0=not indicated, 1=initiate, 2=consider, 3=intensify, 4=maintain",
+    cite:"cvra_nsf_2019"
+});
+
+recom_rx_bp : { rx_override_bp = 1 and nvl(rx_bp,0) = 0 => 1 },
+              { rx_override_bp = 1 and nvl(rx_bp,0) > 0 => 3 },
+              { cvra_cat_r = 3 and nvl(rx_bp,0) = 0 => 1 },
+              { cvra_cat_r = 3 and nvl(rx_bp,0) > 0 and sbp_above_target = 1 => 3 },
+              { cvra_cat_r = 3 and nvl(rx_bp,0) > 0 and sbp_above_target = 0 => 4 },
+              { cvra_cat_r = 2 and nvl(rx_bp,0) = 0 => 2 },
+              { cvra_cat_r = 2 and nvl(rx_bp,0) > 0 and sbp_above_target = 1 => 3 },
+              { cvra_cat_r = 2 and nvl(rx_bp,0) > 0 and sbp_above_target = 0 => 4 },
+              { => 0 };
+
+/* ================================================================
+   STAGE 4a: Lipid Pharmacotherapy Recommendation
+   ================================================================ */
+
+#doc(,{
+    txt:"Lipid pharmacotherapy: 0=not indicated, 1=initiate, 2=consider, 3=intensify, 4=maintain",
+    cite:"cvra_nsf_2019"
+});
+
+recom_rx_lipid : { rx_override_tc = 1 and nvl(rx_statin,0) = 0 => 1 },
+                 { rx_override_tc = 1 and nvl(rx_statin,0) > 0 => 3 },
+                 { cvra_cat_r = 3 and lipid_rx_n = 0 => 1 },
+                 { cvra_cat_r = 3 and ldl_above_target = 1 => 3 },
+                 { cvra_cat_r = 3 and ldl_above_target = 0 => 4 },
+                 { cvra_cat_r = 2 and lipid_rx_n = 0 => 2 },
+                 { cvra_cat_r = 2 and lipid_rx_n > 0 => 4 },
+                 { => 0 };
+
+/* ================================================================
+   STAGE 4b: Antiplatelet — Secondary Prevention
+   ================================================================ */
+
+#doc(,{
+    txt:"Antiplatelet for secondary prevention only. Anticoagulant substitutes."
+});
+
+recom_rx_antiplatelet : { nvl(cvd_prev,0) = 1 and rx_antiplatelet = 0 and rx_anticoag = 0 => 1 },
+                        { nvl(cvd_prev,0) = 1 and (rx_antiplatelet = 1 or rx_anticoag = 1) => 4 },
+                        { => 0 };
+
+gap_antiplatelet : { nvl(cvd_prev,0) = 1 and rx_antiplatelet = 0 and rx_anticoag = 0 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4d: Smoking Cessation Recommendation
+   ================================================================ */
+
+#doc(,{
+    txt:"Smoking cessation: status_smoking_h2_v1 30=current, 29=recently quit, 20=ex-smoker. N07BA=cessation Rx."
+});
+
+is_smoker : { nvl(smoke0,0) >= 29 => 1 }, { => 0 };
+is_exsmoker : { nvl(smoke0,0) = 20 => 1 }, { => 0 };
+rx_cessation_f : { rx_cessation !? => 1 }, { => 0 };
+
+recom_smoking : { is_smoker = 1 and rx_cessation_f = 0 => 1 },
+                { is_smoker = 1 and rx_cessation_f = 1 => 2 },
+                { is_exsmoker = 1 => 3 },
+                { => 0 };
+
+gap_smoking_rx : { is_smoker = 1 and rx_cessation_f = 0 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 4e: Lifestyle Recommendations
+   ================================================================ */
+
+#doc(,{
+    txt:"Universal lifestyle recommendation and weight management"
+});
+
+recom_lifestyle : { . => 1 };
+
+recom_weight : { nvl(bmi,0) >= 25 => 1 }, { => 0 };
+
+#doc(,{
+    txt:"Reassessment interval: First Nations annual, otherwise risk-dependent",
+    cite:"cvra_nsf_2019"
+});
+
+recom_reassess_yr : { nvl(fnp,0) = 1 => 1 },
+                    { cvra_cat_r = 3 => 0 },
+                    { cvra_cat_r = 2 and nvl(rx_bp,0) = 0 and lipid_rx_n = 0 => 2 },
+                    { cvra_cat_r = 2 => 1 },
+                    { cvra_cat_r = 1 => 5 },
+                    { => 0 };
+
+/* ================================================================
+   STAGE 5: Care Gap Detection
+   ================================================================ */
+
+#doc(,{
+    section:"Care Gaps"
+});
+
+#doc(,{
+    txt:"Care gap flags: identify patients where guideline recommendation is not met"
+});
+
+gap_bp_rx : { recom_rx_bp = 1 and nvl(rx_bp,0) = 0 => 1 }, { => 0 };
+
+gap_bp_intensify : { nvl(rx_bp,0) > 0 and sbp_above_target = 1 => 1 }, { => 0 };
+
+gap_lipid_rx : { recom_rx_lipid = 1 and nvl(rx_statin,0) = 0 => 1 }, { => 0 };
+
+gap_lipid_intensify : { nvl(rx_statin,0) > 0 and ldl_above_target = 1 and nvl(rx_ezet,0) = 0 => 1 }, { => 0 };
+
+/* ================================================================
+   STAGE 6: Guideline Concordance Score
+   ================================================================ */
+
+#doc(,{
+    section:"Guideline Concordance"
+});
+
+#doc(,{
+    txt:"Concordance: proportion of applicable pharmacotherapy domains that are met (0-100%)"
+});
+
+n_recom_bp : { recom_rx_bp > 0 => 1 }, { => 0 };
+n_recom_lipid : { recom_rx_lipid > 0 => 1 }, { => 0 };
+n_recom_antipl : { nvl(cvd_prev,0) = 1 => 1 }, { => 0 };
+n_recom_smoking : { is_smoker = 1 => 1 }, { => 0 };
+
+n_applicable : { . => n_recom_bp + n_recom_lipid + n_recom_antipl + n_recom_smoking };
+
+n_met_bp : { recom_rx_bp = 4 => 1 }, { => 0 };
+n_met_lipid : { recom_rx_lipid = 4 => 1 }, { => 0 };
+n_met_antipl : { recom_rx_antiplatelet = 4 => 1 }, { => 0 };
+n_met_smoking : { recom_smoking = 2 => 1 }, { => 0 };
+
+n_met : { . => n_met_bp + n_met_lipid + n_met_antipl + n_met_smoking };
+
+concordance_pct : { n_applicable > 0 => round((n_met / n_applicable) * 100, 0) },
+                  { => 100 };
+
+/* ================================================================
+   Summary output
+   ================================================================ */
+
+[[rb_id]] : { greatest(recom_rx_bp, recom_rx_lipid, recom_rx_antiplatelet, recom_smoking, gap_bp_rx, gap_bp_intensify, gap_lipid_rx, gap_lipid_intensify, gap_smoking_rx, gap_antiplatelet) > 0 => 1 }, { => 0 };
+
+/* ================================================================
+   Attribute definitions
+   ================================================================ */
+
+#define_attribute(clin_high_risk, { label:"Clinically determined high CVD risk (CKD>=3 or FHC)", is_reportable:1, type:1001 });
+#define_attribute(cvra_cat_r, { label:"Reconciled CVD risk category (1=Low, 2=Intermediate, 3=High)", is_reportable:1, type:2 });
+#define_attribute(cvra_agree, { label:"Risk source concordance (2=clinical, 1=agree, 0=discordant, -1=single)", is_reportable:1, type:2 });
+#define_attribute(cvra_src, { label:"Driving risk source (CKD/FHC/FNP/FRAM/AUS/BOTH/NONE)", is_reportable:1, type:1 });
+
+#define_attribute(bp_rx_n, { label:"Count of BP drug classes prescribed", is_reportable:1, type:2 });
+#define_attribute(lipid_rx_n, { label:"Count of lipid drug classes prescribed", is_reportable:1, type:2 });
+
+#define_attribute(rx_override_bp, { label:"Very high BP override (SBP>=160 or DBP>=100)", is_reportable:1, type:1001 });
+#define_attribute(rx_override_tc, { label:"Very high TC override (>=7.5 mmol/L)", is_reportable:1, type:1001 });
+
+#define_attribute(recom_rx_bp, { label:"BP Rx recommendation (0=none, 1=initiate, 2=consider, 3=intensify, 4=maintain)", is_reportable:1, type:2 });
+#define_attribute(recom_rx_lipid, { label:"Lipid Rx recommendation (0=none, 1=initiate, 2=consider, 3=intensify, 4=maintain)", is_reportable:1, type:2 });
+#define_attribute(recom_rx_antiplatelet, { label:"Antiplatelet recommendation (0=none, 1=initiate, 4=maintain)", is_reportable:1, type:2 });
+#define_attribute(recom_smoking, { label:"Smoking cessation recommendation (0=none, 1=initiate, 2=maintain, 3=monitor)", is_reportable:1, type:2 });
+#define_attribute(recom_lifestyle, { label:"Universal lifestyle modification recommended", is_reportable:1, type:2 });
+#define_attribute(recom_weight, { label:"Weight management recommended (BMI>=25)", is_reportable:1, type:1001 });
+#define_attribute(recom_reassess_yr, { label:"Reassessment interval in years (0=not required)", is_reportable:1, type:2 });
+
+#define_attribute(is_smoker, { label:"Current smoker", is_reportable:1, type:1001 });
+#define_attribute(gap_bp_rx, { label:"Care gap: BP Rx indicated but not prescribed", is_reportable:1, type:1001 });
+#define_attribute(gap_bp_intensify, { label:"Care gap: On BP Rx but SBP above target", is_reportable:1, type:1001 });
+#define_attribute(gap_lipid_rx, { label:"Care gap: Lipid Rx indicated but no statin", is_reportable:1, type:1001 });
+#define_attribute(gap_lipid_intensify, { label:"Care gap: On statin but LDL above target, no ezetimibe", is_reportable:1, type:1001 });
+#define_attribute(gap_smoking_rx, { label:"Care gap: Smoker without cessation pharmacotherapy", is_reportable:1, type:1001 });
+#define_attribute(gap_antiplatelet, { label:"Care gap: Established CVD without antithrombotic", is_reportable:1, type:1001 });
+
+#define_attribute(n_applicable, { label:"Guideline domains applicable to patient", is_reportable:1, type:2 });
+#define_attribute(n_met, { label:"Guideline domains met", is_reportable:1, type:2 });
+#define_attribute(concordance_pct, { label:"Guideline concordance score (0-100%)", is_reportable:1, type:2 });
+
+#define_attribute([[rb_id]], { label:"CVD management recommendation active", is_reportable:1, type:1001 });
