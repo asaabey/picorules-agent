@@ -1,0 +1,106 @@
+drug,disease,indicated,evidence_class,evidence_level,evidence_weight,outcome_type,outcome_weight,cell_weight,severity_expr,citation_ref,notes
+sglt2i,dm2,1,I,A,1.0,surrogate,0.3,0.30,hba1c > 75 => 1.2 ; => 1.0,ada_soc_2026,HbA1c reduction primary; CV/renal benefit captured in other rows
+sglt2i,htn,0,,,,,,,,,Not a primary HTN agent; modest BP lowering only
+sglt2i,ihd,1,IIa,A,0.7,composite,0.6,0.42,,esc_ccs_2024,MACE reduction in established ASCVD (EMPA-REG OUTCOME CANVAS)
+sglt2i,hfref,1,I,A,1.0,hard,1.0,1.00,lvef < 30 => 1.2 ; => 1.0,esc_hf_2023_focused,DAPA-HF EMPEROR-Reduced mortality + HF hosp
+sglt2i,hfpef,1,I,A,1.0,hard,0.7,0.70,,esc_hf_2023_focused,DELIVER EMPEROR-Preserved HF hosp primary; mortality neutral
+sglt2i,ckd,1,I,A,1.0,hard,1.0,1.00,uacr > 300 => 1.3 ; uacr > 30 => 1.0 ; => 0.7,kdigo_2024,DAPA-CKD EMPA-KIDNEY composite renal + mortality
+sglt2i,masld,1,IIb,B,0.3,surrogate,0.3,0.09,,aasld_2025_update,Liver fat reduction subgroup signal; not label-indicated
+glp1,dm2,1,I,A,1.0,surrogate,0.3,0.30,hba1c > 75 => 1.2 ; => 1.0,ada_soc_2026,HbA1c + weight primary
+glp1,htn,0,,,,,,,,,Modest BP effect only; not indicated
+glp1,ihd,1,I,A,1.0,hard,1.0,1.00,,esc_ccs_2024,LEADER SUSTAIN-6 REWIND SELECT MACE reduction
+glp1,hfref,0,,,,,,,,,FIGHT LIVE trials neutral/signal-of-harm in HFrEF
+glp1,hfpef,1,IIa,B,0.5,composite,0.6,0.30,bmi >= 30 => 1.2 ; => 1.0,esc_hf_2023_focused,STEP-HFpEF / STEP-HFpEF-DM: symptoms + weight, obesity-gated
+glp1,ckd,1,IIa,A,0.7,hard,1.0,0.70,uacr > 300 => 1.3 ; uacr > 30 => 1.0 ; => 0.7,kdigo_2024,FLOW semaglutide: composite renal + CV death
+glp1,masld,1,I,B,0.7,hard,1.0,0.70,,aasld_2025_update,Semaglutide FDA approval Aug 2025 for MASH F2-F3 (ESSENCE)
+acei_arb,dm2,1,I,B,0.7,hard,1.0,0.70,uacr > 30 => 1.2 ; => 0.6,ada_soc_2026,Gated on albuminuria; reduces progression + CV events
+acei_arb,htn,1,I,A,1.0,hard,1.0,1.00,,nhf_au_2016,First-line; mortality + stroke reduction
+acei_arb,ihd,1,I,A,1.0,hard,1.0,1.00,,esc_ccs_2024,Post-MI and stable IHD mortality benefit
+acei_arb,hfref,1,I,A,1.0,hard,1.0,1.00,lvef < 30 => 1.2 ; => 1.0,esc_hf_2023_focused,Foundational pillar (or ARNI if tolerated)
+acei_arb,hfpef,1,IIb,B,0.3,composite,0.6,0.18,,esc_hf_2023_focused,Symptom relief; no hard outcome benefit
+acei_arb,ckd,1,I,A,1.0,hard,1.0,1.00,uacr > 300 => 1.3 ; uacr > 30 => 1.0 ; => 0.7,kdigo_2024,RENAAL IDNT: slows progression in proteinuric CKD
+acei_arb,masld,0,,,,,,,,,No direct MASLD benefit
+arni,dm2,0,,,,,,,,,
+arni,htn,1,IIa,B,0.5,hard,1.0,0.50,,esc_hf_2023_focused,BP lowering, niche use
+arni,ihd,0,,,,,,,,,PARADISE-MI neutral in post-MI without HF
+arni,hfref,1,I,A,1.0,hard,1.0,1.00,lvef < 30 => 1.2 ; => 1.0,esc_hf_2023_focused,PARADIGM-HF: preferred over ACEi
+arni,hfpef,1,IIb,B,0.3,composite,0.6,0.18,,esc_hf_2023_focused,PARAGON-HF: benefit in LVEF 45-57 subgroup
+arni,ckd,0,,,,,,,,,
+arni,masld,0,,,,,,,,,
+mra,dm2,0,,,,,,,,,
+mra,htn,1,IIa,B,0.5,hard,0.6,0.30,,esc_hypertension_2024,Resistant HTN (PATHWAY-2)
+mra,ihd,1,IIa,B,0.5,hard,1.0,0.50,,esc_ccs_2024,EPHESUS: post-MI with LV dysfunction
+mra,hfref,1,I,A,1.0,hard,1.0,1.00,lvef < 35 => 1.2 ; => 1.0,esc_hf_2023_focused,RALES EMPHASIS-HF mortality
+mra,hfpef,1,IIa,B,0.5,composite,0.6,0.30,,esc_hf_2023_focused,TOPCAT Americas subgroup; FINEARTS-HF supports finerenone
+mra,ckd,0,,,,,,,,,Hard block when eGFR<30 or K>5.0; use finerenone instead
+mra,masld,0,,,,,,,,,
+finerenone,dm2,1,I,A,1.0,hard,1.0,1.00,uacr > 300 => 1.3 ; uacr > 30 => 1.0 ; => 0.7,kdigo_2024,FIDELIO/FIGARO: T2D+CKD composite renal + CV
+finerenone,htn,0,,,,,,,,,
+finerenone,ihd,0,,,,,,,,,
+finerenone,hfref,1,IIa,B,0.5,composite,0.6,0.30,,esc_hf_2023_focused,FINEARTS-HF spans EF spectrum
+finerenone,hfpef,1,IIa,B,0.5,hard,1.0,0.50,,esc_hf_2023_focused,FINEARTS-HF primary endpoint met in HFmrEF/HFpEF
+finerenone,ckd,1,I,A,1.0,hard,1.0,1.00,uacr > 300 => 1.3 ; uacr > 30 => 1.0 ; => 0.7,kdigo_2024,FIDELIO-DKD: renal composite
+finerenone,masld,0,,,,,,,,,
+beta_blocker,dm2,0,,,,,,,,,
+beta_blocker,htn,1,IIb,B,0.3,hard,1.0,0.30,,nhf_au_2016,Reserve for compelling indication (IHD/HF)
+beta_blocker,ihd,1,I,A,1.0,hard,1.0,1.00,,esc_ccs_2024,Post-MI and angina
+beta_blocker,hfref,1,I,A,1.0,hard,1.0,1.00,lvef < 30 => 1.2 ; => 1.0,esc_hf_2023_focused,Carvedilol/bisoprolol/metoprolol-XL mortality
+beta_blocker,hfpef,0,,,,,,,,,No mortality benefit; may worsen chronotropy
+beta_blocker,ckd,0,,,,,,,,,
+beta_blocker,masld,0,,,,,,,,,
+ccb_dhp,dm2,0,,,,,,,,,
+ccb_dhp,htn,1,I,A,1.0,hard,1.0,1.00,,nhf_au_2016,First-line alongside RAAS + thiazide
+ccb_dhp,ihd,1,I,B,0.7,composite,0.6,0.42,,esc_ccs_2024,Angina symptom control
+ccb_dhp,hfref,0,,,,,,,,,Non-DHP hard block in HFrEF; DHP acceptable but not beneficial
+ccb_dhp,hfpef,0,,,,,,,,,
+ccb_dhp,ckd,0,,,,,,,,,
+ccb_dhp,masld,0,,,,,,,,,
+thiazide,dm2,0,,,,,,,,,
+thiazide,htn,1,I,A,1.0,hard,1.0,1.00,,nhf_au_2016,First-line; ALLHAT
+thiazide,ihd,0,,,,,,,,,
+thiazide,hfref,0,,,,,,,,,Loop diuretic preferred for congestion; no mortality benefit
+thiazide,hfpef,0,,,,,,,,,
+thiazide,ckd,0,,,,,,,,,Loses efficacy eGFR<30
+thiazide,masld,0,,,,,,,,,
+statin,dm2,1,I,A,1.0,hard,1.0,1.00,,ada_soc_2026,Primary prevention when age/risk-qualified
+statin,htn,0,,,,,,,,,
+statin,ihd,1,I,A,1.0,hard,1.0,1.00,ldl > 2.6 => 1.2 ; => 1.0,esc_ccs_2024,Foundation of secondary prevention
+statin,hfref,0,,,,,,,,,CORONA/GISSI-HF neutral in HF without ASCVD
+statin,hfpef,0,,,,,,,,,
+statin,ckd,1,IIa,B,0.5,hard,1.0,0.50,,kdigo_2024,Atorvastatin/rosuvastatin in CKD non-dialysis
+statin,masld,1,IIb,B,0.3,composite,0.6,0.18,,aasld_2025_update,Safe and encouraged; ASCVD benefit drives recommendation
+ezetimibe,dm2,0,,,,,,,,,
+ezetimibe,htn,0,,,,,,,,,
+ezetimibe,ihd,1,I,B,0.7,hard,1.0,0.70,ldl > 1.8 => 1.2 ; => 1.0,esc_ccs_2024,IMPROVE-IT: add-on when LDL above target
+ezetimibe,hfref,0,,,,,,,,,
+ezetimibe,hfpef,0,,,,,,,,,
+ezetimibe,ckd,0,,,,,,,,,
+ezetimibe,masld,0,,,,,,,,,
+pcsk9i,dm2,0,,,,,,,,,
+pcsk9i,htn,0,,,,,,,,,
+pcsk9i,ihd,1,I,A,1.0,hard,1.0,1.00,ldl > 1.8 => 1.2 ; => 1.0,esc_ccs_2024,FOURIER ODYSSEY: very high-risk ASCVD
+pcsk9i,hfref,0,,,,,,,,,
+pcsk9i,hfpef,0,,,,,,,,,
+pcsk9i,ckd,0,,,,,,,,,
+pcsk9i,masld,0,,,,,,,,,
+antiplatelet,dm2,0,,,,,,,,,Primary prevention ASPREE-era: not routinely recommended
+antiplatelet,htn,0,,,,,,,,,
+antiplatelet,ihd,1,I,A,1.0,hard,1.0,1.00,,esc_ccs_2024,Aspirin or clopidogrel post-ACS/PCI
+antiplatelet,hfref,0,,,,,,,,,
+antiplatelet,hfpef,0,,,,,,,,,
+antiplatelet,ckd,0,,,,,,,,,
+antiplatelet,masld,0,,,,,,,,,
+metformin,dm2,1,I,A,1.0,surrogate,0.3,0.30,,ada_soc_2026,First-line glycaemic; cardioprotection debated post-UKPDS
+metformin,htn,0,,,,,,,,,
+metformin,ihd,0,,,,,,,,,
+metformin,hfref,0,,,,,,,,,
+metformin,hfpef,0,,,,,,,,,
+metformin,ckd,0,,,,,,,,,Contraindicated eGFR<30; dose-reduce eGFR 30-45
+metformin,masld,1,IIb,B,0.3,surrogate,0.3,0.09,,aasld_2025_update,Not disease-modifying for MASH; reasonable in DM2+MASLD
+resmetirom,dm2,0,,,,,,,,,
+resmetirom,htn,0,,,,,,,,,
+resmetirom,ihd,0,,,,,,,,,
+resmetirom,hfref,0,,,,,,,,,
+resmetirom,hfpef,0,,,,,,,,,
+resmetirom,ckd,0,,,,,,,,,
+resmetirom,masld,1,I,A,1.0,composite,0.6,0.60,fib4 > 2.67 => 1.3 ; => 1.0,aasld_2025_update,MAESTRO-NASH: non-cirrhotic F2-F3; histological endpoints

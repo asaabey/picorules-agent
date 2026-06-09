@@ -1,0 +1,19 @@
+        <br />
+        {% if cd_masld.masld == 1 %}<li><b>Metabolic Dysfunction-Associated Steatotic Liver Disease (MASLD)</b>
+        {% elif cd_masld.fli_steatosis == 1 %}<li><b>Hepatic Steatosis (no cardiometabolic risk identified)</b>
+        {% endif %}
+        {% if cd_masld.fli %}
+            <ol>
+                <li>Fatty Liver Index: <strong>{{ picoformat('cd_masld.fli') }}</strong>/100{% if cd_masld.fli_steatosis == 1 %} (steatosis likely){% else %} (steatosis unlikely){% endif %}</li>
+                {% if cd_masld.cmr_count %}<li>Cardiometabolic risk factors met: <strong>{{ picoformat('cd_masld.cmr_count') }}</strong>/5
+                    <ol>
+                        {% if cd_masld.cmr_bmi == 1 %}<li>BMI/waist circumference criterion met</li>{% endif %}
+                        {% if cd_masld.cmr_glu == 1 %}<li>Fasting glucose/diabetes criterion met</li>{% endif %}
+                        {% if cd_masld.cmr_bp == 1 %}<li>Blood pressure/hypertension criterion met</li>{% endif %}
+                        {% if cd_masld.cmr_tg == 1 %}<li>Triglyceride/dyslipidaemia criterion met</li>{% endif %}
+                        {% if cd_masld.cmr_hdl_low == 1 %}<li>Low HDL cholesterol criterion met</li>{% endif %}
+                    </ol>
+                </li>{% endif %}
+            </ol>
+        </li>
+        {% endif %}

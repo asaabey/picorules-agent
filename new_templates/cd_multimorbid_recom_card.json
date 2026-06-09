@@ -1,0 +1,11 @@
+{
+  "author": null,
+  "description": "Multi-morbidity recommendation orchestrator: top-utility drug, per-domain concordance, multi-indication gap summary",
+  "last_updated": null,
+  "is_active": true,
+  "name": "cd_multimorbid_recom_card",
+  "related_ruleblock": "cd_multimorbid_recom",
+  "is_composition": false,
+  "is_mhr": false,
+  "version": null
+}

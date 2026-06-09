@@ -1,0 +1,228 @@
+<div class="col-12 col-lg-6 mt-4">
+    <div class="card h-100 shadow-sm">
+        <!-- Header -->
+        <div class="card-header d-flex justify-content-between align-items-center bg-white border-bottom-0 pb-0">
+            <h5 class="card-title mb-0">Chronic Kidney Disease
+                {% if ckd_recom.ckd_stage_3a %}<small class="text-muted">· G3a</small>
+                {% elif ckd_recom.ckd_stage_3b %}<small class="text-muted">· G3b</small>
+                {% elif ckd_recom.ckd_stage_4 %}<small class="text-muted">· G4</small>
+                {% elif ckd_recom.ckd_stage_5 %}<small class="text-muted">· G5</small>
+                {% endif %}
+            </h5>
+            {% if ckd_recom.concordance_ckd_pct is not none %}
+            <span class="badge rounded-pill bg-light text-dark border">Concordance {{ picoformat('ckd_recom.concordance_ckd_pct') }}%</span>
+            {% endif %}
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+            <div class="row align-items-center">
+                <!-- Stage image -->
+                <div class="col-auto">
+                    {% if ckd_recom.ckd_stage_3a %}<img src="https://d1xcrowuazv720.cloudfront.net/images/kidneys-s3.png" height="60" />
+                    {% elif ckd_recom.ckd_stage_3b %}<img src="https://d1xcrowuazv720.cloudfront.net/images/kidneys-s3.png" height="60" />
+                    {% elif ckd_recom.ckd_stage_4 %}<img src="https://d1xcrowuazv720.cloudfront.net/images/kidneys-s4.png" height="60" />
+                    {% elif ckd_recom.ckd_stage_5 %}<img src="https://d1xcrowuazv720.cloudfront.net/images/kidneys-s5.png" height="60" />
+                    {% else %}<img src="https://d1xcrowuazv720.cloudfront.net/images/kidneys-s2.png" height="60" />
+                    {% endif %}
+                </div>
+
+                <!-- Severity tags -->
+                <div class="col">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if ckd_recom.proteinuric_high == 1 %}
+                        <span class="badge" style="background:#dc3545;color:#fff;font-size:.7rem;">High proteinuria</span>
+                        {% elif ckd_recom.proteinuric == 1 %}
+                        <span class="badge" style="background:#fd7e14;color:#fff;font-size:.7rem;">Proteinuric</span>
+                        {% endif %}
+                        {% if ckd_recom.ckd_present != 1 %}
+                        <span class="badge" style="background:#6c757d;color:#fff;font-size:.7rem;">CKD not established</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metric grid -->
+            <div class="row g-3 mt-2">
+                {% if ckd_recom.egfr_val is not none %}
+                <div class="col-6 col-md-3">
+                    <div class="metric-label">eGFR</div>
+                    {% if ckd_recom.egfr_val < 30 %}<span class="metric-value" style="color:#dc3545;">{{ picoformat('ckd_recom.egfr_val') }}</span>
+                    {% elif ckd_recom.egfr_val < 60 %}<span class="metric-value" style="color:#fd7e14;">{{ picoformat('ckd_recom.egfr_val') }}</span>
+                    {% else %}<span class="metric-value">{{ picoformat('ckd_recom.egfr_val') }}</span>
+                    {% endif %}
+                    <span class="metric-unit">&nbsp;ml/min</span>
+                </div>
+                {% endif %}
+
+                {% if ckd_recom.acr_val is not none %}
+                <div class="col-6 col-md-3">
+                    <div class="metric-label">uACR</div>
+                    {% if ckd_recom.acr_val >= 300 %}<span class="metric-value" style="color:#dc3545;">{{ picoformat('ckd_recom.acr_val') }}</span>
+                    {% elif ckd_recom.acr_val >= 30 %}<span class="metric-value" style="color:#fd7e14;">{{ picoformat('ckd_recom.acr_val') }}</span>
+                    {% elif ckd_recom.acr_val >= 3 %}<span class="metric-value" style="color:#ffc107;">{{ picoformat('ckd_recom.acr_val') }}</span>
+                    {% else %}<span class="metric-value" style="color:#198754;">{{ picoformat('ckd_recom.acr_val') }}</span>
+                    {% endif %}
+                    <span class="metric-unit">&nbsp;mg/mmol</span>
+                </div>
+                {% endif %}
+
+                {% if ckd_recom.k_val is not none %}
+                <div class="col-6 col-md-3">
+                    <div class="metric-label">Potassium</div>
+                    {% if ckd_recom.k_val > 5.5 %}<span class="metric-value" style="color:#dc3545;">{{ picoformat('ckd_recom.k_val') }}</span>
+                    {% elif ckd_recom.k_val > 5.0 %}<span class="metric-value" style="color:#fd7e14;">{{ picoformat('ckd_recom.k_val') }}</span>
+                    {% else %}<span class="metric-value">{{ picoformat('ckd_recom.k_val') }}</span>
+                    {% endif %}
+                    <span class="metric-unit">&nbsp;mmol/L</span>
+                </div>
+                {% endif %}
+
+                {% if ckd_recom.ldl_val is not none %}
+                <div class="col-6 col-md-3">
+                    <div class="metric-label">LDL-C</div>
+                    {% if ckd_recom.ldl_val > 1.8 %}<span class="metric-value" style="color:#fd7e14;">{{ picoformat('ckd_recom.ldl_val') }}</span>
+                    {% else %}<span class="metric-value" style="color:#198754;">{{ picoformat('ckd_recom.ldl_val') }}</span>
+                    {% endif %}
+                    <span class="metric-unit">&nbsp;mmol/L</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Recommendations -->
+            {% if ckd_recom.ckd_present == 1 %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <hr class="my-2">
+                    <div class="metric-label mb-2">Recommendations (KDIGO 2024)</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if ckd_recom.recom_ckd_acei_arb == 1 %}<span class="badge" style="background:#dc3545;color:#fff;font-size:.75rem;">ACEi/ARB · Initiate</span>
+                        {% elif ckd_recom.recom_ckd_acei_arb == 3 %}<span class="badge" style="background:#fd7e14;color:#fff;font-size:.75rem;">ACEi/ARB · Intensify</span>
+                        {% elif ckd_recom.recom_ckd_acei_arb == 2 %}<span class="badge" style="background:#ffc107;color:#212529 !important;font-size:.75rem;font-weight:600;">ACEi/ARB · Consider</span>
+                        {% elif ckd_recom.recom_ckd_acei_arb == 4 %}<span class="badge" style="background:#198754;color:#fff;font-size:.75rem;">ACEi/ARB · Maintain</span>
+                        {% endif %}
+
+                        {% if ckd_recom.recom_ckd_sglt2i == 1 %}<span class="badge" style="background:#dc3545;color:#fff;font-size:.75rem;">SGLT2i · Initiate</span>
+                        {% elif ckd_recom.recom_ckd_sglt2i == 3 %}<span class="badge" style="background:#fd7e14;color:#fff;font-size:.75rem;">SGLT2i · Intensify</span>
+                        {% elif ckd_recom.recom_ckd_sglt2i == 2 %}<span class="badge" style="background:#ffc107;color:#212529 !important;font-size:.75rem;font-weight:600;">SGLT2i · Consider</span>
+                        {% elif ckd_recom.recom_ckd_sglt2i == 4 %}<span class="badge" style="background:#198754;color:#fff;font-size:.75rem;">SGLT2i · Maintain</span>
+                        {% endif %}
+
+                        {% if ckd_recom.recom_ckd_finerenone == 1 %}<span class="badge" style="background:#dc3545;color:#fff;font-size:.75rem;">Finerenone · Initiate</span>
+                        {% elif ckd_recom.recom_ckd_finerenone == 2 %}<span class="badge" style="background:#ffc107;color:#212529 !important;font-size:.75rem;font-weight:600;">Finerenone · Consider</span>
+                        {% elif ckd_recom.recom_ckd_finerenone == 4 %}<span class="badge" style="background:#198754;color:#fff;font-size:.75rem;">Finerenone · Maintain</span>
+                        {% endif %}
+
+                        {% if ckd_recom.recom_ckd_glp1 == 1 %}<span class="badge" style="background:#dc3545;color:#fff;font-size:.75rem;">GLP-1 RA · Initiate</span>
+                        {% elif ckd_recom.recom_ckd_glp1 == 2 %}<span class="badge" style="background:#ffc107;color:#212529 !important;font-size:.75rem;font-weight:600;">GLP-1 RA · Consider</span>
+                        {% elif ckd_recom.recom_ckd_glp1 == 4 %}<span class="badge" style="background:#198754;color:#fff;font-size:.75rem;">GLP-1 RA · Maintain</span>
+                        {% endif %}
+
+                        {% if ckd_recom.recom_ckd_statin == 1 %}<span class="badge" style="background:#dc3545;color:#fff;font-size:.75rem;">Statin · Initiate</span>
+                        {% elif ckd_recom.recom_ckd_statin == 3 %}<span class="badge" style="background:#fd7e14;color:#fff;font-size:.75rem;">Statin · Intensify</span>
+                        {% elif ckd_recom.recom_ckd_statin == 4 %}<span class="badge" style="background:#198754;color:#fff;font-size:.75rem;">Statin · Maintain</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Contraindication callouts -->
+            {% if ckd_recom.ci_block_acei_arb == 1 or ckd_recom.ci_block_mra == 1 or ckd_recom.ci_block_finerenone == 1 or ckd_recom.ci_block_sglt2i == 1 or ckd_recom.ci_block_metformin == 1 %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <hr class="my-2">
+                    <div class="metric-label mb-2" style="color:#dc3545;">&#9888; Contraindications</div>
+                    <ul style="font-size:.8rem;margin-bottom:0;padding-left:1.25rem;color:#495057;">
+                        {% if ckd_recom.ci_block_acei_arb == 1 %}<li>ACEi/ARB blocked — serum K&#8314; &gt; 5.5 mmol/L</li>{% endif %}
+                        {% if ckd_recom.ci_block_mra == 1 %}<li>MRA (spironolactone/eplerenone) blocked — eGFR &lt; 30 or K&#8314; &gt; 5.0</li>{% endif %}
+                        {% if ckd_recom.ci_block_finerenone == 1 %}<li>Finerenone blocked — eGFR &lt; 25 or K&#8314; &gt; 5.0</li>{% endif %}
+                        {% if ckd_recom.ci_block_sglt2i == 1 %}<li>SGLT2i blocked — eGFR &lt; 20</li>{% endif %}
+                        {% if ckd_recom.ci_block_metformin == 1 %}<li>Metformin blocked — eGFR &lt; 30</li>{% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Care gaps -->
+            {% if ckd_recom.gap_ckd_acei_arb == 1 or ckd_recom.gap_ckd_sglt2i == 1 or ckd_recom.gap_ckd_finerenone == 1 or ckd_recom.gap_ckd_statin == 1 or ckd_recom.gap_ckd_uacr_monitor == 1 %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <hr class="my-2">
+                    <div class="metric-label mb-2">Care gaps</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if ckd_recom.gap_ckd_acei_arb == 1 %}<div class="rx-icon" style="background:#fff3cd;border-color:#ffecb5;">ACEi/ARB</div>{% endif %}
+                        {% if ckd_recom.gap_ckd_sglt2i == 1 %}<div class="rx-icon" style="background:#fff3cd;border-color:#ffecb5;">SGLT2i</div>{% endif %}
+                        {% if ckd_recom.gap_ckd_finerenone == 1 %}<div class="rx-icon" style="background:#fff3cd;border-color:#ffecb5;">Finerenone</div>{% endif %}
+                        {% if ckd_recom.gap_ckd_statin == 1 %}<div class="rx-icon" style="background:#fff3cd;border-color:#ffecb5;">Statin</div>{% endif %}
+                        {% if ckd_recom.gap_ckd_uacr_monitor == 1 %}<div class="rx-icon" style="background:#fff3cd;border-color:#ffecb5;">UACR overdue</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Evidence accordion -->
+            {% if ckd_recom.ckd_present == 1 %}
+            <div class="mt-3" style="border-top:1px solid #dee2e6;">
+                <details style="font-size:.85rem;">
+                    <summary style="padding:.5rem .75rem;background:#fafbfc;cursor:pointer;list-style:none;font-weight:500;color:#0b57d0;">
+                        &#9656; Evidence for CKD recommendations
+                    </summary>
+                    <div style="padding:.75rem;font-size:.82rem;">
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://kdigo.org/guidelines/ckd-evaluation-and-management/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">KDIGO 2024</a> clinical practice guideline for CKD evaluation and management</div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://kdigo.org/guidelines/ckd-evaluation-and-management/" target="_blank">kdigo.org/guidelines</a> · canonical source for RAAS blockade, SGLT2i, finerenone, statin recs</div>
+                        </div>
+                        {% if ckd_recom.recom_ckd_sglt2i > 0 %}
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/32970396/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">DAPA-CKD</a> · Dapagliflozin in patients with CKD · <em>NEJM</em> 2020 · <a href="https://doi.org/10.1056/NEJMoa2024816" target="_blank">doi</a></div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/32970396/" target="_blank">PMID 32970396</a> · HR 0.61 for composite renal outcome</div>
+                        </div>
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/36331190/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">EMPA-KIDNEY</a> · Empagliflozin in CKD · <em>NEJM</em> 2023 · <a href="https://doi.org/10.1056/NEJMoa2204233" target="_blank">doi</a></div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/36331190/" target="_blank">PMID 36331190</a> · HR 0.72 for kidney disease progression</div>
+                        </div>
+                        {% endif %}
+                        {% if ckd_recom.recom_ckd_acei_arb > 0 %}
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/11565518/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">RENAAL</a> · Losartan in T2DM nephropathy · <em>NEJM</em> 2001</div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/11565518/" target="_blank">PMID 11565518</a> · 16% reduction in composite renal endpoint</div>
+                        </div>
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/11565517/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">IDNT</a> · Irbesartan in diabetic nephropathy · <em>NEJM</em> 2001</div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/11565517/" target="_blank">PMID 11565517</a> · 20% reduction in doubling of SCr</div>
+                        </div>
+                        {% endif %}
+                        {% if ckd_recom.recom_ckd_finerenone > 0 %}
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/33264825/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">FIDELIO-DKD</a> · Finerenone in CKD + T2DM · <em>NEJM</em> 2020</div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/33264825/" target="_blank">PMID 33264825</a> · HR 0.82 for renal composite</div>
+                        </div>
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/34449189/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">FIGARO-DKD</a> · Finerenone CV outcomes in CKD + T2DM · <em>NEJM</em> 2021</div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/34449189/" target="_blank">PMID 34449189</a> · HR 0.87 for CV composite</div>
+                        </div>
+                        {% endif %}
+                        {% if ckd_recom.recom_ckd_glp1 > 0 %}
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/38587233/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">FLOW</a> · Semaglutide in T2D + CKD · <em>NEJM</em> 2024</div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/38587233/" target="_blank">PMID 38587233</a> · HR 0.76 for composite renal outcome</div>
+                        </div>
+                        {% endif %}
+                        {% if ckd_recom.recom_ckd_statin > 0 %}
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/21663949/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">SHARP</a> · Simvastatin + ezetimibe in CKD · <em>Lancet</em> 2011</div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/21663949/" target="_blank">PMID 21663949</a> · 17% reduction in major atherosclerotic events</div>
+                        </div>
+                        <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                            <div><a href="https://pubmed.ncbi.nlm.nih.gov/20167359/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">CTT Collaboration</a> · Statin meta-analysis (n≈170k) · <em>Lancet</em> 2010</div>
+                            <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/20167359/" target="_blank">PMID 20167359</a> · 22% reduction in major vascular events per 1 mmol/L LDL drop</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </details>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

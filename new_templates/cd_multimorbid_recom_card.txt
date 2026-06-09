@@ -1,0 +1,223 @@
+<div class="col-12 col-lg-6 mt-4">
+    <div class="card h-100 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white border-bottom-0 pb-0">
+            <h5 class="card-title mb-0">Multi-morbidity Recommendations</h5>
+            {% if cd_multimorbid_recom.concordance_pct_overall %}
+            <span class="badge rounded-pill bg-light text-dark border">Concordance {{ picoformat('cd_multimorbid_recom.concordance_pct_overall') }}%</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <img src="https://d1xcrowuazv720.cloudfront.net/images/heart-icon.png" height="60" />
+                </div>
+                <div class="col">
+                    {% if cd_multimorbid_recom.top_drug and cd_multimorbid_recom.top_drug != 'None' %}
+                    <div class="metric-label">Highest-utility drug to initiate / intensify</div>
+                    <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                        <div class="metric-value" style="font-size:1.5rem;font-weight:600;">{{ picoformat('cd_multimorbid_recom.top_drug') }}</div>
+                        {% if cd_multimorbid_recom.top_drug == 'SGLT2i' or cd_multimorbid_recom.top_drug == 'ACEi/ARB' or cd_multimorbid_recom.top_drug == 'ARNI' or cd_multimorbid_recom.top_drug == 'Statin' or cd_multimorbid_recom.top_drug == 'Finerenone' %}
+                        <span class="badge" style="background:#198754;color:#fff;font-size:.7rem;font-weight:600;letter-spacing:.02em;">Class I · GRADE A</span>
+                        {% elif cd_multimorbid_recom.top_drug == 'GLP-1 RA' or cd_multimorbid_recom.top_drug == 'MRA' or cd_multimorbid_recom.top_drug == 'Beta-blocker' or cd_multimorbid_recom.top_drug == 'Antiplatelet' or cd_multimorbid_recom.top_drug == 'Ezetimibe' %}
+                        <span class="badge" style="background:#20c997;color:#fff;font-size:.7rem;font-weight:600;letter-spacing:.02em;">Class IIa · GRADE B</span>
+                        {% elif cd_multimorbid_recom.top_drug == 'CCB' or cd_multimorbid_recom.top_drug == 'Thiazide' or cd_multimorbid_recom.top_drug == 'Metformin' %}
+                        <span class="badge" style="background:#ffc107;color:#212529;font-size:.7rem;font-weight:600;letter-spacing:.02em;">Class IIb · GRADE B</span>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% if cd_multimorbid_recom.top_drug == 'SGLT2i' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/32970396/" target="_blank">DAPA-CKD</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/36331190/" target="_blank">EMPA-KIDNEY</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/32865377/" target="_blank">EMPEROR-Reduced</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'ACEi/ARB' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/11565518/" target="_blank">RENAAL</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/11565517/" target="_blank">IDNT</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/10639539/" target="_blank">HOPE</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'GLP-1 RA' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/27295427/" target="_blank">LEADER</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/27633186/" target="_blank">SUSTAIN-6</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/38587233/" target="_blank">FLOW</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'ARNI' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/25176015/" target="_blank">PARADIGM-HF</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'MRA' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/10471456/" target="_blank">RALES</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/21073363/" target="_blank">EMPHASIS-HF</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'Finerenone' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/33264825/" target="_blank">FIDELIO-DKD</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/34449189/" target="_blank">FIGARO-DKD</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'Statin' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/20167359/" target="_blank">CTT meta-analysis</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/21663949/" target="_blank">SHARP</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'Ezetimibe' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/26039521/" target="_blank">IMPROVE-IT</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'Beta-blocker' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/10376614/" target="_blank">CIBIS-II</a>
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/10376618/" target="_blank">MERIT-HF</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'Antiplatelet' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/11786451/" target="_blank">ATC meta-analysis</a>
+                        {% elif cd_multimorbid_recom.top_drug == 'Metformin' %}
+                        <a class="trial-chip" style="font-size:.72rem;background:#fff;border:1px solid #cfd4dc;border-radius:1rem;padding:.15rem .55rem;color:#334;text-decoration:none;" href="https://pubmed.ncbi.nlm.nih.gov/9742976/" target="_blank">UKPDS 34</a>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="text-muted"><em>No active drug recommendation.</em></div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row g-3 mt-2">
+                {% if cd_multimorbid_recom.ind_sglt2i_n %}
+                <div class="col-6 col-md-3">
+                    <div class="metric-label">SGLT2i indications</div>
+                    <div class="metric-value">{{ picoformat('cd_multimorbid_recom.ind_sglt2i_n') }}</div>
+                </div>
+                {% endif %}
+                {% if cd_multimorbid_recom.ind_glp1_n %}
+                <div class="col-6 col-md-3">
+                    <div class="metric-label">GLP-1 RA indications</div>
+                    <div class="metric-value">{{ picoformat('cd_multimorbid_recom.ind_glp1_n') }}</div>
+                </div>
+                {% endif %}
+                {% if cd_multimorbid_recom.ind_acei_arb_n %}
+                <div class="col-6 col-md-3">
+                    <div class="metric-label">ACEi/ARB indications</div>
+                    <div class="metric-value">{{ picoformat('cd_multimorbid_recom.ind_acei_arb_n') }}</div>
+                </div>
+                {% endif %}
+                {% if cd_multimorbid_recom.gap_multimorb_priority_n %}
+                <div class="col-6 col-md-3">
+                    <div class="metric-label">Cross-domain priority drugs</div>
+                    <div class="metric-value">{{ picoformat('cd_multimorbid_recom.gap_multimorb_priority_n') }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <hr class="my-2">
+                    <div class="metric-label mb-2">Per-domain concordance</div>
+                    <div class="d-flex flex-wrap justify-content-start gap-2">
+                        {% if cd_multimorbid_recom.has_ckd == 1 %}<div class="rx-icon">CKD {{ picoformat('cd_multimorbid_recom.conc_ckd') }}%</div>{% endif %}
+                        {% if cd_multimorbid_recom.has_chf == 1 %}<div class="rx-icon">CHF {{ picoformat('cd_multimorbid_recom.conc_chf') }}%</div>{% endif %}
+                        {% if cd_multimorbid_recom.has_dm  == 1 %}<div class="rx-icon">DM {{ picoformat('cd_multimorbid_recom.conc_dm') }}%</div>{% endif %}
+                        {% if cd_multimorbid_recom.has_cad == 1 %}<div class="rx-icon">CAD {{ picoformat('cd_multimorbid_recom.conc_cad') }}%</div>{% endif %}
+                        {% if cd_multimorbid_recom.has_htn == 1 %}<div class="rx-icon">HTN {{ picoformat('cd_multimorbid_recom.conc_htn') }}%</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if cd_multimorbid_recom.top_drug and cd_multimorbid_recom.top_drug != 'None' %}
+            <div class="mt-3" style="border-top:1px solid #dee2e6;">
+                <details style="font-size:.85rem;">
+                    <summary style="padding:.5rem .75rem;background:#fafbfc;cursor:pointer;list-style:none;font-weight:500;color:#0b57d0;">
+                        &#9656; Evidence for this recommendation
+                    </summary>
+                    <div style="padding:.75rem;font-size:.82rem;">
+                            {% if cd_multimorbid_recom.top_drug == 'SGLT2i' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/32970396/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">DAPA-CKD</a> · Dapagliflozin in patients with CKD · <em>NEJM</em> 2020 · <a href="https://doi.org/10.1056/NEJMoa2024816" target="_blank">doi</a></div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/32970396/" target="_blank">PMID 32970396</a> · HR 0.61 for composite renal outcome</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/36331190/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">EMPA-KIDNEY</a> · Empagliflozin in CKD · <em>NEJM</em> 2023 · <a href="https://doi.org/10.1056/NEJMoa2204233" target="_blank">doi</a></div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/36331190/" target="_blank">PMID 36331190</a> · HR 0.72 for progression</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/32865377/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">EMPEROR-Reduced</a> · Empagliflozin in HFrEF · <em>NEJM</em> 2020 · <a href="https://doi.org/10.1056/NEJMoa2022190" target="_blank">doi</a></div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/32865377/" target="_blank">PMID 32865377</a> · HR 0.75 for CV death / HF hospitalisation</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://kdigo.org/guidelines/ckd-evaluation-and-management/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">KDIGO 2024</a> guideline for CKD — Rec 4.1.1 (Class 1A)</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'ACEi/ARB' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/11565518/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">RENAAL</a> · Losartan in type 2 DM nephropathy · <em>NEJM</em> 2001</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/11565518/" target="_blank">PMID 11565518</a> · 16% reduction in composite renal endpoint</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/11565517/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">IDNT</a> · Irbesartan in diabetic nephropathy · <em>NEJM</em> 2001</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/11565517/" target="_blank">PMID 11565517</a> · 20% reduction in doubling of SCr</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/10639539/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">HOPE</a> · Ramipril in high-CV-risk patients · <em>NEJM</em> 2000</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/10639539/" target="_blank">PMID 10639539</a> · 22% reduction in MI, stroke, CV death</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'GLP-1 RA' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/27295427/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">LEADER</a> · Liraglutide in T2DM · <em>NEJM</em> 2016</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/27295427/" target="_blank">PMID 27295427</a> · HR 0.87 for 3-point MACE</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/27633186/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">SUSTAIN-6</a> · Semaglutide in T2DM · <em>NEJM</em> 2016</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/27633186/" target="_blank">PMID 27633186</a> · HR 0.74 for 3-point MACE</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/38587233/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">FLOW</a> · Semaglutide in T2DM + CKD · <em>NEJM</em> 2024</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/38587233/" target="_blank">PMID 38587233</a> · HR 0.76 for composite renal outcome</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'ARNI' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/25176015/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">PARADIGM-HF</a> · Sacubitril/valsartan vs enalapril · <em>NEJM</em> 2014</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/25176015/" target="_blank">PMID 25176015</a> · HR 0.80 for CV death / HF hospitalisation</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'MRA' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/10471456/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">RALES</a> · Spironolactone in severe HF · <em>NEJM</em> 1999</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/10471456/" target="_blank">PMID 10471456</a> · 30% mortality reduction</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/21073363/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">EMPHASIS-HF</a> · Eplerenone in mild HFrEF · <em>NEJM</em> 2011</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/21073363/" target="_blank">PMID 21073363</a> · HR 0.63 for CV death / HF hospitalisation</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'Finerenone' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/33264825/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">FIDELIO-DKD</a> · Finerenone in CKD + T2DM · <em>NEJM</em> 2020</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/33264825/" target="_blank">PMID 33264825</a> · HR 0.82 for renal composite</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/34449189/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">FIGARO-DKD</a> · Finerenone CV outcomes in CKD + T2DM · <em>NEJM</em> 2021</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/34449189/" target="_blank">PMID 34449189</a> · HR 0.87 for CV composite</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'Statin' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/20167359/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">CTT Collaboration</a> · Statin meta-analysis (n≈170k) · <em>Lancet</em> 2010</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/20167359/" target="_blank">PMID 20167359</a> · 22% reduction in major vascular events per 1 mmol/L LDL drop</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/21663949/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">SHARP</a> · Simvastatin + ezetimibe in CKD · <em>Lancet</em> 2011</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/21663949/" target="_blank">PMID 21663949</a> · 17% reduction in major atherosclerotic events</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'Ezetimibe' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/26039521/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">IMPROVE-IT</a> · Ezetimibe added to simvastatin post-ACS · <em>NEJM</em> 2015</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/26039521/" target="_blank">PMID 26039521</a> · HR 0.94 for CV composite</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'Beta-blocker' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/10376614/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">CIBIS-II</a> · Bisoprolol in HFrEF · <em>Lancet</em> 1999</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/10376614/" target="_blank">PMID 10376614</a> · 34% all-cause mortality reduction</div>
+                            </div>
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/10376618/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">MERIT-HF</a> · Metoprolol CR/XL in HFrEF · <em>Lancet</em> 1999</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/10376618/" target="_blank">PMID 10376618</a> · 34% all-cause mortality reduction</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'Antiplatelet' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/11786451/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">Antithrombotic Trialists' Collaboration</a> · Aspirin meta-analysis (n≈135k) · <em>BMJ</em> 2002</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/11786451/" target="_blank">PMID 11786451</a> · 25% reduction in serious vascular events in secondary prevention</div>
+                            </div>
+                            {% elif cd_multimorbid_recom.top_drug == 'Metformin' %}
+                            <div style="border-left:3px solid #dee2e6;padding:.35rem .6rem;margin-bottom:.4rem;">
+                                <div><a href="https://pubmed.ncbi.nlm.nih.gov/9742976/" target="_blank" style="font-weight:600;color:#0b57d0;text-decoration:none;">UKPDS 34</a> · Metformin in obese T2DM · <em>Lancet</em> 1998</div>
+                                <div style="color:#6c757d;font-size:.75rem;"><a href="https://pubmed.ncbi.nlm.nih.gov/9742976/" target="_blank">PMID 9742976</a> · 32% reduction in any diabetes-related endpoint</div>
+                            </div>
+                            {% else %}
+                            <div class="text-muted"><em>Evidence summary not yet curated for this recommendation. Refer to local guideline for supporting references.</em></div>
+                            {% endif %}
+                    </div>
+                </details>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

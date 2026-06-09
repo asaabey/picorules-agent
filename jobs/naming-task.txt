@@ -1,0 +1,366 @@
+Group Search Attribute 	Attribute description (intended usage)
+Absent ICPC Coding indicating Diabetes Mellitus (cd_dm_dx)	Flag indicating diabetes diagnosed by lab (HbA1c ≥6.5%) or medication but missing formal ICPC2+ diagnostic coding in the EHR
+Adult polycystic kidney disease (ckd_c_rnm)	Binary flag for autosomal dominant polycystic kidney disease (ADPKD) identified via ICD Q61.2 coding
+AKI in last 12 months(ad_aki)	Acute kidney injury detected in the past 12 months, defined by creatinine-to-baseline ratio >4 with AKIN stage ≥2 and incomplete recovery, or ICD N17 code
+Alert High Hb associated with ESA therapy (tg4810)	Clinical trigger: haemoglobin >130 g/L with a rising trend in a patient actively receiving erythropoiesis-stimulating agent (ESA) therapy, indicating cardiovascular/thrombotic risk
+Alert Acute kidney injury in community (tg4100)	Clinical trigger: community-detected AKI based on creatinine slope analysis with AKIN staging ≥2 and incomplete resolution, excluding patients already on RRT or with advanced CKD
+Alert Medication safety concern (tg4660)	Clinical trigger: concurrent use of NSAIDs with biguanide or SGLT2 inhibitor in a patient with CKD stage ≥3, flagging a medication safety risk (triple whammy)
+Alert Nephrotic range proteinuria in the absence of diabetes (tg4410)	Clinical trigger: two consecutive uACR readings >300 mg/mmol with sustained or worsening proteinuria in a non-diabetic patient not yet seen by renal services
+Alert New commencement on Renal replacement therapy within 1 year (tg 4722)	Clinical trigger: patient commenced haemodialysis (≥10 sessions) or peritoneal dialysis within the last 12 months
+Alert New commencement on Renal replacement therapy within last 3 months (tg 4720)	Clinical trigger: patient commenced haemodialysis (≥10 sessions) or peritoneal dialysis within the last 90 days
+Alert No AVF with advanced CKD4+ with rapid progression (tg4620)	Clinical trigger: CKD stages 4–5 with rapid eGFR decline and no arteriovenous fistula (AVF) formed, indicating need for timely vascular access planning
+Alert Possible nephritic syndrome (tg4420)	Clinical trigger: urine RBC >100 with low leucocytes and uACR >30, suggesting active glomerulonephritis requiring further immunological workup
+Alert Potentially untreated chronic disease (tg2610)	Clinical trigger: untreated CKD (elevated BP + normal potassium + no RAAS inhibitor) or untreated diabetes (HbA1c >8% with no DM medications)
+Alert Potentially untreated proteinuric CKD (tg4630)	Clinical trigger: proteinuric CKD (albuminuria A2+) with gaps in guideline-recommended pharmacotherapy (RAAS inhibitor, SGLT2i, or MRA)
+Alert Unmanaged possible CKD 4 (tg4122)	Clinical trigger: calculated CKD stage 4 with no documented renal service engagement despite recent primary care activity
+Alert Unmanaged possible CKD 5 (tg4123)	Clinical trigger: calculated CKD stage 5 with no documented renal service engagement despite recent primary care activity within 180 days
+Alert Unmanaged possible early CKD with rapid progression (tg4610)	Clinical trigger: CKD stages 1–2 with eGFR slope declining faster than −20 mL/min/year, eGFR <80, and albuminuria A3+, without renal engagement
+AMI (cd_cardiac_cad)	Binary flag for acute myocardial infarction (STEMI or NSTEMI) identified from ICD I21/I23 or ICPC K75/K76 coding
+Anaemia in CKD without ESA (ckd_complcations)	Binary flag for haemoglobin <100 g/L in CKD stage ≥4 without current erythropoiesis-stimulating agent (ESA) therapy
+Anteria Resection (sx_abdo)	Binary flag for anterior resection procedure (high or low) identified from CARESYS procedure codes for colorectal surgery
+Aortic Valve insufficiency (cd_cardiac_vhd)	Binary flag for aortic valve regurgitation/insufficiency identified from ICD I06.1/I35.1 or ICPC K83 coding
+Aortic valve replacement (cd_cardiac_vhd)	Binary flag for surgical aortic valve replacement identified from ICPC K54005 coding
+Aortic valve stenosis (cd_cardiac_vhd)	Binary flag for aortic valve stenosis identified from ICD I06.0/I35.0 or ICPC K83/K71 coding
+At risk for CKD (at_risk)	Binary flag for patients without CKD or RRT but with at least one risk factor (diabetes, hypertension, CVD, obesity, AKI, RHD, or hepatitis B)
+Attendance at oncology clinic ca_careplan)	Binary flag indicating the patient has attended an outpatient oncology clinic encounter
+AV fistuloplasty (rrt_hd_acc_iv)	Binary flag for presence of arteriovenous fistula surveillance or fistuloplasty procedure in a patient on haemodialysis or home HD
+AV fistuloplasty last date (rrt_hd_acc_iv)	Date of the most recent AV fistuloplasty or vascular access surveillance procedure
+Benign Prostatic Hyperplasia (uro_bph)	Binary flag for benign prostatic hyperplasia identified from ICD/ICPC urological coding
+BMI (cd_obesity)	Body mass index calculated from last recorded weight (kg) and height (m); used to classify obesity (BMI >30)
+CABG (cd_cardiac_cad)	Binary flag for coronary artery bypass graft surgery identified from ICD Z95.1 or ICPC K54007 coding
+CABG-FDT (cd_cardiac_cad)	First documented date of coronary artery bypass graft surgery
+Cardiac outpatient encounter (cd_cawrdiac_enc)	Binary flag indicating the patient has attended a cardiac outpatient clinic encounter (enc_op_car_%)
+Charlson comorbidity index (cmid_charlson)	Weighted comorbidity score (0–37) calculated across 17 disease categories using ICD/ICPC codes with standard Charlson weighting (1–6 per condition)
+Chronic HepB (cd_hepb_master)	Master binary flag for chronic hepatitis B, combining coded diagnosis status and serological evidence from HBsAg/HBeAg/HBV DNA results
+Chronic HepB ALT Last result date (cd_hepb_master)	Date of the most recent alanine aminotransferase (ALT) result for hepatitis B monitoring
+Chronic HepB Antiviral Agent (cd_hepb_master)	Name of the current HBV antiviral agent: Entecavir, Tenofovir, Lamivudine, or Adefovir (if prescribed)
+Chronic HepB Coded Status Code (cd_hepb_master)	Numeric code representing the EHR-coded hepatitis B diagnosis status (C+, C−, or unclassified)
+Chronic HepB Coded Status Label (cd_hepb_master)	Human-readable label for the coded hepatitis B diagnosis status (e.g., "C+ confirmed", "C− resolved")
+Chronic HepB Coding Vrs Serology (cd_hepb_master)	Concordance label comparing coded HBV diagnosis against serological test results to flag discrepancies
+Chronic HepB HepB Viral Load Last result date (cd_hepb_master)	Date of the most recent HBV DNA viral load test result
+Chronic HepB Immune clearance phase (cd_hepb_master)	Binary flag for immune clearance phase (phase 2): HBeAg-positive with elevated ALT and high viral load
+Chronic HepB Immune control phase (cd_hepb_master)	Binary flag for immune control phase (phase 3): HBeAg-negative with normal ALT and low/undetectable viral load
+Chronic HepB Immune escape phase (cd_hepb_master)	Binary flag for immune escape phase (phase 4): HBeAg-negative with elevated ALT and detectable viral load (reactivation)
+Chronic HepB Immune Phase Code (cd_hepb_master)	Numeric code (1–4) for the current HBV immune phase: 1=tolerance, 2=clearance, 3=control, 4=escape
+Chronic HepB Immune Phase Date (cd_hepb_master)	Date when the current HBV immune phase classification was determined
+Chronic HepB Immune Phase label (cd_hepb_master)	Human-readable label for the current HBV immune phase (e.g., "Immune tolerance", "Immune escape")
+Chronic HepB Immune tolerance phase (cd_hepb_master)	Binary flag for immune tolerance phase (phase 1): HBeAg-positive with normal ALT and high viral load
+Chronic HepB Serological Status Code (cd_hepb_master)	Numeric code (1–9) representing the serological HBV status derived from HBsAg, HBeAg, and HBV DNA results
+Chronic HepB Serological Status Date (cd_hepb_master)	Date when the serological HBV status was last assessed
+Chronic HepB Serological Status Label (cd_hepb_master)	Human-readable label for the serological HBV status (e.g., "S+ chronic infection", "S− resolved")
+Chronic HepB Ultrasound Last Date (cd_hepb_master)	Date of the most recent abdominal ultrasound for hepatocellular carcinoma surveillance in chronic HBV
+CKD aetiology likely diabetes (ckd_cause)	Binary flag indicating diabetes is the likely cause of CKD, based on presence of coded diabetes in a patient with CKD or RRT
+CKD aetiology likely hypertension (ckd_cause)	Binary flag indicating hypertension is the likely cause of CKD, based on coded hypertension in a CKD/RRT patient without diabetes
+CKD aetiology likely Lupi nephritis (ckd_cause)	Binary flag indicating lupus nephritis is the likely cause of CKD, based on coded SLE in a CKD/RRT patient
+CKD aetiology likely other GN (ckd_cause)	Binary flag indicating other glomerulonephritis (non-lupus) as the likely CKD cause, based on ICD N00–N08 coding
+CKD Anaemic ESA date (ckd_prog_vm)	Date of the most recent erythropoiesis-stimulating agent (ESA) administration for CKD-related anaemia
+CKD AVF formation date (ckd_prog_vm)	Date when the arteriovenous fistula (AVF) was surgically created for haemodialysis access
+CKD AVF present (ckd_prog_vm)	Binary flag indicating a functioning arteriovenous fistula is present for haemodialysis access
+CKD Blood pressure mean (ckd_prog_vm)	Mean systolic blood pressure over the past 12 months, used for CKD progression monitoring
+CKD Careplan (ckd_prog_vm)	Numeric value extracted from the CKD component of the careplan_h9_v1 attribute, indicating careplan documentation status
+CKD Careplan date (ckd_prog_vm)	Date of the most recent CKD-specific careplan documentation
+CKD CKD Education initial  (ckd_prog_vm)	Date of the patient's first CKD education session with renal services
+CKD CKD Education Review (ckd_prog_vm)	Date of the most recent CKD education review session
+CKD CKD Stage (ckd_prog_vm)	CKD stage label (G1–G5) per KDIGO 2012 classification based on eGFR and albuminuria persistence
+CKD complications present (ckd_complications)	Binary flag indicating at least one CKD complication in stage ≥3: anaemia, hyperkalaemia, hyperphosphataemia, secondary hyperparathyroidism, or hypoalbuminaemia
+CKD Creatinine (ckd_prog_vm)	Most recent serum creatinine value (µmol/L) used for CKD monitoring
+CKD Diabetes HbA1c (ckd_prog_vm)	Most recent HbA1c value (%) for glycaemic monitoring in CKD patients with diabetes
+CKD Diabetes HbA1c date (ckd_prog_vm)	Date of the most recent HbA1c test for CKD patients with diabetes
+CKD Diabetes Present (ckd_prog_vm)	Binary flag indicating coexisting diabetes mellitus in a CKD patient
+CKD eGFR (ckd_prog_vm)	Most recent estimated glomerular filtration rate (mL/min/1.73m²) for CKD staging and progression tracking
+CKD eGFR date (ckd_prog_vm)	Date of the most recent eGFR measurement
+CKD Haemoglobin (ckd_prog_vm)	Most recent haemoglobin value (g/L) for anaemia monitoring in CKD
+CKD Haemoglobin date (ckd_prog_vm)	Date of the most recent haemoglobin measurement
+CKD ipa_sep_id (ckd_prog_vm)	Date of the most recent inpatient admission/separation for a CKD patient
+CKD KFRE 2 year probability (kfre)	Kidney Failure Risk Equation 2-year probability of progression to kidney failure (dialysis or transplant), using the 4-variable model (age, sex, eGFR, uACR)
+CKD KFRE 5 year probability (kfre)	Kidney Failure Risk Equation 5-year probability of progression to kidney failure, using the 4-variable model (age, sex, eGFR, uACR)
+CKD KFRE eGFR value (kfre)	eGFR value (mL/min/1.73m²) used as input to the KFRE calculation; applicable for CKD stages G3a–G4
+CKD KFRE uacr value (kfre)	uACR value (mg/mmol) used as input to the KFRE calculation; converted to mg/g for the equation
+CKD opa_sep_id (ckd_prog_vm)	Date of the most recent outpatient clinic encounter for a CKD patient
+CKD panel eGFR last date (ckd)	 	Date of the most recent eGFR result from the CKD staging ruleblock
+CKD panel eGFR last value (ckd)	Most recent eGFR value (mL/min/1.73m²) from the CKD staging ruleblock
+CKD panel uACR last date (ckd)	Date of the most recent urine albumin-to-creatinine ratio (uACR) result
+CKD panel uACR last value (ckd)	Most recent uACR value (mg/mmol) from the CKD staging ruleblock
+CKD stage 1 (ckd)	Binary flag for CKD stage G1: eGFR ≥90 mL/min with persistent albuminuria (A2+) or structural/histological evidence
+CKD stage 2 (ckd)	Binary flag for CKD stage G2: eGFR 60–89 mL/min with persistent albuminuria (A2+) or structural evidence
+CKD stage 3a (ckd)	Binary flag for CKD stage G3a: eGFR 45–59 mL/min (mildly to moderately decreased), per KDIGO 2012
+CKD stage 3b (ckd)	Binary flag for CKD stage G3b: eGFR 30–44 mL/min (moderately to severely decreased), per KDIGO 2012
+CKD stage 4 (ckd)	Binary flag for CKD stage G4: eGFR 15–29 mL/min (severely decreased), per KDIGO 2012
+CKD stage 5 (ckd)	Binary flag for CKD stage G5: eGFR <15 mL/min (kidney failure, not on RRT), per KDIGO 2012
+CKD TTEM : CKD-A1 date (ckd_ttem)	Date when uACR first entered the A1 range (3–30 mg/mmol) — time-to-event modelling for albuminuria progression
+CKD TTEM : CKD-A1 val (ckd_ttem)	uACR value (mg/mmol) at the time of first entering CKD albuminuria category A1
+CKD TTEM : CKD-A2 date (ckd_ttem)	Date when uACR first entered the A2 range (30–300 mg/mmol) — microalbuminuria onset
+CKD TTEM : CKD-A2 val (ckd_ttem)	uACR value (mg/mmol) at the time of first entering CKD albuminuria category A2
+CKD TTEM : CKD-A3 date (ckd_ttem)	Date when uACR first exceeded 300 mg/mmol — macroalbuminuria onset
+CKD TTEM : CKD-A3 val (ckd_ttem)	uACR value (mg/mmol) at the time of first entering CKD albuminuria category A3
+CKD TTEM : CKD-G1 date (ckd_ttem)	Date when eGFR was first recorded ≥90 mL/min — baseline for time-to-event CKD progression tracking
+CKD TTEM : CKD- G1 val (ckd_ttem)	eGFR value (mL/min/1.73m²) at the time of first G1 classification
+CKD TTEM : CKD- G2 date (ckd_ttem)	Date when eGFR first declined to 60–89 mL/min — onset of CKD stage G2
+CKD TTEM : CKD- G2 val (ckd_ttem)	eGFR value at the time of first G2 classification
+CKD TTEM : CKD- G3a date (ckd_ttem)	Date when eGFR first declined to 45–59 mL/min — onset of CKD stage G3a
+CKD TTEM : CKD- G3a val (ckd_ttem)	eGFR value at the time of first G3a classification
+CKD TTEM : CKD- G3b date (ckd_ttem)	Date when eGFR first declined to 30–44 mL/min — onset of CKD stage G3b
+CKD TTEM : CKD- G3b val (ckd_ttem)	eGFR value at the time of first G3b classification
+CKD TTEM : CKD- G4 date (ckd_ttem)	Date when eGFR first declined to 15–29 mL/min — onset of CKD stage G4
+CKD TTEM : CKD- G4 val (ckd_ttem)	eGFR value at the time of first G4 classification
+CKD TTEM : CKD- G5 date (ckd_ttem)	Date when eGFR first declined below 15 mL/min — onset of CKD stage G5 (kidney failure)
+CKD TTEM : CKD- G5 val (ckd_ttem)	eGFR value at the time of first G5 classification
+CKD TTEM : RRT start date (ckd_ttem)	Date of first renal replacement therapy (HD or PD) procedure — endpoint for CKD time-to-event modelling
+CKD uACR (ckd_prog_vm)	Most recent urine albumin-to-creatinine ratio (mg/mmol) for albuminuria monitoring in CKD
+CKD uACR date (ckd_prog_vm)	Date of the most recent uACR measurement
+Composite indicating persistence and no assumption violation (ckd)	Numeric composite asserting CKD diagnostic confidence: both eGFR and uACR show persistence without assumption violations per KDIGO criteria
+Coronary artery disease (cd_cardiac_cad)	Binary flag for coronary artery disease identified from AMI (STEMI/NSTEMI), other CAD codes, or CABG procedure history
+CVA-FDT (cd_cardiac_cad)	First documented date of cerebrovascular accident (stroke) used in cardiovascular disease timeline
+cvra-legacy adjusted probability(cvra)	5-year cardiovascular risk probability (%) calculated using Framingham equations adjusted for age, sex, cholesterol, HDL, BP, smoking, and diabetes
+cvra-legacy category (cvra)	Cardiovascular risk category: 1=Low (<10%), 2=Moderate (10–15%), 3=High (≥15% or automatic overrides such as CKD ≥3, TC ≥7, SBP ≥180)
+cvra-legacy override(cvra)	Binary flag indicating the patient was automatically classified as high cardiovascular risk due to override conditions (e.g., DM+age≥60, CKD≥3, prior CVD)
+Date of birth ($tkc)	Patient's date of birth from the demographic record
+Date of death ($tkc)	Patient's date of death from the demographic record (null if alive)
+Default locality (dmg-loc)	Numeric locality code derived from the most frequent health centre location over the past 2 years
+Definitive Familial Hypercholesterolaemia based on modifiedDLS (cd_dyslip)	Binary flag for definitive familial hypercholesterolaemia: modified Dutch Lipid Score >8 (based on LDL level + premature CAD/ASCVD weighting)
+Demographic location (dmg_loc)	Numeric 5-digit locality code extracted from the patient's most frequent health centre location over the past 2 years
+Demographic location: most frequent (dmg_loc)	The health centre location where the patient has been seen most frequently, used as the primary demographic locality
+Demographic PHC source (dmg_loc)	Numeric code identifying the primary health care source/organisation providing the majority of the patient's care
+Demography: Aboriginal Ethnicity (dmg)	Binary flag indicating Aboriginal ethnicity based on indigenous status code (1 or 3)
+Demography: Age(dmg)	Patient's age in years calculated as (current date − date of birth) / 365.25
+Demography: Alive with absent DOD (dmg)	Binary flag indicating the patient is alive (date of death is present in the record but used inversely — 1 if DOD exists)
+Demography: Date of Birth (dmg)	Patient's date of birth from the demographic attribute (dmg_dob)
+Demography: Date of Death (dmg)	Patient's date of death from the demographic attribute (dmg_dod), null if alive
+Demography: Female gender (dmg)	Binary flag for female gender (1 if gender=0 in the demographic record)
+Demography: Gender [male=1 female=0] (dmg)	Numeric gender value from the demographic record: male=1, female=0
+Demography: Potential duplicate client (dmg_eid_alt)	Binary flag indicating a possible duplicate patient record exists based on alternative enterprise identifiers
+Demography: Torres Straite Islander Ethnicity (dmg)	Binary flag indicating Torres Strait Islander ethnicity based on indigenous status code (2 or 3)
+Diabetes (cd_dm_dx)	Binary flag for prevalent diabetes mellitus (Type 1, 2, or 3c) identified from ICD/ICPC coding, HbA1c ≥6.5%, or diabetic medication use
+Diabetes biguanides (cd_dm_rx_rcm)	Binary flag indicating the patient is currently prescribed metformin (biguanide, ATC A10BA)
+Diabetes GLP1a (cd_dm_rx_rcm)	Binary flag indicating the patient is currently prescribed a GLP-1 receptor agonist (ATC A10BJ)
+Diabetes GLP1a use in 3 years (cd_dm_rx_rcm)	Binary flag indicating the patient has used a GLP-1 receptor agonist within the past 3 years (1080 days)
+Diabetes glycaemic control_f_ (cd_dm_gly_cntrl)	Glycaemic control category based on last HbA1c: 1 = <6% (tight), 2 = 6–8% (acceptable), 3 = 8–10% (suboptimal), 4 = ≥10% (poor)
+Diabetes HbA1c delta_n_ (cd_dm_glyc_ctrl)	Change in HbA1c (%) between the two most recent tests, indicating trend direction (positive = worsening, negative = improving)
+Diabetes intermittent acting insulin (cd_dm_rx_rcm)	Binary flag indicating the patient is currently prescribed intermediate-acting insulin (ATC A10AC)
+Diabetes Last HbA1c ngsp_n_ (cd_dm_glyc_cntrl)	Most recent HbA1c value (NGSP %) within the past 360 days
+Diabetes long acting insulin (cd_dm_glyc_cntrl)	Binary flag indicating the patient is currently prescribed long-acting insulin (ATC A10AE)
+Diabetes management plan (cd_dm_mx)	Binary flag indicating documented diabetes management activity: careplan, podiatry review, or diabetes educator review
+Diabetes Maximum HbA1c ngsp_n_ (cd_dm_glyc_cntrl)	Highest recorded HbA1c value (NGSP %) across the patient's history
+Diabetes mixed insulin (cd_dm_rx_rcm)	Binary flag indicating the patient is currently prescribed mixed (biphasic) insulin preparations
+Diabetes mx last careplan (cd_dm_mx)	Date of the most recent diabetes-specific careplan documentation
+Diabetes mx last diabetic educator review date (cd_dm_mx)	Date of the most recent diabetic educator review (MBS item 10951)
+Diabetes mx last podiatry review date (cd_dm_mx)	Date of the most recent podiatry review for diabetic foot assessment (MBS item 10962)
+Diabetes SGLT2i (cd_dm_rx_rcm)	Binary flag indicating the patient is currently prescribed an SGLT2 inhibitor (ATC A10BK)
+Diabetes short acting insulin (cd_dm_rx_rcm)	Binary flag indicating the patient is currently prescribed short/rapid-acting insulin (ATC A10AB)
+Diabetes sulphonylurea (cd_dm_rx_rcm)	Binary flag indicating the patient is currently prescribed a sulphonylurea (ATC A10BB)
+Diabetes Type 3c (cd_dm_dx)	Binary flag for secondary (pancreatogenic) diabetes mellitus identified from ICD E09 or ICPC T89003/T89008 coding
+Diabetic complications (cd_dm_comp)	Binary flag indicating presence of at least one microvascular diabetic complication (retinopathy, neuropathy, foot ulcer) or DKA
+Diabetic foot ulcer (cd_dm_comp)	Binary flag for diabetic foot ulcer identified from ICD E11.73 coding
+Diabetic neuropathy (cd_dm_comp)	Binary flag for diabetic neuropathy identified from ICD E11.4x or ICPC neuropathy coding
+Diabetic retinopathy (cd_dm_comp)	Binary flag for diabetic retinopathy (non-proliferative or proliferative) identified from ICD E10/E11/E13 with retinal suffix codes or ICPC F83
+Dialysis (HD) commencement date (rrt_panel_vm)	Date of the patient's first haemodialysis session, marking RRT initiation
+Dialysis panel 13105 last date (rrt_panel_vm)	Date of the most recent MBS item 13105 (chronic disease management) claim for a dialysis patient
+Dialysis panel access type (rrt_panel_vm)	Numeric code indicating the current dialysis vascular access type (e.g., AVF, CVC, graft)
+Dialysis panel attendance (rrt_panel_vm)	Percentage attendance rate at scheduled dialysis sessions
+Dialysis panel AV plasty (rrt_panel_vm)	Date of the most recent arteriovenous fistuloplasty procedure
+Dialysis panel diastolic bp mean (rrt_panel_vm)	Mean diastolic blood pressure (mmHg) over the past 12 months for a dialysis patient
+Dialysis panel Hd recency flag (rrt_panel_vm)	Binary flag indicating whether the patient has had a recent haemodialysis session (recency check)
+Dialysis panel Labs bicarb (rrt_panel_vm)	Most recent serum bicarbonate value (mmol/L) for acid-base monitoring in dialysis
+Dialysis panel Labs calcium (rrt_panel_vm)	Most recent serum calcium value (mmol/L) for mineral bone disease monitoring in dialysis
+Dialysis panel Labs CRP date (rrt_panel_vm)	Date of the most recent C-reactive protein (CRP) test for inflammation monitoring in dialysis
+Dialysis panel Labs CRP value (rrt_panel_vm)	Most recent CRP value (mg/L) for inflammation monitoring in dialysis
+Dialysis panel Labs ferritin (rrt_panel_vm)	Most recent serum ferritin value (µg/L) for iron stores assessment in dialysis
+Dialysis panel Labs Haemoglobin (rrt_panel_vm)	Most recent haemoglobin value (g/L) for anaemia monitoring in dialysis
+Dialysis panel Labs Haemoglobin change pct (rrt_panel_vm)	Percentage change in haemoglobin between the two most recent measurements, indicating trend
+Dialysis panel Labs magnesium (rrt_panel_vm)	Most recent serum magnesium value (mmol/L) for electrolyte monitoring in dialysis
+Dialysis panel Labs phosphate (rrt_panel_vm)	Most recent serum phosphate value (mmol/L) for mineral bone disease monitoring in dialysis
+Dialysis panel Labs platelets (rrt_panel_vm)	Most recent platelet count (×10⁹/L) for haematological monitoring in dialysis
+Dialysis panel Labs potassium (rrt_panel_vm)	Most recent serum potassium value (mmol/L) for electrolyte monitoring in dialysis
+Dialysis panel Labs pth (rrt_panel_vm)	Most recent parathyroid hormone value (pmol/L) for secondary hyperparathyroidism monitoring in dialysis
+Dialysis panel Labs sodium (rrt_panel_vm)	Most recent serum sodium value (mmol/L) for electrolyte monitoring in dialysis
+Dialysis panel Labs spKTV (rrt_panel_vm)	Single-pool Kt/V value measuring dialysis adequacy (target ≥1.2 per KDOQI guidelines)
+Dialysis panel Labs tsat (rrt_panel_vm)	Most recent transferrin saturation (%) for functional iron assessment in dialysis
+Dialysis panel Labs URR (rrt_panel_vm)	Urea reduction ratio (%) measuring dialysis adequacy (target ≥65%)
+Dialysis panel last clinic (rrt_panel_vm)	Date of the most recent outpatient clinic encounter for a dialysis patient
+Dialysis panel last hd clinic (rrt_panel_vm)	Date of the most recent haemodialysis clinic encounter
+Dialysis panel last hospitalisation (rrt_panel_vm)	Date of the most recent hospital admission for a dialysis patient
+Dialysis panel Meds calcitriol (rrt_panel_vm)	Date of the most recent calcitriol (active vitamin D) prescription for mineral bone disease management
+Dialysis panel Meds cinacalcet (rrt_panel_vm)	Date of the most recent cinacalcet (calcimimetic) prescription for secondary hyperparathyroidism management
+Dialysis panel Meds phos_bind (rrt_panel_vm)	Date of the most recent phosphate binder prescription for hyperphosphataemia management
+Dialysis panel most dialysed satellite facility code (rrt_panel_vm)	Facility code of the satellite unit where the patient receives the majority of their dialysis sessions (mode)
+Dialysis panel parameter hours (rrt_panel_vm)	Actual dialysis session duration (hours) from the most recent treatment
+Dialysis panel parameter mode (rrt_panel_vm)	Dialysis modality mode: conventional HD vs haemodiafiltration (HDF)
+Dialysis panel prescription hours (rrt_panel_vm)	Prescribed dialysis session duration (hours) per treatment
+Dialysis panel prescription IBW (rrt_panel_vm)	Prescribed ideal body weight (kg) used for dialysis adequacy calculations
+Dialysis panel pth change pct (rrt_panel_vm)	Percentage change in parathyroid hormone between the two most recent measurements
+Dialysis panel remote facility code for 13105 (rrt_panel_vm)	Facility code associated with the most recent MBS 13105 chronic disease management item for remote dialysis patients
+Dialysis panel satellite facility code (rrt_panel_vm)	Facility code of the current satellite dialysis unit where the patient receives treatment
+Dialysis panel satellite facility location (rrt_panel_vm) 	 	Text name of the satellite dialysis facility location
+Dialysis panel systolic bp max (rrt_panel_vm)	Maximum systolic blood pressure (mmHg) recorded over the past 12 months for a dialysis patient
+Dialysis panel systolic bp mean (rrt_panel_vm)	Mean systolic blood pressure (mmHg) over the past 12 months for a dialysis patient
+Dialysis panel years on dialysis (rrt_panel_vm)	Number of years since the patient commenced haemodialysis (calculated from HD start date)
+Distinct location over 1y with MBS 715 723 (dmg_loc) 	Count of distinct health centre locations where MBS 715 or 723 items were claimed in the past year
+Encounter with renal services (engmnt_renal)	Binary flag indicating the patient has had at least one encounter with renal specialist services
+Evolocumab Prescribed (cd_dyslip)	Binary flag indicating the patient is currently prescribed evolocumab (PCSK9 inhibitor) for lipid lowering
+Ezetimibe Prescribed (cd_dyslip)	Binary flag indicating the patient is currently prescribed ezetimibe for lipid lowering
+Gender ($tkc)	Patient's gender from the TKC demographic record (male=1, female=0)
+Given names($tkc)	Patient's given name(s) from the TKC demographic record
+Glomerulonephritis GN Acute or Chronic (ckd_c_gn)	Binary flag for any glomerulonephritis (acute or chronic) identified from ICD N00–N08, ICPC U88, or M32.14 coding
+Glomerulonephritis GN Chronic (ckd_c_gn)	Binary flag for chronic glomerulonephritis identified from ICD N01–N08, ICPC U88, or M32.14 coding
+Glomerulonephritis GN Nephritic (ckd_c_gn)	Binary flag for nephritic presentation of GN (haematuria-predominant) from ICD N00–N03, N05, N07 coding
+Glomerulonephritis GN Nephrotic (ckd_c_gn)	Binary flag for nephrotic presentation of GN (proteinuria-predominant) from ICD N04 or N06 coding
+Graft function known and therapy (rrt_tx)	Binary flag indicating the transplant recipient has documented graft function (creatinine available) and is on immunosuppressive therapy
+HDL cholesterol concentration (cd_dyslip)	Most recent HDL cholesterol value (mmol/L) within the past 12 months
+Health Centre (most frequent) ($tkc)	The health centre where the patient has been seen most frequently across their history
+Health Centre (most recent) ($tkc)	The health centre where the patient was most recently seen
+High CVR (cvra)	Binary flag indicating the patient is classified as high cardiovascular risk (≥15% 5-year risk or automatic override criteria met)
+HRN ($tkc)	Patient's Hospital Registration Number, zero-padded to 7 digits
+Hypercholesteremia (cd_dyslip)	Binary flag for hypercholesterolaemia: LDL >4.9 mmol/L, or LDL >1.8 with ASCVD, or coded dyslipidaemia (ICD E78/ICPC T93), or FHC detected
+Hyperphosphataemia due to CKD (ckd_complications)	Binary flag for serum phosphate ≥2.0 mmol/L in CKD stage ≥3, indicating CKD-mineral bone disease
+Hyperphosphataemia due to CKD (ckd_complications	Binary flag for elevated PTH ≥63 pmol/L in CKD stage ≥3, indicating likely secondary hyperparathyroidism
+Hypertension (ckd_htn)	Binary flag for hypertension identified from ICD I10/I15, ICPC K85–K87 coding, or ≥3 systolic BP readings >140 mmHg within 2 years
+Hypoalbuminaemia in CKD (ckd_complications)	Binary flag for serum albumin <32 g/L in CKD stage ≥3, indicating protein-energy wasting or nephrotic losses
+IHI ($tkc)	Patient's Individual Healthcare Identifier (national identifier)
+Incident Diabetes Mellitus (ckd_dm_dx)	Binary flag for newly diagnosed diabetes within the past 12 months (first diabetes evidence within last year)
+Incident Haemodialysis (rrt)	Binary flag for new haemodialysis commencement within the past 12 months (first HD date within last year and ≥10 sessions)
+Incident Hypertension (cd_htn)	Binary flag for newly diagnosed hypertension within the past 12 months (first hypertension evidence within last year)
+Incident Peritoneal Dialysis (rrt)	Binary flag for new peritoneal dialysis commencement within the past 12 months
+Incident Peritoneal or Haemodialysis (rrt)	Binary flag for new commencement of any dialysis modality (HD or PD) within the past 12 months
+Is Active in the last 2years (at_risk)	Binary flag indicating the patient has clinical activity (any ICD, ICPC, lab, medication, or observation data) within the past 2 years and is not deceased
+Is deceased($tkc)	Binary flag indicating the patient has a recorded date of death
+Is location active (dmg_loc)	Binary flag indicating the patient's demographic location has been active (mode location recorded) within the past 24 months
+Last Fibroscan Date (cd_cirrhosis)	Date of the most recent transient elastography (FibroScan) examination for liver fibrosis assessment
+Last Fibroscan Value (cd_cirrhosis)	Most recent FibroScan stiffness value (kPa) for non-invasive liver fibrosis staging
+LDL cholesterol concentration (cd)dylip)	Most recent LDL cholesterol value (mmol/L) within the past 12 months
+LDL gt 5 threshold (cd_dyslip)	Count of LDL cholesterol values exceeding 5.0 mmol/L in the past 5 years, supporting familial hypercholesterolaemia assessment
+Left or Right Hemicolectomy (sx_abdo)	Binary flag for left or right hemicolectomy procedure identified from CARESYS surgical procedure codes
+Likely secondary hyperparathyroidism due to CKD (ckd_complication)	Binary flag for PTH ≥63 pmol/L in CKD stage ≥3, indicating secondary hyperparathyroidism due to CKD-mineral bone disease
+Loss of Weight (cd_nutr_low)	Binary flag for significant unintended weight loss: baseline BMI <20 with >10% weight loss over 6–24 months
+MACE-FDT (cd_cardiac_cad)	First documented date of a major adverse cardiovascular event (AMI, stroke, or cardiovascular death)
+MBS 705 Long Health Assessment Last date (mbs_billing history)	Date of the most recent MBS item 705 (long health assessment) claim
+MBS 715 Health Assessment Last date (mbs_history_billing)	Date of the most recent MBS item 715 (Aboriginal and Torres Strait Islander health assessment) claim
+MBS 721 GPMP Last date (mbs_billing history)	Date of the most recent MBS item 721 (GP Management Plan) claim
+MBS 723 Team care arrangement Last date (mbs_billing history)	Date of the most recent MBS item 723 (Team Care Arrangement) claim
+MBS 732 Review GPMP Last date (mbs_billing history)	Date of the most recent MBS item 732 (review of GP Management Plan) claim
+Mean diastolic bp over 1 year (cd_htn_bp_control)	Mean diastolic blood pressure (mmHg) calculated from all readings over the past 12 months
+Mitral valve insufficiency (cd_cardiac_vhd)	Binary flag for mitral valve regurgitation/insufficiency identified from ICD I05.1/I05.2/I34.0 or ICPC K83 coding
+Mitral valve replacement (cd_cardiac_vhd)	Binary flag for surgical mitral valve replacement identified from ICPC K54009 coding
+Mitral valve stenosis (cd_cardiac_vhd)	Binary flag for mitral valve stenosis identified from ICD I05.0/I05.2/I34.2 or ICPC K73/K83/K71 coding
+Most Frequent Health Centre (global)	The health centre where the patient has been seen most frequently, used as the default demographic location
+Most recent Health Centre (global)	The health centre where the patient was most recently seen across all encounters
+Native kidney biopsy (ckd_diagnostics)	Binary flag indicating a native kidney biopsy has been performed (histopathology result or imaging-guided biopsy documented)
+Non-steroidal MRA (tg4630)	Binary flag indicating the patient is currently prescribed a non-steroidal mineralocorticoid receptor antagonist (e.g., finerenone)
+Non-steroidal MRA Eligible for CKD (tg4630)	Binary flag indicating the patient with proteinuric CKD is eligible for non-steroidal MRA therapy per guideline criteria
+NSTEMI_FDT (cd_cardiac_cad)	First documented date of a non-ST-elevation myocardial infarction
+Nursing home resident (dmg_residency)	Binary flag indicating the patient is a nursing home resident, identified from MBS item 731 claims within the past 730 days
+Obesity (cd_obesity)	Binary flag for obesity defined as BMI >30 kg/m², calculated from measured weight and height
+Origin PHC District  (dmg_loc_origin)	Two-digit district code extracted from the patient's origin primary health care location (first MBS 715/723/13105 record)
+Origin PHC Locality (dmg_loc_origin)	One-digit locality code extracted from the patient's origin primary health care location
+Origin PHC Location (dmg_loc_origin)	Numeric location code for the patient's origin primary health care centre (where first MBS 715/723/13105 was claimed)
+Origin PHC Location code (dmg_loc_origin)	String location code for the patient's origin primary health care centre
+Origin PHC Region (dmg_loc_origin)	One-digit region code extracted from the patient's origin primary health care location
+Origin PHC Source (dmg_loc_origin)	Two-digit source code identifying the primary health care organisation at the patient's origin location
+PD in the past (rrt)	Binary flag indicating the patient has previously been on peritoneal dialysis but is no longer on PD (historical modality)
+PD start date (rrt)	Date of the patient's first peritoneal dialysis procedure
+Possible Familial Hypercholesteremia based on modified DLS (cd_dyslip)	Binary flag for possible familial hypercholesterolaemia: modified Dutch Lipid Score 3–5 (based on LDL level + premature CAD/ASCVD weighting)
+Prescribed ARNI (cd_cardiac_ccf)	Binary flag indicating the patient is currently prescribed an angiotensin receptor-neprilysin inhibitor (sacubitril/valsartan, ATC C09DX04) for heart failure
+Presence of AF (cd_cardiac_af)	Binary flag for atrial fibrillation identified from ICD I48 or ICPC K78 coding, with CHA₂DS₂-VASc score calculated if non-valvular
+Presence of amputation (ortho_amputation)	Binary flag for limb amputation identified from prosthetic clinic encounters, ICD Y83.5, ICPC A87010, or CARESYS amputation procedure codes
+Presence of Antiphospholipid syndrome (cd_ rhum_aps)	Binary flag for antiphospholipid syndrome identified from ICD D68.61 or ICPC B83021 coding
+Presence of breast carcinoma(ca_breast)	Binary flag for breast carcinoma identified from ICD C50 or ICPC X76 coding (first occurrence date)
+Presence of cardiac device (cd_cardiac _device)	Binary flag for cardiac device (permanent pacemaker or implantable defibrillator) identified from ICPC K54001 or CARESYS procedure codes
+Presence of cardiac investigations (cd_cardiac_ix)	Binary flag indicating the patient has had cardiac investigations (echocardiography or coronary angiography) documented
+Presence of CHF (cd_cardiac_chf)	Binary flag for congestive heart failure or cardiomyopathy identified from ICD I42/I50, ICPC K77, or ARNI prescription (sacubitril/valsartan)
+Presence of Chronic Hepatitis C (id_hcv)	Binary flag for chronic hepatitis C identified from ICPC D72008 or ICD B18.2 coding
+Presence of Cirrhosis (cd_cirrhosis)	Binary flag for cirrhosis identified from ICD K70.3 (alcoholic), K71.7 (toxic), K74 (fibrosis/cirrhosis), or ICPC D97 coding
+Presence of colorectal carcinoma (ca_crc)	Binary flag for colorectal carcinoma identified from ICD C18/C19/C20 or ICPC D75 coding (first occurrence date)
+Presence of covid 19 infection (id_covid19)	Binary flag for COVID-19 infection identified from ICPC R83015 coding
+Presence of cryptococcal infection (id_cap)	Binary flag for cryptococcal infection identified from ICD B45.0 coding
+Presence of Dementia (cd_cns)	Binary flag for dementia identified from ICD F01/F02/F03 or ICPC P70/P15 coding
+Presence of dilated cardiomyopathy (cd_cardiac_chf)	 	Binary flag for dilated cardiomyopathy identified from ICD I42.0 coding
+Presence of endometrial carcinoma (ca_endometrial)	Binary flag for endometrial carcinoma identified from ICD C54.1 coding (first occurrence date)
+Presence of Epilepsy (cd_cns)	Binary flag for epilepsy identified from ICD G40 or ICPC N88 coding
+Presence of Extradural Haemorrhages (cd_cns_ch)	Binary flag for extradural haemorrhage identified from ICPC N80010 or ICD I62.1 coding
+Presence of fractures (ortho_fractures)	Binary flag for pelvic fracture identified from ICD S32.1 coding
+Presence of Gout (cd_rheum_gout)	Binary flag for gout identified from ICD M10, ICPC T92001, or xanthine oxidase inhibitor (allopurinol) use
+Presence of haematological disease (cd_haem)	Binary flag for cytopenias: haemoglobin <100 g/L, or WCC <1.5 ×10⁹/L, or platelets <100 ×10⁹/L (any one or combination)
+Presence of HTLV1-2 (id_htlv)	Binary flag for HTLV-1/2 infection identified from positive serology (lab_bld_htlv=1) or ICD B97.33 coding
+Presence of hypertrophic cardiomyopathy (cd_cardiac_chf)	Binary flag for hypertrophic cardiomyopathy identified from ICD I42.1/I42.2 coding
+Presence of intercerebral haemorrhage (cd_cns_ch)	Binary flag for intracerebral haemorrhage identified from ICPC N80008/N80015 or ICD I61 coding
+Presence of lung carcinoma (ca_lung)	Binary flag for lung carcinoma identified from ICD C34 or ICPC R84 coding (first occurrence date)
+Presence of melanoma (ca_skin_melanoma)	Binary flag for melanoma identified from ICD C43 or ICPC S77003 coding (first occurrence date)
+Presence of metastatic carcinoma (ca_mets)	Binary flag for metastatic disease identified from ICD C77–C80 (bone, CNS, liver, lung, peritoneal, nodal) or ICPC A79009 coding
+Presence of misc carcinoma (ca_misc)	Binary flag for any malignancy (ICD C%) not captured by the specific organ carcinoma ruleblocks
+Presence of Non Valvular AF (cd_cardiac_af)	Binary flag for non-valvular atrial fibrillation (AF present without valvular heart disease), used for CHA₂DS₂-VASc scoring
+Presence of ovarian carcinoma (ca_ovarian) 	Binary flag for ovarian carcinoma identified from ICD C56 or ICPC X77006 coding (first occurrence date)
+Presence of Parkinsons disease (cd_cns)	Binary flag for Parkinson's disease identified from ICPC N87 coding with N04 antiparkinsonian medication use
+Presence of PD catheter (rrt_pd)	Binary flag for peritoneal dialysis catheter in situ, identified from CARESYS procedure codes 1310900/1310901
+Presence of prostate carcinoma (ca_prostate)	Binary flag for prostate carcinoma identified from ICD C61 or ICPC Y77 coding (first occurrence date)
+Presence of recurrent soft tissue infection (id_sti)	Binary flag for recurrent soft tissue infection: ICD L0 or ICPC S10/S76 coding with multiple episodes spanning >1 year
+Presence of recurrent uti (id_uti)	Binary flag for recurrent urinary tract infection: UTI episodes spanning >90 days apart or recurrent UTI ICPC codes U71014/U71015
+Presence of renal cell carcinoma (ca_rcc)	Binary flag for renal cell carcinoma identified from ICD C64 or ICPC U75003 coding (first occurrence date)
+Presence of respiratory infection requiring hospitalisation (id_cap)	Binary flag for community-acquired pneumonia or severe respiratory infection requiring hospitalisation, including viral (ICD J09–J12), bacterial (J13–J14), NOS (J18), or melioidosis
+Presence of restrictive cardiomyopathy (cd_cardiac_chf)	Binary flag for restrictive cardiomyopathy identified from ICD I42.5 coding
+Presence of Rheumatoid arthritis (cd_rheum_ra)	Binary flag for rheumatoid arthritis identified from ICD M05 or ICPC L88004 coding
+Presence of SLE (cd_rheum_sle)	Binary flag for systemic lupus erythematosus identified from ICD M32 or ICPC L99056/L99065 coding
+Presence of solid organ carcinoma (ca_solid)	Binary flag for any solid organ carcinoma: composite of breast, prostate, RCC, CRC, lung, thyroid, endometrial, ovarian, or metastatic disease
+Presence of Subdural Haemorrhage (cd_cns_ch)	Binary flag for subdural haemorrhage identified from ICPC N80001/N80004 or ICD I62.0 coding
+Presence of thyroid carcinoma (ca thyroid)	Binary flag for thyroid carcinoma identified from ICD C37 or ICPC T71 coding (first occurrence date)
+Presence of tuberculosis (id_tb)	Binary flag for active or latent tuberculosis identified from ICPC A700, ICD M49 (spinal TB), ICD J65 (TB sequelae), or ICPC A70J99 (latent TB)
+Presence of Vasculitis (cd_imm_vasculitis)	Binary flag for systemic vasculitis: GPA (ICD M31.3), giant cell arteritis (M31.5/M31.6), MPO-ANCA (M31.7), or Takayasu arteritis (M31.4)
+Prevalent arteriovenous fistula for haemodialysis (ckd_access)	Binary flag indicating a functioning arteriovenous fistula (AVF) exists for haemodialysis access, identified from CARESYS procedure, ICD Z49.0, or ICPC K99049 codes
+Prevalent Diabetes Mellitus (cd_dm_dx)	Binary flag for prevalent (established) diabetes mellitus — patient has existing DM diagnosis of any type
+Prevalent Hypertension (cd_htn)	Binary flag for prevalent (established) hypertension — patient has existing hypertension diagnosis
+Prevalent smoker (at_risk)	Binary flag for current smoking status, derived from smoking status code ≥29 in the clinical record
+Previous atherosclerotic vascular disease (cd_dyslip)	Binary flag for prior atherosclerotic cardiovascular disease (CAD, stroke, or PVD), used to determine aggressive LDL targets (≤1.8 mmol/L)
+Probable Familial Hypercholestolaemia based based on modified DLS (cd_dyslip)	Binary flag for probable familial hypercholesterolaemia: modified Dutch Lipid Score 6–8 (based on LDL level + premature CAD/ASCVD weighting)
+RAAS (tg4630)	Binary flag indicating the patient is currently prescribed a RAAS inhibitor (ACE inhibitor ATC C09AA or ARB ATC C09CA)
+RAAS Eligible for CKD (tg4630)	Binary flag indicating the patient with proteinuric CKD is eligible for RAAS inhibitor therapy per guideline criteria
+Renal Referral from Primary care (engmnt_renal)	Binary flag indicating a referral to nephrology/renal services has been made from primary care
+Renal services interaction (ckd_journey)	Binary flag indicating the patient has had meaningful interaction with renal services: initial education, review education, or first encounter documented (non-RRT patients)
+Renal structural anatomical anomaly (ckd_c_rnm)	Binary flag for structural or genetic renal anomalies: renal agenesis (Q60), cystic disease (Q61), obstructive (Q62), malformations (Q63/Q64), neoplasm (C64), or post-nephrectomy (Z90.5)
+Renal supportive care (ckd_careplan)	Binary flag indicating the patient is on a renal supportive (conservative) care pathway, identified from ICPC U59011 coding
+Renal supportive care Last date (ckd_careplan)	Date of the most recent renal supportive care documentation
+Renal Transplant multi-parity (rrt)	Binary flag indicating the transplant recipient has had multiple transplants (>10 transplant-related procedure codes suggesting re-transplantation)
+Renal Tubulo -interstitial disease chronic (ckd_c_tid)	Binary flag for chronic tubulo-interstitial kidney disease identified from ICD N11–N16 or N25 coding
+rheumatic heart disease (cd_cardiac_rhd)	Binary flag for rheumatic heart disease identified from ICD I05–I09 or ICPC K71 coding
+Rheumatic heart disease (cd_cardiac_vhd)	Binary flag for rheumatic heart disease as the aetiology of valvular heart disease, identified from ICD I05–I09 or ICPC K71 coding
+RRT Haemodialysis (rrt)	Binary flag indicating the patient is currently on in-centre haemodialysis (RRT modality = HD)
+RRT Home Haemodialysis (rrt)	Binary flag indicating the patient is currently on home haemodialysis (RRT modality = HHD)
+RRT Peritoneal Dialysis (rrt)	Binary flag indicating the patient is currently on peritoneal dialysis (RRT modality = PD)
+RRT Transplant (rrt)	Binary flag indicating the patient has a functioning renal transplant (RRT modality = TX)
+Rx cardiac meds (cd_cardiac_rx)	Binary flag indicating the patient is prescribed cardiac medications: statins, potassium-sparing diuretics, loop diuretics, chronotropes, anticoagulants, or antiplatelets
+Screened by blood pressure uACR and eGFR within last 1y as per recommendations (at_risk)	Count (0–3) of recommended CKD screening tests (eGFR, uACR, blood pressure) completed within the past 12 months
+Screened by blood pressure within last 1 year (at_risk)	Binary flag indicating the patient has had a blood pressure measurement within the past 12 months
+Screened by eGFR within last 1 year (at_risk)	Binary flag indicating the patient has had an eGFR test within the past 12 months
+Screened by HbA1c within the last 1y (at_risk)	Binary flag indicating the patient has had an HbA1c test within the past 12 months
+Screened by uACR within last 1y (at_risk)	Binary flag indicating the patient has had a urine albumin-to-creatinine ratio (uACR) test within the past 12 months
+SGLT2i (tg4630)	Binary flag indicating the patient is currently prescribed an SGLT2 inhibitor (ATC A10BK)
+SGLT2i Eligible for CKD (tg4630)	Binary flag indicating the patient with proteinuric CKD is eligible for SGLT2 inhibitor therapy per guideline criteria
+Smoking current NRT use (cd_smoking)	Binary flag indicating the patient is currently using nicotine replacement therapy (NRT)
+Smoking Status (cd_smoking)	Numeric smoking status code from the clinical record, used to classify current/former/never smoker
+Statin Prescribed (cd_dyslip)	Binary flag indicating the patient is currently prescribed a statin for lipid-lowering therapy
+STEMI-FDT (cd_cardiac_cad)	First documented date of a ST-elevation myocardial infarction
+Steroidal MRA (tg4630)	Binary flag indicating the patient is currently prescribed a steroidal mineralocorticoid receptor antagonist (e.g., spironolactone, ATC C03DA)
+Stroke (cd_cva)	Binary flag for cerebrovascular accident (haemorrhagic or thromboembolic stroke) identified from ICD I60–I67 or ICPC K89/K90/K91 coding
+Surname ($tkc)	Patient's surname from the TKC demographic record
+TKC category (at_risk)	TKC population category: 1 = CKD or RRT (kidney disease confirmed), 2 = At risk (risk factors present, no CKD), 3 = Other
+TKC Category 2 label (at_risk)	Human-readable label for the TKC category (e.g., "At risk", "CKD stage 3a", "Haemodialysis", "Transplant")
+TKC cohort (at_risk)	Binary flag indicating the patient belongs to the TKC cohort: active within 2 years AND has CKD, RRT, or at-risk status
+Total cholesterol concentration (cd_dyslip)	Most recent total cholesterol value (mmol/L) within the past 12 months
+Total cholesterol test date (cd_dyslip)	Date of the most recent total cholesterol test
+transplant_panel:active followup within 90 days (rrt_tx)	Binary flag indicating the transplant recipient has had an outpatient clinic visit within the past 90 days
+transplant_panel:last clinic date  (rrt_tx)	Date of the most recent outpatient clinic encounter for the transplant recipient
+transplant_panel:last creatinine date (rrt_tx)	Date of the most recent serum creatinine measurement for graft function monitoring
+transplant_panel:last creatinine value (rrt_tx)	Most recent serum creatinine value (µmol/L) for transplant graft function monitoring
+transplant_panel:last everolimus date (rrt_tx)	Date of the most recent everolimus therapeutic drug monitoring (TDM) level
+transplant_panel:last everolimus value (rrt_tx)	Most recent everolimus trough level (µg/L) for immunosuppression monitoring
+transplant_panel:last tacrolimus date (rrt_tx)	Date of the most recent tacrolimus therapeutic drug monitoring (TDM) level
+transplant_panel:last tacrolimus value (rrt_tx)	Most recent tacrolimus trough level (µg/L) for immunosuppression monitoring
+transplant_panel:last transplant date (rrt_tx)	Date of the patient's most recent renal transplant procedure
+Treated with ACEi (cd_htn)	Binary flag (count ≥1) indicating the patient is prescribed an ACE inhibitor (ATC C09AA) for hypertension
+Treated with ARB (cd_htn)	Binary flag (count ≥1) indicating the patient is prescribed an angiotensin receptor blocker (ATC C09CA) for hypertension
+Treated with Beta blocker (cd_htn)	Binary flag (count ≥1) indicating the patient is prescribed a beta-blocker (ATC C07) for hypertension
+Treated with Calcium channel blocker (cd_htn)	Binary flag (count ≥1) indicating the patient is prescribed a calcium channel blocker (ATC C08) for hypertension
+Treated with Centrally acting agent(cd_htn)	Binary flag (count ≥1) indicating the patient is prescribed a centrally acting antihypertensive (ATC C02)
+Treated with loop diauretic (cd_htn)	Binary flag (count ≥1) indicating the patient is prescribed a loop diuretic (ATC C03C) for hypertension/fluid management
+Treated with thiazide diauretic (cd_htn)	Binary flag (count ≥1) indicating the patient is prescribed a thiazide diuretic (ATC C03AA) for hypertension
+Triglyceride concentration (cd_dyslip	Most recent triglyceride value (mmol/L) within the past 12 months
+Valvular Heart Disease (cd_cardiac_vhd)	Binary flag for any valvular heart disease: mitral, aortic, or tricuspid valve pathology (stenosis, insufficiency, or replacement)
+Visable in TKC app (global)	Binary flag indicating the patient meets visibility criteria for display in the Territory Kidney Care application
+VTE (cd_cardiac_vte)	Binary flag for venous thromboembolism: pulmonary embolism (ICD I26), deep vein thrombosis (I82.2/I82.3/I82.9), Budd-Chiari syndrome (I82.0), or superficial thrombophlebitis (I82.8)

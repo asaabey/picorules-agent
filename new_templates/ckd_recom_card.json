@@ -1,0 +1,11 @@
+{
+  "author": null,
+  "description": "Revamped CKD card: stage + eGFR/uACR/K+/LDL metrics, per-drug KDIGO 2024 recommendations with action state, contraindication callouts, care gaps, evidence accordion",
+  "last_updated": null,
+  "is_active": true,
+  "name": "ckd_recom_card",
+  "related_ruleblock": "ckd_recom",
+  "is_composition": false,
+  "is_mhr": false,
+  "version": null
+}

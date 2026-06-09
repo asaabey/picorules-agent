@@ -1,0 +1,106 @@
+{% if cd_cvra_recom.cvra_cat_r and cd_cvra_recom.cvra_cat_r > 0 %}
+<div class="col-md-6">
+<div class="card h-100">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-notes-medical me-2"></i>Lifestyle &amp; Detail</span>
+    </div>
+    <div class="card-body">
+
+        <!-- Smoking Card -->
+        {% if cd_cvra_recom.recom_smoking and cd_cvra_recom.recom_smoking > 0 %}
+        <div class="recommendation-item mb-3" style="{% if cd_cvra_recom.recom_smoking == 1 %}border-left-color:#e74c3c;{% elif cd_cvra_recom.recom_smoking == 2 %}border-left-color:#2d753c;{% else %}border-left-color:#6c757d;{% endif %}">
+            <div class="recommendation-title">
+                <i class="fas fa-smoking-ban"></i> Smoking
+                {% if cd_cvra_recom.recom_smoking == 1 %}<span class="risk-category high-risk ms-auto" style="font-size:0.7rem;padding:2px 8px;margin-top:0;">INITIATE</span>
+                {% elif cd_cvra_recom.recom_smoking == 2 %}<span class="risk-category low-risk ms-auto" style="font-size:0.7rem;padding:2px 8px;margin-top:0;">ON Rx</span>
+                {% elif cd_cvra_recom.recom_smoking == 3 %}<span class="risk-category ms-auto" style="font-size:0.7rem;padding:2px 8px;margin-top:0;background:#e2e3e5;color:#383d41;">EX-SMOKER</span>
+                {% endif %}
+            </div>
+            <div class="recommendation-details">
+                <div class="row g-2">
+                    <div class="col-6"><div class="metric-label">Status</div><div class="metric-value">{% if cd_cvra_recom.is_smoker == 1 %}Current smoker{% elif cd_cvra_recom.is_exsmoker == 1 %}Ex-smoker{% endif %}</div></div>
+                    <div class="col-6"><div class="metric-label">Cessation Rx</div><div class="metric-value">{% if cd_cvra_recom.rx_cessation_f == 1 %}Yes{% else %}No{% endif %}</div></div>
+                </div>
+                {% if cd_cvra_recom.recom_smoking == 1 %}<div class="mt-2" style="color:#e74c3c;font-size:0.8rem;"><i class="fas fa-exclamation-circle me-1"></i>Cessation Rx recommended (varenicline, bupropion, or NRT)</div>{% endif %}
+                {% if cd_cvra_recom.recom_smoking == 2 %}<div class="mt-2" style="color:#2d753c;font-size:0.8rem;"><i class="fas fa-check-circle me-1"></i>Continue cessation support</div>{% endif %}
+                {% if cd_cvra_recom.recom_smoking == 3 %}<div class="mt-2" style="color:#6c757d;font-size:0.8rem;"><i class="fas fa-info-circle me-1"></i>Monitor for relapse</div>{% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Lifestyle Card -->
+        <div class="recommendation-item mb-3" style="border-left-color:var(--primary-color);">
+            <div class="recommendation-title">
+                <i class="fas fa-running"></i> Lifestyle
+                <span class="risk-category ms-auto" style="font-size:0.7rem;padding:2px 8px;margin-top:0;background:#e2e3e5;color:#383d41;">UNIVERSAL</span>
+            </div>
+            <div class="recommendation-details">
+                <div style="font-size:0.85rem;">Healthy eating, physical activity, reduce alcohol</div>
+                {% if cd_cvra_recom.recom_weight == 1 %}
+                <div class="mt-1" style="color:#856404;font-size:0.8rem;"><i class="fas fa-weight me-1"></i>Weight management{% if cd_cvra_recom.bmi %} (BMI {{ picoformat('cd_cvra_recom.bmi') }}){% endif %}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Reassessment -->
+        <div class="p-3" style="background-color:#f8f9fa;border-radius:10px;margin-bottom:15px;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                <strong style="font-size:0.85rem;">Reassess:</strong>
+                <span class="ms-2" style="font-size:0.85rem;">
+                {% if cd_cvra_recom.recom_reassess_yr == 0 %}Not routinely required
+                {% elif cd_cvra_recom.recom_reassess_yr == 1 %}Annual{% if cd_cvra_recom.fnp == 1 %} <span class="risk-category" style="font-size:0.65rem;padding:2px 6px;margin-top:0;background:#d1ecf1;color:#0c5460;">First Nations</span>{% endif %}
+                {% elif cd_cvra_recom.recom_reassess_yr == 2 %}Every 2 years
+                {% elif cd_cvra_recom.recom_reassess_yr == 5 %}Every 5 years
+                {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <!-- Audit Detail -->
+        <a class="text-muted" data-bs-toggle="collapse" href="#cvraRecomDetail" role="button" aria-expanded="false" style="font-size:0.8rem;text-decoration:none;">
+            <i class="fas fa-chevron-down me-1"></i>Assessment detail
+        </a>
+        <div class="collapse" id="cvraRecomDetail">
+            <div class="risk-details mt-2" style="font-size:0.8rem;">
+                <div class="row g-2">
+                    <div class="col-12" style="border-bottom:1px solid #dee2e6;padding-bottom:4px;"><strong>Risk Reconciliation</strong></div>
+                    {% if cd_cvra_recom.frmnghm_cat %}
+                    <div class="col-6"><span class="text-muted">Framingham</span><br>Cat {{ picoformat('cd_cvra_recom.frmnghm_cat') }}{% if cd_cvra_recom.frmnghm_p %} <small class="text-muted">({{ picoformat('cd_cvra_recom.frmnghm_p') }}%)</small>{% endif %}</div>
+                    {% endif %}
+                    {% if cd_cvra_recom.auspredict_cat %}
+                    <div class="col-6"><span class="text-muted">AusCVDRisk</span><br>Cat {{ picoformat('cd_cvra_recom.auspredict_cat') }}{% if cd_cvra_recom.auspredict_p %} <small class="text-muted">({{ picoformat('cd_cvra_recom.auspredict_p') }}%)</small>{% endif %}</div>
+                    {% endif %}
+                    <div class="col-6"><span class="text-muted">Reconciled</span><br><strong>Cat {{ picoformat('cd_cvra_recom.cvra_cat_r') }}</strong></div>
+                    <div class="col-6"><span class="text-muted">Source</span><br>{{ cd_cvra_recom.cvra_src }}{% if cd_cvra_recom.cvra_agree == 0 %} <small style="color:#856404;">(discordant)</small>{% endif %}</div>
+
+                    {% if cd_cvra_recom.clin_high_risk == 1 %}
+                    <div class="col-12"><small class="text-muted"><i class="fas fa-info-circle me-1"></i>Clinical override: {% if cd_cvra_recom.ckd and cd_cvra_recom.ckd >= 3 %}CKD stage {{ picoformat('cd_cvra_recom.ckd') }}{% endif %}{% if cd_cvra_recom.fhc_prob and cd_cvra_recom.fhc_prob >= 2 %} FHC prob {{ picoformat('cd_cvra_recom.fhc_prob') }}{% endif %}</small></div>
+                    {% endif %}
+
+                    <div class="col-12 mt-2" style="border-bottom:1px solid #dee2e6;padding-bottom:4px;"><strong>Targets</strong></div>
+                    {% if cd_cvra_recom.sbp_target %}
+                    <div class="col-6"><span class="text-muted">SBP</span><br>&lt;{{ picoformat('cd_cvra_recom.sbp_target') }} {% if cd_cvra_recom.sbp_above_target == 1 %}<span class="risk-category high-risk" style="font-size:0.65rem;padding:1px 5px;margin-top:0;">above</span>{% else %}<span class="risk-category low-risk" style="font-size:0.65rem;padding:1px 5px;margin-top:0;">at target</span>{% endif %}</div>
+                    {% endif %}
+                    {% if cd_cvra_recom.ldl_target %}
+                    <div class="col-6"><span class="text-muted">LDL</span><br>&lt;{{ picoformat('cd_cvra_recom.ldl_target') }} {% if cd_cvra_recom.ldl_above_target == 1 %}<span class="risk-category high-risk" style="font-size:0.65rem;padding:1px 5px;margin-top:0;">above</span>{% else %}<span class="risk-category low-risk" style="font-size:0.65rem;padding:1px 5px;margin-top:0;">at target</span>{% endif %}</div>
+                    {% endif %}
+
+                    <div class="col-12 mt-2" style="border-bottom:1px solid #dee2e6;padding-bottom:4px;"><strong>Concordance</strong></div>
+                    <div class="col-12">
+                        <table style="width:100%;font-size:0.8rem;">
+                            <tr><td style="padding:2px 0;">BP</td><td style="text-align:right;">{% if cd_cvra_recom.n_recom_bp == 1 %}{% if cd_cvra_recom.n_met_bp == 1 %}<i class="fas fa-check-circle" style="color:#2d753c;"></i> Met{% else %}<i class="fas fa-times-circle" style="color:#e74c3c;"></i> Not met{% endif %}{% else %}<span class="text-muted">N/A</span>{% endif %}</td></tr>
+                            <tr><td style="padding:2px 0;">Lipid</td><td style="text-align:right;">{% if cd_cvra_recom.n_recom_lipid == 1 %}{% if cd_cvra_recom.n_met_lipid == 1 %}<i class="fas fa-check-circle" style="color:#2d753c;"></i> Met{% else %}<i class="fas fa-times-circle" style="color:#e74c3c;"></i> Not met{% endif %}{% else %}<span class="text-muted">N/A</span>{% endif %}</td></tr>
+                            <tr><td style="padding:2px 0;">Antiplatelet</td><td style="text-align:right;">{% if cd_cvra_recom.n_recom_antipl == 1 %}{% if cd_cvra_recom.n_met_antipl == 1 %}<i class="fas fa-check-circle" style="color:#2d753c;"></i> Met{% else %}<i class="fas fa-times-circle" style="color:#e74c3c;"></i> Not met{% endif %}{% else %}<span class="text-muted">N/A</span>{% endif %}</td></tr>
+                            <tr><td style="padding:2px 0;">Smoking</td><td style="text-align:right;">{% if cd_cvra_recom.n_recom_smoking == 1 %}{% if cd_cvra_recom.n_met_smoking == 1 %}<i class="fas fa-check-circle" style="color:#2d753c;"></i> Met{% else %}<i class="fas fa-times-circle" style="color:#e74c3c;"></i> Not met{% endif %}{% else %}<span class="text-muted">N/A</span>{% endif %}</td></tr>
+                            <tr style="border-top:1px solid #dee2e6;"><td style="padding:4px 0;font-weight:bold;">Total</td><td style="text-align:right;font-weight:bold;">{{ picoformat('cd_cvra_recom.n_met') }}/{{ picoformat('cd_cvra_recom.n_applicable') }} ({{ picoformat('cd_cvra_recom.concordance_pct') }}%)</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+{% endif %}

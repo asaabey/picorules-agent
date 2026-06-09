@@ -1,0 +1,153 @@
+            <!-- Framingham Risk Score Card -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Adjusted Framingham Risk Score (CARPA version)</span>
+                        
+                        <img src="https://www.carpa.com.au/wp-content/uploads/2019/12/CARPA-logo-png.png" alt="CARPA" style="height:40px;">
+                    </div>
+                    <div class="card-body text-center">
+                        {% if cvra.risk_high_ovr  ==1 %}<div class="risk-value">&gt;15%</div>{% endif %} 
+                        {% if cvra.risk_high_ovr  ==0 %}<div class="risk-value">{{cvra.risk_5 }}%</div>{% endif %} 
+
+                        {% if cvra.cvra_cat == 1 %}<div class="risk-category low-risk">Low Risk</div>{% endif %} 
+                        {% if cvra.cvra_cat == 2 %}<div class="risk-category moderate-risk">Moderate Risk</div>{% endif %} 
+                        {% if cvra.cvra_cat == 3 %}<div class="risk-category high-risk">High Risk</div>{% endif %} 
+                        
+                        
+                        
+                        <div class="risk-details">
+
+<style>
+/* Compact table styling */
+.table-compact th,
+.table-compact td {
+    padding: 4px 6px;        /* reduces row height */
+    line-height: 1.2;        /* tight vertical spacing */
+    font-size: 13px;         /* optional: smaller text */
+    vertical-align: middle;  /* keeps content centered */
+}
+
+.table-compact thead th {
+    background-color: #f1f3f5;
+    font-weight: 600;
+    border-bottom: 2px solid #343a40;
+}
+
+</style>
+
+  <table class="table table-compact">
+              <thead>
+                <tr>
+                  <th scope="col"style="text-align:left">Variable</th>
+                  <th scope="col">Value</th>
+                  <th scope="col"style="text-align:right">Date</th>
+                </tr>
+ </thead>
+              <tbody>
+                
+<tr>
+                         <td style="text-align:left">
+                            <div class="risk-metric">
+                                <span>First Nations:</span></td>
+                               <td> <strong>{% if cvra_vm.fnp == 1%}Yes{% else %}No{% endif %}</strong></td>
+<td style="text-align:right"></td>
+                            </div>
+</tr>
+<!--
+                            <div class="risk-metric">
+                                <span>5 year risk of MI:</span>
+                                <strong>{% if cvra.risk_high_ovr  ==1 %} &gt;15{% else %}{{ cvra_vm.risk_5_mi }}{% endif %}%</strong>
+                            </div>
+                            <div class="risk-metric">
+                                <span>5 year risk of CHD:</span>
+                                <strong>{% if cvra.risk_high_ovr  ==1 %} &gt;15{% else %}{{ cvra_vm.risk_5_chd }}{% endif %}%</strong>
+                            </div>
+-->
+<tr>
+                       <td style="text-align:left">     <div class="risk-metric">
+                                <span>Age:</span></td>
+                               <td> <strong>{{ cvra.age }}</strong></td>
+<td style="text-align:right"></td>
+                            </div>
+</tr>
+<tr>
+<td style="text-align:left"> 
+                            <div class="risk-metric">
+                                <span>Sex at birth:</span></td>
+                               <td> <strong>{% if cvra.female==1 %}Female{% else %}Male{% endif %}</strong></td>
+<td style="text-align:right"></td>
+                            </div>
+</tr>
+<tr>
+<td style="text-align:left"> 
+                            <div class="risk-metric">
+                                <span>Smoking status:</span></td>
+                               <td>
+                                {% if cvra.smoking_status_code == 3 %}<strong>Current smoker</strong>{% endif %}
+                                {% if cvra.smoking_status_code == 2 %}<strong>Ex-smoker</strong>{% endif %}
+                                {% if cvra.smoking_status_code == 1 %}<strong>Non-smoker</strong>{% endif %}</td>
+<td style="text-align:right; {% if cvra.smoking_status_dt_out_of_date == 1 %}color:red;{% endif %}">{% if cvra.smoke0_dt is not none %}{{ picodate('cvra.smoke0_dt') }}{% endif %}</td>
+                            </div>
+</tr>
+<tr>
+<td style="text-align:left"> 
+                            <div class="risk-metric">
+                                <span>Systolic blood pressure:</span></td>
+                               <td><strong>{{ cvra.sbp_val}}&nbsp;mmHg</strong></td>
+<td style="text-align:right; {% if cvra.sbp_out_of_date == 1 %}color:red;{% endif %}">{% if cvra.sbp_dt is not none %}{{ picodate('cvra.sbp_dt') }}{% endif %}</td>
+                            </div>
+</tr>
+<tr>
+<td style="text-align:left"> 
+                            <div class="risk-metric">
+                                <span>Total cholesterol:</span></td>
+                                <td><strong>{{ cvra.tc_val }}&nbsp;mmol/L</strong></td>
+<td style="text-align:right; {% if cvra.tc_out_of_date == 1 %}color:red;{% endif %}">{% if cvra.tc_dt is not none %}{{ picodate('cvra.tc_dt') }}{% endif %}</td>
+                            </div>
+</tr>
+<tr>
+<td style="text-align:left"> 
+                            <div class="risk-metric">
+                                <span>HDL cholesterol:</span></td>
+                                <td><strong>{{ cvra.hdl_val }}</strong></td>
+<td style="text-align:right; {% if cvra.hdl_out_of_date == 1 %}color:red;{% endif %}">{% if cvra.hdl_dt is not none %}{{ picodate('cvra.hdl_dt') }}{% endif %}</td>
+                            </div>
+</tr>
+<tr>
+                         <td style="text-align:left">    <div class="risk-metric">
+                                <span>Previous CV disease:</span> </td>
+                                <td><strong>{% if cvra.cvd_prev == 1%}Yes{% else %}No{% endif %}</strong></td>
+<td style="text-align:right"></td>
+                            </div>
+</tr>
+<tr>
+                    <td style="text-align:left">
+                            <div class="risk-metric">
+                                <span>High risk criteria already met:</span></td>
+                     <td><strong>{% if cvra_vm.has_high_risk_factors_legacy == 1%}Yes{% else %}No{% endif %}</strong></td>
+<td style="text-align:right"></td>
+                            </div>
+</tr>
+
+<tr>
+<td style="text-align:left"> 
+                            <div class="risk-metric">
+                                <span>History of atrial fibrillation:</span></td>
+                               <td><strong>{% if cvra_vm.af == 1 %}Yes{% else %}No{% endif %}</strong></td>
+<td style="text-align:right"></td>
+                            </div>
+</tr>
+<tr>
+                           <td style="text-align:left">  <div class="risk-metric">
+                                <span>Diabetes:</span></td>
+                               <td><strong>{% if cvra_vm.dm ==1 %}Yes{% else %}No{% endif %}</strong></td>
+<td style="text-align:right"></td>
+                            </div>
+</tr>
+</tbody>
+</table>
+                        </div>
+                    </div>
+                </div>
+            </div>

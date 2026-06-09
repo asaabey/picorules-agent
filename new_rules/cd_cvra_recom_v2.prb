@@ -12,11 +12,13 @@
      KDIGO 2024 CKD       https://kdigo.org/guidelines/ckd-evaluation-and-management/
 
    v2 changes vs v1:
-     - SBP target lowered to 130 (AU 2023, except very-high young
-       <120 and frail elderly 140)
-     - clin_high_risk expanded: T2DM with end-organ damage, severe
-       hypercholesterolaemia (LDL>=5.0), prior CVD, eGFR<45 OR
-       albuminuria
+     - SBP target set to 130 for most adults (AU 2023), 140 for age >=80
+       as a frailty proxy. SPRINT-derived <120 for high-risk <65 was
+       included initially but removed on 2026-05-19 review — AU 2023
+       does not endorse <120; that target is AHA/ACC 2025 only.
+     - clin_high_risk expanded: T2DM with end-organ damage, prior CVD,
+       eGFR<45 OR persistent albuminuria. (Standalone LDL>=5.0 removed
+       on review against AU 2023 guideline; see comment at clin_high_risk.)
      - First Nations reclassification refined to age/risk-factor
        conditional rather than blanket +1
      - Lipid intensification ladder extended: statin -> ezetimibe ->
@@ -54,6 +56,7 @@ auspredict_p => rout_cvra_ensemble.auspredict_p.val.bind();
 
 cvd_prev => rout_cvra.cvd_prev.val.bind();
 age => rout_cvra_ensemble.age.val.bind();
+gender => rout_dmg.gender.val.bind();
 ckd => rout_ckd.ckd.val.bind();
 cga_a_val => rout_ckd.cga_a_val.val.bind();
 fhc_prob => rout_cd_dyslip.fhc_prob.val.bind();
@@ -130,6 +133,13 @@ tc => eadv.lab_bld_cholesterol_total.val.last().where(dt>sysdate-365);
 smoke0 => eadv.status_smoking_h2_v1.val.last();
 rx_cessation => eadv.[rxnc_n07ba].dt.last().where(val=1);
 
+/* uACR readings above AU 2023 sex-banded thresholds, last 3 years.
+   rout_dmg.gender: 1=male, 0=female.
+   Persistence requires >=2 abnormal readings spanning >=90 days. */
+uacr_high_n     => eadv.lab_ua_acr.val.count().where(((gender=1 and val>25) or (gender=0 and val>35)) and dt > sysdate-1095);
+uacr_high_fd => eadv.lab_ua_acr.dt.min().where(((gender=1 and val>25) or (gender=0 and val>35)) and dt > sysdate-1095);
+uacr_high_ld  => eadv.lab_ua_acr.dt.max().where(((gender=1 and val>25) or (gender=0 and val>35)) and dt > sysdate-1095);
+
 /* ================================================================
    STAGE 1: Risk Reconciliation (expanded in v2)
    ================================================================ */
@@ -142,25 +152,44 @@ rx_cessation => eadv.[rxnc_n07ba].dt.last().where(val=1);
     txt:"Clinical overrides per 2023 AU CVD Risk Guideline (https://www.cvdcheck.org.au/) auto-high categories: established CVD, T2DM with end-organ damage, severe hypercholesterolaemia (LDL>=5.0), moderate-severe CKD (KDIGO 2024 — https://kdigo.org/guidelines/ckd-evaluation-and-management/), familial hypercholesterolaemia. First Nations reclassification handled separately."
 });
 
-albuminuria : { nvl(cga_a_val,0) >= 2 => 1 }, { => 0 };
+/* KDIGO A2+ from rout_ckd — used as a microvascular complication marker
+   inside dm_eod. NOT used standalone as a clinical-high-risk override
+   (AU 2023 uses a tighter, sex-banded, persistent definition; see below). */
+albuminuria_kdigo : { nvl(cga_a_val,0) >= 2 => 1 }, { => 0 };
 
-dm_eod : { greatest(nvl(dm_retino,0), nvl(dm_neuro,0), nvl(dm_foot,0), albuminuria) > 0 => 1 },
+/* AU 2023 clinical-high-risk definition: persistent uACR above sex-banded
+   threshold (>25 M / >35 F mg/mmol), >=2 readings spanning >=90 days.
+   Date subtraction lives in its own conditional so the compiler emits
+   DATEDIFF (subtraction in a WHEN clause is rendered as raw `-` which
+   SQL Server rejects on datetime2 columns). */
+uacr_high_span : { uacr_high_ld > uacr_high_fd => uacr_high_ld - uacr_high_fd },
+                 { => 0 };
+
+albuminuria_persistent_au : { nvl(uacr_high_n,0) >= 2 and uacr_high_span >= 90 => 1 },
+                            { => 0 };
+
+dm_eod : { greatest(nvl(dm_retino,0), nvl(dm_neuro,0), nvl(dm_foot,0), albuminuria_kdigo) > 0 => 1 },
          { => 0 };
 
+/* Note: LDL>=5.0 was previously a standalone high-risk trigger; removed
+   because the AU 2023 guideline (Nelson et al., MJA 2024; cvdcheck.org.au
+   Step 2) lists only confirmed FH and moderate-severe CKD as clinically
+   determined high risk. Severe isolated hypercholesterolaemia is handled
+   via rx_override_tc (TC>=7.5) in Step 5 territory, not high-risk
+   reclassification. FH suspicion is still captured via fhc_prob (Dutch
+   Lipid Clinic Score). */
 clin_high_risk : { nvl(cvd_prev,0) = 1 => 1 },
                  { nvl(ckd,0) >= 3 => 1 },
                  { nvl(fhc_prob,0) >= 2 => 1 },
-                 { nvl(ldl_val,0) >= 5.0 => 1 },
                  { nvl(dm,0) = 1 and dm_eod = 1 => 1 },
-                 { albuminuria = 1 => 1 },
+                 { albuminuria_persistent_au = 1 => 1 },
                  { => 0 };
 
 clin_high_src : { nvl(cvd_prev,0) = 1 => `CVD` },
                 { nvl(ckd,0) >= 3 => `CKD` },
                 { nvl(fhc_prob,0) >= 2 => `FHC` },
-                { nvl(ldl_val,0) >= 5.0 => `LDL` },
                 { nvl(dm,0) = 1 and dm_eod = 1 => `DM_EOD` },
-                { albuminuria = 1 => `ACR` },
+                { albuminuria_persistent_au = 1 => `ACR` },
                 { => `NONE` };
 
 /* First Nations reclassification: 2023 AU guideline applies different
@@ -206,11 +235,10 @@ rx_antiplatelet : { rx_antiplatelet_dt !? => 1 }, { => 0 };
 rx_anticoag : { rx_anticoag_dt !? => 1 }, { => 0 };
 
 #doc(,{
-    txt:"BP target per 2023 AU CVD Risk Guideline (https://www.cvdcheck.org.au/) / TG: <120 for high-risk young (<65), 140 for frail elderly (>=80) as proxy, 130 for everyone else under treatment. Cf. 2025 AHA/ACC BP guideline (https://doi.org/10.1161/CIR.0000000000001356) which also adopts <130 as standard target."
+    txt:"BP target per 2023 AU CVD Risk Guideline (https://www.cvdcheck.org.au/, National Hypertension Taskforce MJA 2024): <130/80 mmHg for most adults. Age >=80 relaxed to 140 as a frailty proxy (AHA/ACC 2025 https://doi.org/10.1161/CIR.0000000000001356 uses age 75 + frailty). Previous SPRINT-derived <120 target for high-risk <65 dropped on 2026-05-19 review against AU 2023 (not endorsed)."
 });
 
-sbp_target : { cvra_cat_r = 3 and age < 65 => 120 },
-             { age >= 80 => 140 },
+sbp_target : { age >= 80 => 140 },
              { => 130 };
 
 sbp_above_target : { sbp_val !? and sbp_val > sbp_target => 1 }, { => 0 };

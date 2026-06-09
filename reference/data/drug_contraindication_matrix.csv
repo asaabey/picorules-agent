@@ -1,0 +1,40 @@
+drug,condition_expr,severity,notes
+sglt2i,egfr < 20,hard,Initiation not recommended; continue with caution if already tolerating per KDIGO 2024
+sglt2i,dka_hx = 1,hard,Prior euglycaemic DKA or T1DM
+sglt2i,recurrent_gu_infection = 1,soft,Mycotic/UTI recurrence — consider alternative
+glp1,mtc_personal_hx = 1 or mtc_family_hx = 1,hard,Medullary thyroid carcinoma risk
+glp1,men2 = 1,hard,Multiple endocrine neoplasia type 2
+glp1,pancreatitis_hx = 1,soft,Prior pancreatitis — risk/benefit
+glp1,gastroparesis = 1,soft,Delayed gastric emptying worsened
+acei_arb,k_last > 5.5,hard,Hyperkalaemia at baseline
+acei_arb,bilateral_ras = 1,hard,Bilateral renal artery stenosis
+acei_arb,pregnancy = 1,hard,Teratogenic — fetotoxic in T2/T3
+acei_arb,angioedema_hx = 1,hard,Prior ACEi angioedema
+arni,angioedema_hx = 1,hard,As per ACEi
+arni,k_last > 5.5,hard,
+arni,egfr < 30,soft,Dose adjust; avoid initiation in severe CKD
+mra,egfr < 30,hard,AKI / hyperkalaemia risk
+mra,k_last > 5.0,hard,
+finerenone,k_last > 5.0,hard,Lower threshold than steroidal MRA
+finerenone,egfr < 25,hard,Initiation threshold
+beta_blocker,hr_last < 50,hard,Bradycardia
+beta_blocker,av_block_2_3 = 1,hard,High-grade AV block without pacemaker
+beta_blocker,severe_asthma = 1,soft,Cardioselective OK; non-selective avoid
+beta_blocker,acute_hf_decomp = 1,hard,Do not initiate during decompensation
+ccb_ndhp,hfref = 1,hard,Non-DHP (verapamil/diltiazem) worsens HFrEF
+ccb_ndhp,lvef < 40,hard,
+thiazide,egfr < 30,soft,Reduced efficacy; chlortalidone has some data
+thiazide,na_last < 130,hard,Hyponatraemia
+thiazide,gout_active = 1,soft,Worsens urate
+statin,alt_last > 3 * uln,hard,Active liver disease; decompensated cirrhosis
+statin,pregnancy = 1,hard,
+statin,myopathy_active = 1,hard,Rhabdomyolysis history
+ezetimibe,alt_last > 3 * uln,soft,Use with caution with concurrent statin
+pcsk9i,statin_intolerance_or_max = 0,soft,Reserve for max-tolerated statin context
+antiplatelet,active_bleeding = 1,hard,
+antiplatelet,platelets_last < 50,hard,Severe thrombocytopenia
+metformin,egfr < 30,hard,
+metformin,egfr < 45,soft,Dose-reduce; avoid new start
+metformin,decompensated_lf = 1,hard,Lactic acidosis risk
+resmetirom,cirrhosis = 1,hard,Not studied in decompensated cirrhosis; label restricts to non-cirrhotic MASH
+resmetirom,tsh_abnormal = 1,soft,Monitor thyroid axis

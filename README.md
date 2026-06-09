@@ -38,20 +38,20 @@ The skill will:
 ### Compile a ruleblock to SQL
 
 ```
-/picorule compile rules/cd_masld.prb
+/picorule compile new_rules/cd_masld.prb
 ```
 
 Or directly from the command line:
 
 ```bash
 # Dialects: mssql (default), oracle, postgresql
-node scripts/compile.mjs rules/cd_masld.prb mssql
+node scripts/compile.mjs new_rules/cd_masld.prb mssql
 ```
 
 ### Validate a ruleblock
 
 ```
-/picorule validate rules/my_rule.prb
+/picorule validate new_rules/my_rule.prb
 ```
 
 Checks for ordering violations, missing defaults, undefined variables, invalid attribute names, and other common errors.
@@ -62,7 +62,7 @@ Checks for ordering violations, missing defaults, undefined variables, invalid a
 picorules-agent/
 ├── .claude/skills/picorule/   # Claude Code skill definition
 │   └── SKILL.md
-├── rules/                     # Your ruleblocks (new rules go here)
+├── new_rules/                     # Your ruleblocks (new rules go here)
 ├── scripts/
 │   └── compile.mjs            # Compiler CLI wrapper
 ├── reference/                 # Git submodules (read-only reference data)

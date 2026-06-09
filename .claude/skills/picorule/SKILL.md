@@ -300,7 +300,7 @@ node scripts/compile.mjs <path-to-file.prb> [dialect]
 **Examples:**
 ```bash
 node scripts/compile.mjs reference/rules/picodomain_rule_pack/rule_blocks/cd_cirrhosis.prb mssql
-node scripts/compile.mjs rules/my_new_rule.prb postgresql
+node scripts/compile.mjs new_rules/my_new_rule.prb postgresql
 ```
 
 The script outputs compiled SQL to stdout and errors/warnings/metrics to stderr. Show the user the SQL output and explain the generated query structure.

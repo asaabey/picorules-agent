@@ -197,7 +197,7 @@ rx_antiplatelet : { rx_antiplatelet_dt !? => 1 }, { => 0 };
 rx_anticoag : { rx_anticoag_dt !? => 1 }, { => 0 };
 
 #doc(,{
-    txt:"BP and LDL targets based on risk category and CVD history. LDL targets follow AU (TG Cardiovascular / 2023 Australian CVD Risk Guideline). EU (ESC/EAS 2019/2025) targets are tighter: secondary prevention <1.4 mmol/L + >=50% reduction; <1.0 mmol/L if recurrent events. US (2026 ACC/AHA dyslipidemia) aligns with AU at 1.8 for secondary prevention.",
+    txt:"BP and LDL targets based on risk category and CVD history. LDL targets follow AU (TG Cardiovascular / 2023 Australian CVD Risk Guideline). EU (ESC/EAS 2019/2025) targets are tighter: secondary prevention under 1.4 mmol/L plus 50pct reduction, under 1.0 mmol/L if recurrent events. US (2026 ACC/AHA dyslipidemia) aligns with AU at 1.8 for secondary prevention.",
     cite:"cvra_nsf_2019"
 });
 

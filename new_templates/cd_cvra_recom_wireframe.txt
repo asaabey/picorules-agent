@@ -1,0 +1,280 @@
+================================================================================
+  cd_cvra_recom — Template Wireframe
+================================================================================
+
+  Ruleblock: cd_cvra_recom
+  Purpose:   CVD management recommendations and guideline concordance
+  Audience:  Primary care clinician reviewing patient dashboard
+
+
+================================================================================
+  SECTION 1: Risk Summary Header
+================================================================================
+
+  Renders as a horizontal badge strip (same pattern as cd_cvra_banner_1)
+
+  +---------------------------------------------------------------------------+
+  |                                                                           |
+  |  [badge: risk category]  [badge: concordance]  [badge: source]           |
+  |                                                                           |
+  |  Examples:                                                                |
+  |    cvra_cat_r=3  -->  [danger]  HIGH CVR                                  |
+  |    cvra_cat_r=2  -->  [warning] MOD CVR                                   |
+  |    cvra_cat_r=1  -->  [success] LOW CVR                                   |
+  |    cvra_cat_r=0  -->  (hidden — no data)                                  |
+  |                                                                           |
+  |    concordance_pct  -->  [success] 100%  |  [warning] 50%  | [danger] 0% |
+  |      colour thresholds: >=75 success, 25-74 warning, <25 danger           |
+  |                                                                           |
+  |    cvra_src  -->  [secondary badge, muted] e.g. "FRAM" "AUS" "CKD" "FNP" |
+  |                                                                           |
+  |    cvra_agree=0  -->  [info badge] "Discordant"  (only when discordant)   |
+  |                                                                           |
+  |    clin_high_risk=1  -->  [danger badge] "Clinical Override"              |
+  |                                                                           |
+  +---------------------------------------------------------------------------+
+
+  Conditional visibility:
+    - Entire section hidden when cvra_cat_r = 0 (no data)
+    - Concordance badge hidden when n_applicable = 0
+
+
+================================================================================
+  SECTION 2: Concordance Score (compact bar)
+================================================================================
+
+  Visual: horizontal progress bar with fraction label
+
+  +---------------------------------------------------------------------------+
+  |                                                                           |
+  |  Guideline Concordance   [======------]  2/4 domains met (50%)           |
+  |                                                                           |
+  |    n_met / n_applicable  --> width of filled portion                      |
+  |    concordance_pct       --> percentage label                              |
+  |                                                                           |
+  |    Colour: same thresholds as badge above                                 |
+  |      >=75% green (#2d753c)                                                |
+  |      25-74% amber/warning                                                 |
+  |      <25% red (#ad2121)                                                   |
+  |                                                                           |
+  +---------------------------------------------------------------------------+
+
+  Conditional visibility:
+    - Hidden when n_applicable = 0 (no recommendations apply)
+
+
+================================================================================
+  SECTION 3: Recommendation Cards (stacked vertical list)
+================================================================================
+
+  Each domain is a card/row. Only shown when recommendation code > 0.
+  Card structure:
+
+  +-- [icon] [Domain Label] --------------------------------- [Status Badge] --+
+  |   Current treatment:  ...                                                  |
+  |   Target:             ...                                                  |
+  |   Action:             ...  (only for codes 1, 2, 3)                       |
+  +----------------------------------------------------------------------------+
+
+  Status badge maps to recom code:
+    0 = (card hidden)
+    1 = [danger]  INITIATE
+    2 = [warning] CONSIDER
+    3 = [warning] INTENSIFY
+    4 = [success] ON TARGET
+
+
+  --- CARD: Blood Pressure -------------------------------------------------
+
+  Visible when: recom_rx_bp > 0
+
+  +-- [heart-pulse icon] Blood Pressure Lowering ------------ [INITIATE] -----+
+  |                                                                            |
+  |   Risk category:     HIGH (reconciled)                                     |
+  |   Latest SBP/DBP:    {{sbp_val}}/{{dbp_val}}  ({{picodate(sbp_dt)}})     |
+  |   Target SBP:        <{{sbp_target}} mmHg                                 |
+  |   Mean SBP (1yr):    {{sbp_mu_1}} mmHg                                    |
+  |                                                                            |
+  |   Current Rx:        {{bp_rx_n}} class(es)                                |
+  |     [pills]  ACEi  ARB  CCB  BB  Thiazide  Loop                          |
+  |              (each shown as small badge if rx_bp_X > 0, greyed if not)    |
+  |                                                                            |
+  |   [gap_bp_rx=1]        --> "BP-lowering medication recommended"           |
+  |   [gap_bp_intensify=1] --> "SBP above target — consider intensification"  |
+  |   [rx_override_bp=1]   --> "Override: SBP>=160 or DBP>=100"               |
+  |                                                                            |
+  +----------------------------------------------------------------------------+
+
+
+  --- CARD: Lipid Lowering -------------------------------------------------
+
+  Visible when: recom_rx_lipid > 0
+
+  +-- [droplet icon] Lipid Lowering ------------------------- [INTENSIFY] ----+
+  |                                                                            |
+  |   LDL cholesterol:   {{ldl_val}} mmol/L                                   |
+  |   LDL target:        <{{ldl_target}} mmol/L                               |
+  |   Total cholesterol:  {{tc}} mmol/L                                        |
+  |                                                                            |
+  |   Current Rx:        {{lipid_rx_n}} agent(s)                              |
+  |     [pills]  Statin  Ezetimibe  PCSK9i                                    |
+  |              (each shown as small badge if rx_X > 0, greyed if not)       |
+  |                                                                            |
+  |   [gap_lipid_rx=1]        --> "Statin recommended"                        |
+  |   [gap_lipid_intensify=1] --> "LDL above target — consider add-on"        |
+  |   [rx_override_tc=1]      --> "Override: TC >= 7.5 mmol/L"                |
+  |                                                                            |
+  +----------------------------------------------------------------------------+
+
+
+  --- CARD: Antiplatelet (Secondary Prevention) --------------------------------
+
+  Visible when: recom_rx_antiplatelet > 0   (i.e. cvd_prev = 1)
+
+  +-- [shield icon] Antiplatelet ----------------------------- [INITIATE] ----+
+  |                                                                            |
+  |   Prior CVD:         Yes                                                   |
+  |   Antiplatelet:      {{rx_antiplatelet ? "Yes" : "No"}}                   |
+  |   Anticoagulant:     {{rx_anticoag ? "Yes" : "No"}}                       |
+  |                                                                            |
+  |   [gap_antiplatelet=1] --> "No antithrombotic therapy — recommend          |
+  |                             antiplatelet or review anticoagulation"         |
+  |                                                                            |
+  +----------------------------------------------------------------------------+
+
+
+  --- CARD: Smoking Cessation ----------------------------------------------
+
+  Visible when: recom_smoking > 0
+
+  +-- [no-smoking icon] Smoking Cessation -------------------- [INITIATE] ----+
+  |                                                                            |
+  |   Smoking status:    Current smoker / Recently quit / Ex-smoker            |
+  |   Cessation Rx:      {{rx_cessation_f ? "Yes (N07BA)" : "No"}}           |
+  |                                                                            |
+  |   [recom_smoking=1] --> "Cessation pharmacotherapy recommended             |
+  |                          (varenicline, bupropion, or NRT)"                 |
+  |   [recom_smoking=2] --> "Continue cessation support"                       |
+  |   [recom_smoking=3] --> "Ex-smoker — monitor for relapse"                  |
+  |                                                                            |
+  |   [gap_smoking_rx=1] --> "Current smoker without cessation                 |
+  |                           pharmacotherapy"                                 |
+  |                                                                            |
+  +----------------------------------------------------------------------------+
+
+
+  --- CARD: Lifestyle -------------------------------------------------------
+
+  Always visible (recom_lifestyle = 1)
+
+  +-- [running icon] Lifestyle ------------------------------- [universal] ----+
+  |                                                                            |
+  |   Healthy eating, physical activity, alcohol reduction                     |
+  |                                                                            |
+  |   [recom_weight=1] --> "Weight management recommended (BMI {{bmi}})"      |
+  |   [recom_weight=0] --> (weight line hidden)                                |
+  |                                                                            |
+  +----------------------------------------------------------------------------+
+
+
+================================================================================
+  SECTION 4: Reassessment
+================================================================================
+
+  +-- [calendar icon] Reassessment -------------------------------------------+
+  |                                                                            |
+  |   recom_reassess_yr = 0  -->  "Not routinely required (high risk on Rx)"  |
+  |   recom_reassess_yr = 1  -->  "Annual" [+ "First Nations" badge if fnp=1] |
+  |   recom_reassess_yr = 2  -->  "Every 2 years"                             |
+  |   recom_reassess_yr = 5  -->  "Every 5 years"                             |
+  |                                                                            |
+  +----------------------------------------------------------------------------+
+
+
+================================================================================
+  SECTION 5: Audit / Detail (collapsible)
+================================================================================
+
+  Collapsed by default. Expander: "Show assessment detail"
+
+  +-- Risk Reconciliation Detail (collapsed) ---------------------------------+
+  |                                                                            |
+  |   Framingham category:     {{frmnghm_cat}}   (5yr risk: {{frmnghm_p}}%)  |
+  |   AusCVDRisk category:     {{auspredict_cat}} (5yr risk: {{auspredict_p}}%)|
+  |   Ensemble category:       {{ensemble_cat}}                                |
+  |   Clinical override:       {{clin_high_risk ? "Yes" : "No"}}              |
+  |     CKD stage:             {{ckd}}                                         |
+  |     FHC probability:       {{fhc_prob}}                                    |
+  |     First Nations (FNP):   {{fnp}}                                         |
+  |   Reconciled category:     {{cvra_cat_r}}                                  |
+  |   Driving source:          {{cvra_src}}                                    |
+  |   Source agreement:         {{cvra_agree}}                                 |
+  |                                                                            |
+  +-- Treatment Inventory ---------------------------------------------------+
+  |                                                                            |
+  |   BP classes:    {{bp_rx_n}}                                               |
+  |   Lipid agents:  {{lipid_rx_n}}                                            |
+  |   Antiplatelet:  {{rx_antiplatelet}}                                       |
+  |   Anticoagulant: {{rx_anticoag}}                                           |
+  |   Cessation Rx:  {{rx_cessation_f}}                                        |
+  |                                                                            |
+  +-- Targets ---------------------------------------------------------------+
+  |                                                                            |
+  |   SBP target:    <{{sbp_target}} mmHg    (above: {{sbp_above_target}})    |
+  |   LDL target:    <{{ldl_target}} mmol/L  (above: {{ldl_above_target}})    |
+  |                                                                            |
+  +-- Concordance Breakdown -------------------------------------------------+
+  |                                                                            |
+  |   Domain         Applicable   Met                                          |
+  |   BP             {{n_recom_bp}}       {{n_met_bp}}                        |
+  |   Lipid          {{n_recom_lipid}}    {{n_met_lipid}}                     |
+  |   Antiplatelet   {{n_recom_antipl}}   {{n_met_antipl}}                    |
+  |   Smoking        {{n_recom_smoking}}  {{n_met_smoking}}                   |
+  |   -------        -----------  ---                                          |
+  |   Total          {{n_applicable}}     {{n_met}}    ({{concordance_pct}}%) |
+  |                                                                            |
+  +----------------------------------------------------------------------------+
+
+
+================================================================================
+  LAYOUT NOTES
+================================================================================
+
+  - Badge classes follow Bootstrap 4: badge-success, badge-warning, badge-danger
+  - Colour palette matches existing templates:
+      success  #2d753c (green)
+      warning  amber (Bootstrap default)
+      danger   #ad2121 (red)
+  - picoformat() for numeric values, picodate() for dates
+  - All values accessed as cd_cvra_recom.variable_name
+  - Cards with code=0 are hidden entirely (no empty cards)
+  - Drug class badges within cards: small outlined badges, filled if prescribed,
+    outlined/greyed if not — gives a visual "checklist" feel
+  - Care gap messages shown as alert-style inline warnings within the card
+  - Override messages shown as alert-danger inline within the card
+  - Concordance bar and badges use the same 3-tier colour scheme
+
+================================================================================
+  DATA DEPENDENCIES (template variables)
+================================================================================
+
+  From cd_cvra_recom:
+    cvra_cat_r, cvra_agree, cvra_src, clin_high_risk
+    ensemble_cat, frmnghm_cat, auspredict_cat, frmnghm_p, auspredict_p
+    bp_rx_n, lipid_rx_n, rx_antiplatelet, rx_anticoag
+    sbp_target, sbp_above_target, ldl_target, ldl_above_target
+    rx_override_bp, rx_override_tc
+    recom_rx_bp, recom_rx_lipid, recom_rx_antiplatelet
+    recom_smoking, recom_lifestyle, recom_weight, recom_reassess_yr
+    is_smoker, is_exsmoker, rx_cessation_f
+    gap_bp_rx, gap_bp_intensify, gap_lipid_rx, gap_lipid_intensify
+    gap_smoking_rx, gap_antiplatelet
+    n_applicable, n_met, concordance_pct
+    n_recom_bp, n_recom_lipid, n_recom_antipl, n_recom_smoking
+    n_met_bp, n_met_lipid, n_met_antipl, n_met_smoking
+
+  From other ruleblocks (via cd_cvra_recom bindings):
+    sbp_val, sbp_dt, dbp_val, tc, ldl_val
+    rx_bp_acei, rx_bp_arb, rx_bp_ccb, rx_bp_bb, rx_bp_thiaz, rx_bp_loop
+    rx_statin, rx_ezet, rx_evolocumab
+    sbp_mu_1, bmi, smoke0, fnp, ckd, fhc_prob, cvd_prev

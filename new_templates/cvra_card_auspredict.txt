@@ -1,0 +1,311 @@
+{% macro suffix_with_uom(arg1, var_name, unit, none_string="") %}
+  {%- if arg1 is none -%}
+     {{ none_string|safe }}
+  {%- else -%}
+    {%- if unit == "%" -%}
+    {{ picoformat(var_name) }}{{ unit }}
+    {%- else -%}
+    {{ picoformat(var_name) }}&nbsp;{{ unit }}
+    {%- endif -%}
+  {%- endif -%}
+{% endmacro %}
+<style>
+/* Compact table styling */
+.table-compact th,
+.table-compact td {
+  padding: 4px 6px;    /* reduces row height */
+  line-height: 1.2;    /* tight vertical spacing */
+  font-size: 13px;     /* optional: smaller text */
+  vertical-align: middle; /* keeps content centered */
+}
+
+.table-compact thead th {
+  background-color: #f1f3f5;
+  font-weight: 600;
+  border-bottom: 2px solid #343a40;
+}
+</style>
+
+<!-- Australian PREDICT CVRA Risk Score Card -->
+<div class="col-md-6">
+  <div class="card h-100">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Australian PREDICT CVRA Score</span>
+      <img src=https://www.cvdcheck.org.au/assets/cmsImages/cvd.logo.svg alt="AusCVD Risk" style="height:40px;">
+      </div>
+      <div class="card-body text-center">
+{% if cvra_vm.has_high_risk_factors ==1 %}        <div class="risk-value">&gt;15%</div>{% endif %} 
+{% if cvra_vm.has_high_risk_factors ==0 %}        <div class="risk-value">{{ suffix_with_uom(cvra_vm.rounded_risk_percent, 'cvra_vm.rounded_risk_percent', '%') }}</div>{% endif %} 
+
+{% if cvra_vm.risk_cat == 1 %}        <div class="risk-category low-risk">Low Risk</div>{% endif %} 
+{% if cvra_vm.risk_cat == 2 %}        <div class="risk-category moderate-risk">Intermediate Risk</div>{% endif %} 
+{% if cvra_vm.risk_cat == 3 %}        <div class="risk-category high-risk">High Risk</div>{% endif %} 
+
+        <div class="risk-details">
+          <!--
+<div class="risk-metric">
+<span>5-Year CVD Risk:</span>
+
+{% if cvra_vm.has_high_risk_factors ==1 %}<strong> >15 %</strong>{% endif %} 
+{% if cvra_vm.has_high_risk_factors ==0 %}<strong>{{ cvra_vm.rounded_risk_percent  }} %</strong>{% endif %} 
+</div>
+-->
+
+          <table class="table table-compact">
+            <thead>
+              <tr>
+                <th scope="col" style="text-align:left">Variable</th>
+                <th scope="col">Value</th>
+                <th scope="col" style="text-align:right">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>First Nations:</span>
+                  </div>
+                </td>
+                <td><strong>{% if cvra_vm.fnp == 1%}Yes<sup>[1]</sup>{% else %}No{% endif %}</strong></td>
+                <td style="text-align:right"/>
+
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Age:</span>
+                  </div>
+                </td>
+                <td><strong>{{ suffix_with_uom(cvra_vm.age, 'cvra_vm.age')}}</strong></td>
+                <td style="text-align:right"/>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Sex at birth:</span>
+                  </div>
+                </td>
+                <td>
+                  <strong>{% if cvra_vm.sex==0 %}Female{% else %}Male{% endif %}</strong>
+                </td>
+                <td style="text-align:right"/>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Smoking status:</span>
+                  </div>
+                </td>
+                <td>
+{% if cvra_vm.smoking_status_code == 3 %}                    <strong>Current smoker</strong>{% endif %}
+{% if cvra_vm.smoking_status_code == 2 %}                    <strong>Ex-smoker</strong>{% endif %}
+{% if cvra_vm.smoking_status_code == 1 %}                    <strong>Non-smoker</strong>{% endif %}
+{% if cvra_aus_cvd_risk_pre.upgraded_to_missing_smoking_to_non_smoker == 1 or cvra_aus_cvd_risk_pre.upgraded_to_smoker_based_on_rx == 1 %}<strong><sup>[2]</sup></strong>{% endif %}
+                </td>
+                <td style="text-align:right; {% if cvra_aus_cvd_risk_pre.smoking_status_dt_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.smoking_status_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.smoking_status_dt') }}{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Systolic blood pressure:</span>
+                  </div>
+                </td>
+                <td><strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.sbp_val, 'cvra_aus_cvd_risk_pre.sbp_val', 'mmHg') }}</strong></td>
+                <td style="text-align:right; {% if cvra_aus_cvd_risk_pre.sbp_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.sbp_0_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.sbp_0_dt') }}{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Ratio of total cholesterol to HDL cholesterol:</span><br>
+                    <span>&nbsp;-&nbsp;Total:</span><br>
+                    <span>&nbsp;-&nbsp;HDL:</span>
+                  </div>
+                </td>
+                <td>
+                  <strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.hdl_ratio, 'cvra_aus_cvd_risk_pre.hdl_ratio') }}</strong><br>
+                  <strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.tc_val, 'cvra_aus_cvd_risk_pre.tc_val', 'mmol/L') }}</strong><br>
+                  <strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.hdl_val, 'cvra_aus_cvd_risk_pre.hdl_val', 'mmol/L') }}</strong>
+                </td>
+                <td>
+                    <br>
+                    <span style="text-align:right; {% if cvra_aus_cvd_risk_pre.tc_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.tc_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.tc_dt') }}{% endif %}</span><br>
+                    <span style="text-align:right; {% if cvra_aus_cvd_risk_pre.hdl_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.hdl_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.hdl_dt') }}{% endif %}</span>
+                </td>
+
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>SEIFA IRSD Quintile:</span></td>
+                  </div>
+                <td><strong>{{ suffix_with_uom(cvra_vm.seifa_quintile, 'cvra_vm.seifa_quintile') }}</strong></td>
+                <td style="text-align:right"/>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Blood pressure-lowering medicines:</span></td>
+                    </div>
+                  <td><strong>{% if cvra_vm.bplm == 1%}Yes{% else %}No{% endif %}</strong></td>
+                  <td style="text-align:right"/>
+                
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Lipid-modifying medicines:</span>
+                  </div>
+                </td>
+                <td><strong>{% if cvra_vm.llm == 1%}Yes{% else %}No{% endif %}</strong></td>
+                <td style="text-align:right"/>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Antithrombotic medicines:</span>
+                  </div>
+                </td>
+                <td><strong>{% if cvra_vm.atm == 1%}Yes{% else %}No{% endif %}</strong></td>
+                <td style="text-align:right"/>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>History of atrial fibrillation :</span>
+                  </div>
+                </td>
+                <td><strong>{% if cvra_vm.af == 1%}Yes{% else %}No{% endif %}</strong></td>
+                <td style="text-align:right"/>
+              </tr>
+{% if cvra_vm.dm==1 %}
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Diabetes{% if cd_dm_dx.dm_type == 1 %}<sup>[3]</sup>{% endif %}:</span>
+                  </div>
+                </td>
+                <td><strong>Yes</strong></td>
+                <td style="text-align:right"/>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>HbA1c:</span>
+                  </div>
+                </td>
+                <td><strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.hba1c_mmol_per_mol, 'cvra_aus_cvd_risk_pre.hba1c_mmol_per_mol', 'mmol/mol') }}</strong></td>
+                <td style="text-align:right; {% if cvra_aus_cvd_risk_pre.hba1c_mmol_per_mol_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.hba1c_mmol_per_mol_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.hba1c_mmol_per_mol_dt') }}{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>BMI:</span><br>
+                    <span>&nbsp;-&nbsp;Height:</span><br>
+                    <span>&nbsp;-&nbsp;Weight:</span>
+                  </div>
+                </td>
+                <td>
+                  <strong>{{ suffix_with_uom(cvra_vm.bmi, 'cvra_vm.bmi', 'kg/m²') }}</strong><br>
+                  <strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.height_m, 'cvra_aus_cvd_risk_pre.height_m', 'm') }}</strong><br>
+                  <strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.weight_kg_val, 'cvra_aus_cvd_risk_pre.weight_kg_val', 'kg') }}</strong></td>
+                </td>
+                <td style="text-align:right">
+                    <br>
+                    <span style="text-align:right; {% if cvra_aus_cvd_risk_pre.height_cm_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.height_cm_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.height_cm_dt') }}{% endif %}</span><br>
+                    <span style="text-align:right; {% if cvra_aus_cvd_risk_pre.weight_kg_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.weight_kg_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.weight_kg_dt') }}{% endif %}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Insulin:</span>
+                  </div>
+                </td>
+                <td><strong>{% if cvra_vm.ins == 1%}Yes{% else %}No{% endif %}</strong></td>
+                <td style="text-align:right"></td>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>Diabetes Years:</span>
+                  </div>
+                </td>
+                <td><strong>{{ suffix_with_uom(cvra_vm.dm_yr, 'cvra_vm.dm_yr', 'y') }}</strong></td>
+                <td style="text-align:right"></td>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>ACR:</span>
+                  </div>
+                </td>
+                <td><strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.acr_val, 'cvra_aus_cvd_risk_pre.acr_val', 'g/mol') }}</strong></td>
+                <td style="text-align:right; {% if cvra_aus_cvd_risk_pre.acr_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.acr_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.acr_dt') }}{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>eGFR:</span>
+                  </div>
+                </td>
+                <td><strong>{{ suffix_with_uom(cvra_aus_cvd_risk_pre.egfr_val, 'cvra_aus_cvd_risk_pre.egfr_val', 'ml/min/1.73m²') }}</strong></td>
+                <td style="text-align:right; {% if cvra_aus_cvd_risk_pre.egfr_out_of_date == 1 %}color:red;{% endif %}">{% if cvra_aus_cvd_risk_pre.egfr_dt is not none %}{{ picodate('cvra_aus_cvd_risk_pre.egfr_dt') }}{% endif %}</td>
+              </tr>
+{% endif %}
+              <tr>
+                <td style="text-align:left">
+                  <div class="risk-metric">
+                    <span>High Risk Factors:</span>
+                  </div>
+                </td>
+                <td><strong>{% if cvra_vm.has_high_risk_factors == 1%}Yes{% else %}No{% endif %}</strong></td>
+                <td style="text-align:right"></td>
+              </tr>
+            </tbody>
+          </table>
+{% if cvra_vm.reclass_risk_cat > 1 %}
+          <div class="risk-metric">
+            <strong>Suggested reclassification: </strong>
+{%   if cvra_vm.reclass_risk_cat == 1 %}        <span class="risk-category low-risk">Low Risk</span>{% endif %}
+{%   if cvra_vm.reclass_risk_cat == 2 %}        <span class="risk-category moderate-risk">Intermediate Risk</span>{% endif %}
+{%   if cvra_vm.reclass_risk_cat == 3 %}        <span class="risk-category high-risk">High Risk</span>{% endif %}
+          </div>
+{% endif %}
+          <div class="card-footer d-flex align-items-start flex-wrap gap-2">
+            <i class="me-2">Notes</i>
+            <small class="text-muted">
+                {% if 1==1 %}
+                <span class="me-3">[1] Consider reclassification due as FNP</span><br>
+                {% endif %}
+                {% if cvra_aus_cvd_risk_pre.upgraded_to_missing_smoking_to_non_smoker == 1 or cvra_aus_cvd_risk_pre.upgraded_to_smoker_based_on_rx == 1 %}
+                    {% if cvra_aus_cvd_risk_pre.upgraded_to_missing_smoking_to_non_smoker == 1 %}
+                <span class="me-3">[2] Smoking status missing, upgraded to non smoker, update EHR</span><br>
+                    {% endif %}
+                    {% if cvra_aus_cvd_risk_pre.upgraded_to_smoker_based_on_rx == 1 %}
+                <span class="me-3">[2] Smoking status was upgraded to smoke based on presense of NRT medication</span><br>
+                    {% endif %}
+                {% endif %}
+                {% if cd_dm_dx.dm_type == 1 %}
+                <span class="me-3">[3] Not Validated in Type 1 DM</span><br>
+                {% endif %}
+                {% set out_of_date_list = [
+                    cvra_aus_cvd_risk_pre.acr_out_of_date
+                    ,cvra_aus_cvd_risk_pre.egfr_out_of_date
+                    ,cvra_aus_cvd_risk_pre.hba1c_mmol_per_mol_out_of_date
+                    ,cvra_aus_cvd_risk_pre.hdl_out_of_date
+                    ,cvra_aus_cvd_risk_pre.height_cm_out_of_date
+                    ,cvra_aus_cvd_risk_pre.sbp_out_of_date
+                    ,cvra_aus_cvd_risk_pre.smoking_status_dt_out_of_date
+                    ,cvra_aus_cvd_risk_pre.tc_out_of_date
+                    ,cvra_aus_cvd_risk_pre.weight_kg_out_of_date
+                ] %}
+                {% if any(out_of_date_list) %}
+                <span class="me-3">[4] Dates in Red Prompt</span><br>
+                {% endif %}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
